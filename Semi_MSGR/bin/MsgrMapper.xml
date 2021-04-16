@@ -12,20 +12,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 로그인 쿼리문 -->
 	<select id="signIn" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT id, nickname
-		FROM chat
-		WHERE id = #{id} AND password = #{password}
+		SELECT mem_id_vc, mem_nick_vc
+		FROM msgr_member
+		WHERE mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
 	</select>
 
 	<!-- 회원가입 중복확인 쿼리문 -->
 	<select id="idCheck" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT id FROM chat WHERE id = #{id}
+		SELECT mem_id_vc FROM msgr_member WHERE mem_id_vc = #{mem_id_vc}
 	</select>
 
 	<!-- 회원가입 쿼리문 -->
 	<insert id="signUp" parameterType="java.util.Map">
-		INSERT INTO chat (id, password, nickname) values (#{id}, #{password}, #{nickname})
+		INSERT INTO chat (mem_id_vc, mem_pw_vc, mem_nick_vc) values (#{mem_id_vc}, #{mem_pw_vc},
+		#{mem_nick_vc})
 	</insert>
+
+	<select id="getRoomList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT room.room_name_vc, room.room_no_nu
+		FROM MSGR_ROOM room, MSGR_ROOM_IN_LIST rlist
+		WHERE room.room_no_nu = rlist.room_no_nu AND rlist.mem_id_vc = #{mem_id_vc}
+		ORDER BY room.room_no_nu ASC
+	</select>
 
 	<!-- 로그인 프로시저 -->
 	<resultMap id="loginHashMap" type="hashmap" />
@@ -33,4 +41,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		{CALL proc_login(#{id}, #{password}, #{nickname, mode=OUT,
 		jdbcType=CURSOR, javaType=ResultSet, resultMap=loginHashMap})}
 	</select>
+
 </mapper>

@@ -25,9 +25,18 @@ public class MessengerMap {
 	private void columnInit() {
 		map = new HashMap<String, Object>();
 		/* 모든 테이블의 컬럼 미리 put 해놓기 */
-		map.put("id", "");
-		map.put("password", "");
-		map.put("nickname", "");
+		map.put("mem_id_vc", "");
+		map.put("mem_pw_vc", "");
+		map.put("mem_nick_vc", "");
+		map.put("buddy_seq_nu", 0);
+		map.put("buddy_id_vc", "");
+		map.put("room_no_nu", 0);
+		map.put("chat_no_nu", 0);
+		map.put("chat_vc", "");
+		map.put("room_name_vc", "");
+		map.put("is_private_yn", 0);
+		map.put("join_chat_no_nu", 0);
+
 		/* 모든 테이블의 컬럼 미리 put 해놓기 */
 	}
 

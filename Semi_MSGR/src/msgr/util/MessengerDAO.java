@@ -1,10 +1,13 @@
 package msgr.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+
+import msgr.map.MessengerMap;
 
 public class MessengerDAO {
 
@@ -82,6 +85,16 @@ public class MessengerDAO {
 		return idCheck;
 	}
 
+	public List<Map<String, Object>> getRoomList(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getRoomList", pMap);
+
+		sqlSession.close();
+
+		return tempList;
+	}
+
 	// 로그인 프로시저 메서드
 	public Map<String, Object> loginProcedure(String id, String password, Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -96,13 +109,16 @@ public class MessengerDAO {
 		return pMap;
 	}
 
-//	public static void main(String[] args) {
-//		MessengerDAO	dao		= new MessengerDAO();
-//		MessengerMap	msgrMap	= MessengerMap.getInstance();
-//		msgrMap.getMap().put("id", "testuser10");
-//		msgrMap.getMap().put("password", "123");
-//		msgrMap.getMap().put("nickname", "test10");
-//		int result = dao.signUp(msgrMap.getMap());
-//		System.out.println(result);
-//	}
+	public static void main(String[] args) {
+		MessengerDAO				dao		= new MessengerDAO();
+		MessengerMap				msgrMap	= MessengerMap.getInstance();
+		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+		msgrMap.getMap().put("mem_id_vc", "test1");
+		list = dao.getRoomList(msgrMap.getMap());
+
+		for (Map<String, Object> map : list) {
+			System.out.println(map);
+		}
+
+	}
 }
