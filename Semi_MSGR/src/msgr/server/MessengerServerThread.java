@@ -1,3 +1,4 @@
+package msgr.server;
 import java.util.StringTokenizer;
 
 public class MessengerServerThread extends Thread {
