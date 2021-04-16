@@ -119,6 +119,7 @@ public class SignInView extends JFrame implements ActionListener {
 					msgrClient.getConnection();
 				}
 				// nickname이 초기값에서 바뀌지 않았으면 잘못 입력했다는 뜻
+				// 아니면 tempList.size() == 0이어도 됨
 				else if ("".equals(nickname)) {
 					JOptionPane.showMessageDialog(this, "잘못된 아이디 또는 비밀번호입니다.", "경고", JOptionPane.WARNING_MESSAGE);
 					textField_id.requestFocus();

@@ -24,8 +24,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 회원가입 쿼리문 -->
 	<insert id="signUp" parameterType="java.util.Map">
-		INSERT INTO chat (mem_id_vc, mem_pw_vc, mem_nick_vc) values (#{mem_id_vc}, #{mem_pw_vc},
-		#{mem_nick_vc})
+		INSERT INTO msgr_member (mem_id_vc, mem_pw_vc, mem_nick_vc) values (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
 	</insert>
 
 	<select id="getRoomList" parameterType="java.util.Map" resultType="java.util.Map">
