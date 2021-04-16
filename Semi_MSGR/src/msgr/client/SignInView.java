@@ -87,8 +87,10 @@ public class SignInView extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 
+		// 로그인 버튼 눌렀을 경우
 		if (obj == button_signIn) {
 
+			// 아이디 혹은 비밀번호 필드가 비었을 경우
 			if ("".equals(textField_id.getText()) || "".equals(pwField_pw.getText())) {
 				JOptionPane.showMessageDialog(this, "잘못된 아이디 또는 비밀번호입니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				textField_id.requestFocus();
@@ -97,35 +99,37 @@ public class SignInView extends JFrame implements ActionListener {
 
 			try {
 				MessengerMap voMap = MessengerMap.getInstance();
+
+				// 사용자가 입력한 아이디, 비밀번호를 맵으로 받는다.
 				voMap.getMap().put("mem_id_vc", textField_id.getText());
 				voMap.getMap().put("mem_pw_vc", pwField_pw.getText());
 				msgrDAO = MessengerDAO.getInstance();
 				List<Map<String, Object>> tempList = msgrDAO.signIn(voMap.getMap());
 
-				System.out.println(tempList.size());
-
+				// 리스트 길이가 0보다 크면 받아온 결과가 있다는 뜻
 				if (tempList.size() > 0) {
 					nickname = String.valueOf(tempList.get(0).get("MEM_NICK_VC"));
-				}
-
-				if ("null".equals(nickname) || nickname.length() == 0) {
-					JOptionPane.showMessageDialog(this, "잘못된 아이디 또는 비밀번호입니다.", "경고", JOptionPane.WARNING_MESSAGE);
-					textField_id.requestFocus();
-					return;
-				}
-				else {
 					JOptionPane.showMessageDialog(this, nickname + "님의 접속을 환영합니다.");
 					this.setVisible(false);
 					textField_id.setText("");
 					pwField_pw.setText("");
+
+					// 로그인 성공하면 MessengerClient 인스턴스화하고 서버와 연결
 					msgrClient = new MessengerClient(this);
 					msgrClient.getConnection();
+				}
+				// nickname이 초기값에서 바뀌지 않았으면 잘못 입력했다는 뜻
+				else if ("".equals(nickname)) {
+					JOptionPane.showMessageDialog(this, "잘못된 아이디 또는 비밀번호입니다.", "경고", JOptionPane.WARNING_MESSAGE);
+					textField_id.requestFocus();
+					return;
 				}
 			}
 			catch (HeadlessException he) {
 				he.printStackTrace();
 			}
 		}
+		// 회원가입 버튼을 눌렀을 경우 SignUpView 인스턴스화
 		else if (obj == button_signUp) {
 			SignUpView signUpView = new SignUpView();
 		}

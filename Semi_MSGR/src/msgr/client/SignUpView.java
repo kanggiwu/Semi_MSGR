@@ -15,8 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import messenger.map.MessengerMap;
-import messenger.util.MessengerDAO;
+import msgr.map.MessengerMap;
+import msgr.util.MessengerDAO;
 
 public class SignUpView extends JDialog implements ActionListener {
 
