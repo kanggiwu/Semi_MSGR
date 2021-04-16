@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MsgrMapper">
+	<resultMap type="map" id="result">
+		<!-- 맵 프로퍼티 설정 위치 -->
+	</resultMap>
+
+	<!-- 로그인 쿼리문 -->
+	<select id="signIn" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT mem_id_vc, mem_nick_vc
+		FROM msgr_member
+		WHERE mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
+	</select>
+
+	<!-- 회원가입 중복확인 쿼리문 -->
+	<select id="idCheck" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT mem_id_vc FROM msgr_member WHERE mem_id_vc = #{mem_id_vc}
+	</select>
+
+	<!-- 회원가입 쿼리문 -->
+	<insert id="signUp" parameterType="java.util.Map">
+		INSERT INTO chat (mem_id_vc, mem_pw_vc, mem_nick_vc) values (#{mem_id_vc}, #{mem_pw_vc},
+		#{mem_nick_vc})
+	</insert>
+
+	<select id="getRoomList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT room.room_name_vc, room.room_no_nu
+		FROM MSGR_ROOM room, MSGR_ROOM_IN_LIST rlist
+		WHERE room.room_no_nu = rlist.room_no_nu AND rlist.mem_id_vc = #{mem_id_vc}
+		ORDER BY room.room_no_nu ASC
+	</select>
+
+	<!-- 로그인 프로시저 -->
+	<resultMap id="loginHashMap" type="hashmap" />
+	<select id="loginProcedure" statementType="CALLABLE" parameterType="java.util.Map">
+		{CALL proc_login(#{id}, #{password}, #{nickname, mode=OUT,
+		jdbcType=CURSOR, javaType=ResultSet, resultMap=loginHashMap})}
+	</select>
+
+</mapper>
