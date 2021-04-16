@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MsgrMapper">
+	<resultMap type="map" id="result">
+		<!-- 맵 프로퍼티 설정 위치 -->
+	</resultMap>
+
+	<!-- 로그인 쿼리문 -->
+	<select id="signIn" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT id, nickname
+		FROM chat
+		WHERE id = #{id} AND password = #{password}
+	</select>
+
+	<!-- 회원가입 중복확인 쿼리문 -->
+	<select id="idCheck" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT id FROM chat WHERE id = #{id}
+	</select>
+
+	<!-- 회원가입 쿼리문 -->
+	<insert id="signUp" parameterType="java.util.Map">
+		INSERT INTO chat (id, password, nickname) values (#{id}, #{password}, #{nickname})
+	</insert>
+
+	<!-- 로그인 프로시저 -->
+	<resultMap id="loginHashMap" type="hashmap" />
+	<select id="loginProcedure" statementType="CALLABLE" parameterType="java.util.Map">
+		{CALL proc_login(#{id}, #{password}, #{nickname, mode=OUT,
+		jdbcType=CURSOR, javaType=ResultSet, resultMap=loginHashMap})}
+	</select>
+</mapper>
