@@ -143,6 +143,16 @@ public class SignUpView extends JDialog implements ActionListener {
 				return;
 			}
 			else {
+
+				// 중복확인을 했으나 아이디를 재입력했을 경우 다시 중복확인을 요청함
+				if (!id.equals(textField_id.getText())) {
+					isChecked = false;
+
+					if (!isChecked) {
+						JOptionPane.showMessageDialog(this, "아이디 중복확인을 해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
+				}
 				int				idCheck	= 0;
 				MessengerMap	pMap	= MessengerMap.getInstance();
 				dao = MessengerDAO.getInstance();
