@@ -5,11 +5,28 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+	Mybatis에서 insert, update, delete의 return은 int이다.
+	쿼리에서 resultType에 int를 선언하는 것이 아니라 자바 코드에서 리턴 타입을 int로 선언하는 것. 
+	Mybatis에서는 기본적으로 쿼리가 돌고 나면 업데이트 한 행의 개수를 리턴한다.
+	예를들어 insert가 성공적으로 수행되어 1행의 데이터가 입력되었다면 return 1을 반환한다.
+	insert: 1(여러갱의 경우도 1)
+	update: 수정에 성공한 행의 개수 반환, 실패시 0 반환
+	delete: 삭제한 행의 개수를 반환.
+	
+	***resultType은 select 구문에만 존재 ***
+ -->
 <mapper namespace="MsgrMapper">
-	<resultMap type="map" id="result">
-		<!-- 맵 프로퍼티 설정 위치 -->
-	</resultMap>
+	<!-- 맵 프로퍼티 설정 위치 -->
+	<resultMap type="map" id="result"/>
 
+	<!-- 로그인 프로시저 <= 지울것-->
+	<resultMap id="loginHashMap" type="hashmap" />
+	<select id="loginProcedure" statementType="CALLABLE" parameterType="java.util.Map">
+		{CALL proc_login(#{id}, #{password}, #{nickname, mode=OUT,
+		jdbcType=CURSOR, javaType=ResultSet, resultMap=loginHashMap})}
+	</select> 
+	
 	<!-- 로그인 쿼리문 -->
 	<select id="signIn" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT mem_id_vc, mem_nick_vc
@@ -17,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		WHERE mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
 	</select>
 
-	<!-- 회원가입 중복확인 쿼리문 -->
+	<!-- 회원가입 중복확인 쿼리문 --><!-- ui정의서 p.5에 해당 sql문 추가하기 -->
 	<select id="idCheck" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT mem_id_vc FROM msgr_member WHERE mem_id_vc = #{mem_id_vc}
 	</select>
@@ -27,18 +44,85 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		INSERT INTO msgr_member (mem_id_vc, mem_pw_vc, mem_nick_vc) values (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
 	</insert>
 
-	<select id="getRoomList" parameterType="java.util.Map" resultType="java.util.Map">
+	<!-- 톡방리스트 불러오기 쿼리문 --><!-- rlist 왜 빨간줄? 어째서 스펠링이 틀리다는겨 -->
+	<select id="getTalkRoomList" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT room.room_name_vc, room.room_no_nu
 		FROM MSGR_ROOM room, MSGR_ROOM_IN_LIST rlist
 		WHERE room.room_no_nu = rlist.room_no_nu AND rlist.mem_id_vc = #{mem_id_vc}
 		ORDER BY room.room_no_nu ASC
 	</select>
-
-	<!-- 로그인 프로시저 -->
-	<resultMap id="loginHashMap" type="hashmap" />
-	<select id="loginProcedure" statementType="CALLABLE" parameterType="java.util.Map">
-		{CALL proc_login(#{id}, #{password}, #{nickname, mode=OUT,
-		jdbcType=CURSOR, javaType=ResultSet, resultMap=loginHashMap})}
+	
+	<!-- 친구목록 불러오기 쿼리문 -->
+	<select id="getFriendList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT buddy_id_vc FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vd} ORDER BY mem_id_vc
 	</select>
+	
+	<!-- 톡방 추가하기 쿼리문 --><!-- 오픈톡이랑 친구톡이랑 나눠야 하지 않나? -->
+	<insert id="createTalkRoom" parameterType="java.util.Map" >
+		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES (#{room_no_nu), #{room_name_vc}, 0)
+	</insert>
+	
+	<!-- 톡방  삭제 쿼리문 -->
+	<delete id="deleteTalkRoom" parameterType="java.util.Map" >
+		DELETE FROM MSGR_ROOM WHERE room_no_nu = #{room_no_nu}
+	</delete>
+	
+	<!-- 마지막 대화번호 가져오기 쿼리문 -->
+	<select id="getLastChatNum" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT chat_no_nu FROM(SELECT chat_no_nu) FROM MSGR_CHAT ORDER BY chat_no_nu DESC) WHERE ROWNUM =1
+	</select>
+	
+	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 --><!-- rlist??? -->
+	<select id="getChatAfterJoin" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
+		WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc})
+		AND rlist.mem_id_vc = #{rlist.mem_id_vc}
+		AND chat.roon_no_nu = #{chat.room_no_nu}
+	</select>
+	
+	<!-- 회원탈퇴 쿼리문-->
+	<!-- 다중쿼리...? 개빡쵸 ... 쿼리 한문장 끝날때마다 ;세미콜론 필수 -->
+	<!-- 1. msgr_chat 에서 mem_id_vc null로 바꾸기 
+		 2. 톡방 리스트에서 #{mem_id_vc 삭제} 
+		 3. 친구목록에서 #{mem_id_vc}삭제 
+		 4. 멤버에서 삭제  -->
+	<delete id="deleteMember" parameterType="java.util.Map" >
+		{
+		 CALL
+		  BEGIN
+		  	UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vd};
+		  	DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
+		  	DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc};
+		  	DELETE FROM MSGR__MEMBER WEHRE mem_id_vc = #{mem_id_vc};
+		  END
+		}
+	</delete>
+	
+	<!-- 친구삭제 쿼리문  다중 쿼리문 얘 또 써야 하나?--> <!-- 해당 쿼리문 다시 생각해 봐야함. -->
+	<delete id="deleteFriend" parameterType="java.util.MAP" >
+		{
+		 CALL
+		  BEGIN
+		  	DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
+		  	DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
+		  END
+		}
+	</delete>
+	
+	<!-- 닉네임 변경 쿼리문 -->
+	<update id="changeNickname" parameterType="java.util.Map" >
+		UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc = #{mem_id_vc}
+	</update>
+	
+	<!-- 친구추가 쿼리문 --><!-- 여기도 확인해야 함 -->
+	<insert id ="makeFrineds" parameterType="java.util.Map" >
+		{
+		 CALL
+		  BEGIN
+		   INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq_nu.NEXTVAL, #{msgr_mem_id), #{msgr_buddy_id};
+		   CREATE SEQUENCE buddy_seq_nu START WITH 1 INCREMENT BY MAXVALUE 1000 CYCLE NOCACHE
+		 END
+		}
+	</insert>
 
 </mapper>
