@@ -27,6 +27,7 @@ public class SignInView extends JFrame implements ActionListener {
 	private JButton				button_signIn	= null;
 	private JButton				button_signUp	= null;
 	MessengerDAO				msgrDAO			= null;
+	private String				id				= "";
 	private String				nickname		= "";
 	private MessengerClientView	msgrClient		= null;
 
@@ -108,6 +109,7 @@ public class SignInView extends JFrame implements ActionListener {
 
 				// 리스트 길이가 0보다 크면 받아온 결과가 있다는 뜻
 				if (tempList.size() > 0) {
+					id = String.valueOf(tempList.get(0).get("MEM_ID_VC"));
 					nickname = String.valueOf(tempList.get(0).get("MEM_NICK_VC"));
 					JOptionPane.showMessageDialog(this, nickname + "님의 접속을 환영합니다.");
 					this.setVisible(false);
@@ -136,6 +138,14 @@ public class SignInView extends JFrame implements ActionListener {
 		}
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getNickname() {
 		return nickname;
 	}
@@ -143,4 +153,5 @@ public class SignInView extends JFrame implements ActionListener {
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
+
 }

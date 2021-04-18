@@ -4,34 +4,60 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.List;
+import java.util.Map;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
-public class BuddyListView extends JPanel implements ActionListener, ListSelectionListener {
+import msgr.map.MessengerMap;
+import msgr.util.MessengerDAO;
+
+public class BuddyListView extends JPanel implements MouseListener {
 	MessengerClientView	msgrClient		= null;
-	String[]		friendName		= { "강지우", "유성열", "이민주", "임동혁" };
-	JList<String>	friendList		= null;
-	JScrollPane		scrollPane_list	= new JScrollPane(friendList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	JList<Object>		buddyList		= null;
+	DefaultListModel	dlm				= new DefaultListModel();
+	JScrollPane			scrollPane_list	= null;
 
 	public BuddyListView() {
 
 	}
 
+	public void getBuddyList() {
+
+		MessengerDAO	dao		= MessengerDAO.getInstance();
+		MessengerMap	pMap	= MessengerMap.getInstance();
+		pMap.getMap().put("mem_id_vc", msgrClient.getId());
+		List<Map<String, Object>> tempList = dao.getBuddyList(pMap.getMap());
+
+		for (Map<String, Object> map : tempList) {
+			dlm.addElement(map.get("BUDDY_ID_VC"));
+		}
+		buddyList.setModel(dlm);
+	}
+
 	public BuddyListView(MessengerClientView msgrClient) {
-		friendList = new JList<String>();
 		this.msgrClient = msgrClient;
 		initDisplay();
 	}
 
 	public void initDisplay() {
 		Font font = new Font("맑은 고딕", Font.PLAIN, 15);
-		friendList.setFont(font);
-		friendList.addListSelectionListener(this);
+		buddyList = new JList<Object>();
+		buddyList.setFont(font);
+		buddyList.addMouseListener(this);
+
+		getBuddyList();
+		scrollPane_list = new JScrollPane(buddyList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+									JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.setLayout(new BorderLayout());
 		this.add("Center", scrollPane_list);
 		this.setSize(500, 400);
@@ -43,15 +69,44 @@ public class BuddyListView extends JPanel implements ActionListener, ListSelecti
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent ae) {
+	public void mouseClicked(MouseEvent e) {
+		System.out.println(buddyList.getSelectedValue());
 
-//		Object obj = ae.getSource();
+		if (e.getClickCount() == 2) {
+
+			if (!"".equals(buddyList.getSelectedValue())) {
+				System.out.println("어떤 방이든 더블클릭됨");
+			}
+		}
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent lse) {
-		Object obj = lse.getLastIndex();
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
 
-		System.out.println(obj);
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		Object obj = e.getSource();
+
+		if (obj == buddyList) {
+
+			if (e.isPopupTrigger()) {
+				msgrClient.popupMenu.show(this, e.getX(), e.getY());
+			}
+		}
 	}
 }
