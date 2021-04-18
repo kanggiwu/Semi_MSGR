@@ -26,7 +26,7 @@ public class MessengerServerThread extends Thread {
 	public MessengerServerThread(MessagerServer msgrServer) {
 		this.msgrServer = msgrServer;
 	}
-
+//깃 연습
 	public void run() {
 		String msg = null;
 		bubbyList = new Vector<>();
