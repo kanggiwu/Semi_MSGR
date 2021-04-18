@@ -30,7 +30,7 @@ public class MessengerDAO {
 	/** alt + shift + j
 	 * 로그인 메서드 
 	 *  SELECT mem_id_vc, mem_nick_vc
-		FROM msgr_member
+		FROM MSGR_MEMBER
 		WHERE mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디, 비밀번호를 저장해둔 Map
@@ -97,7 +97,7 @@ public class MessengerDAO {
 		WHERE room.room_no_nu = rlist.room_no_nu AND rlist.mem_id_vc = #{mem_id_vc}
 		ORDER BY room.room_no_nu ASC
 	 * 
-	 * @param pMap
+	 * @param pMap 
 	 * @return
 	 */
 	public List<Map<String, Object>> getTalkRoomList(Map<String, Object> pMap) {
@@ -111,7 +111,7 @@ public class MessengerDAO {
 	}
 	
 	/**
-	 * 친구목록 불러오기 메서드
+	 * 친구목록 불러오기 메서드   
 	 * SELECT buddy_id_vc FROM MSGR_BUDDY 
 	 * WHERE mem_id_vc = #{mem_id_vd} ORDER BY mem_id_vc
 	 * 
@@ -129,16 +129,17 @@ public class MessengerDAO {
 	}
 	
 	/**
-	 * 톡방 추가하기 메소드
+	 * 오픈톡방 추가하기 메소드
+	 
 	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
-	 * VALUES (#{room_no_nu), #{room_name_vc}, 1)
+	 * VALUES (#{room_no_nu), #{room_name_vc}, 0)
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> createTalkRoom(Map<String, Object> pMap){
+	public List<Map<String, Object>> createOpenTalkRoom(Map<String, Object> pMap){
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.createTalkRoom", pMap);
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.createOpenTalkRoom", pMap);
 	
 		sqlSession.close();
 
@@ -146,7 +147,25 @@ public class MessengerDAO {
 	}
 	
 	/**
+	 * 친구톡방 추가하기 메소드
+	 
+	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
+	 * VALUES (#{room_no_nu), #{room_name_vc}, 1)
+	 * @param pMap
+	 * @return
+	 */
+	public List<Map<String, Object>> createBuddyTalkRoom(Map<String, Object> pMap){
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.createBuddyTalkRoom", pMap);
+		
+		sqlSession.close();
+		
+		return tempList;
+	}
+	/**
 	 * 톡방 삭제 메소드
+	 * 
 	 * DELETE FROM MSGR_ROOM 
 	 * WHERE room_no_nu = #{room_no_nu}
 	 * @param pMap
@@ -161,7 +180,24 @@ public class MessengerDAO {
 
 		return tempList;
 	}
-	
+
+	///////////////////////////얘가 문제임/////////////////////////////////
+	/**
+	 * 모든 대화내용 삽입 쿼리문
+	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
+		VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc}) 
+	 * @param pMap
+	 * @return
+	 */
+	public List<Map<String, Object>> insertAllChat(Map<String, Object> pMap){
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.insertAllChat", pMap);
+		
+		sqlSession.close();
+		
+		return tempList;
+	}
 	
 	/**
 	 * 마지막 대화번호 가져오기 메소드
@@ -265,13 +301,9 @@ public class MessengerDAO {
 	
 	/**
 	 * 친구추가 메소드
-	 * {
-		 CALL
-		  BEGIN
+	 * 
 		   INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq_nu.NEXTVAL, #{msgr_mem_id), #{msgr_buddy_id};
-		   CREATE SEQUENCE buddy_seq_nu START WITH 1 INCREMENT BY MAXVALUE 1000 CYCLE NOCACHE
-		 END
-		}
+	
 	 * @param pMap
 	 * @return
 	 */
@@ -285,31 +317,20 @@ public class MessengerDAO {
 		return tempList;
 	}
 	
-	/* 로그인 프로시저 메서드
-	public Map<String, Object> loginProcedure(String id, String password, Map<String, Object> pMap) {
-		factory = MyBatisCommonFactory.getInstance();
-		SqlSession sqlSession = factory.openSession();
 
-		pMap.put("id", id);
-		pMap.put("password", password);
-		sqlSession.selectOne("model.MemberMapper.mapProcedureTest", pMap);
-
-		sqlSession.close();
-
-		return pMap;
-	}
-	*/
-	/*public static void main(String[] args) {
-		MessengerDAO				dao		= new MessengerDAO();
-		MessengerMap				msgrMap	= MessengerMap.getInstance();
-		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-		msgrMap.getMap().put("mem_id_vc", "test1");
-		list = dao.getRoomList(msgrMap.getMap());
-
-		for (Map<String, Object> map : list) {
-			System.out.println(map);
-		}
-
-	}
-	*/
+//	public static void main(String[] args) {
+//		MessengerDAO				dao		= new MessengerDAO();
+//		MessengerMap				msgrMap	= MessengerMap.getInstance();
+//		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+//		msgrMap.getMap().put("mem_id_vc", "test1");
+//		msgrMap.getMap().put("mem_pw_vc", "1234");
+//		list = dao.signIn(msgrMap.getMap());
+//
+//		for (Map<String, Object> map : list) {
+//			System.out.println(map);
+//		}
+//		
+//
+//	}
+	
 }

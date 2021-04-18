@@ -19,19 +19,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 맵 프로퍼티 설정 위치 -->
 	<resultMap type="map" id="result"/>
 
-	<!-- 로그인 쿼리문 -->
+	<!-- 로그인 쿼리문 --><!-- 확인 -->
 	<select id="signIn" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT mem_id_vc, mem_nick_vc
 		FROM MSGR_MEMBER
 		WHERE mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
 	</select>
 
-	<!-- 아이디 중복확인 쿼리문 --><!-- ui정의서 p.5에 해당 sql문 추가하기 -->
+	<!-- 아이디 중복확인 쿼리문 --><!-- 확인 -->
 	<select id="idCheck" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT mem_id_vc FROM MSGR_MEMBER WHERE mem_id_vc = #{mem_id_vc}
 	</select>
 
-	<!-- 회원가입 쿼리문 -->
+	<!-- 회원가입 쿼리문 --><!-- 확인 -->
 	<insert id="signUp" parameterType="java.util.Map">
 		INSERT INTO MSGR_MEMBER (mem_id_vc, mem_pw_vc, mem_nick_vc) 
 		VALUES (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
@@ -48,12 +48,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 친구목록 불러오기 쿼리문 -->
 	<select id="getBuddyList" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT buddy_id_vc FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vd} ORDER BY mem_id_vc
+		SELECT M_BUDDY.buddy_id_vc, M_MEMBER.MEM_NICK_VC
+  		FROM msgr_member m_member, msgr_buddy m_buddy
+ 		WHERE     M_MEMBER.MEM_ID_VC = M_BUDDY.buddy_id_vc
+       	AND M_BUDDY.MEM_ID_VC = #{mem_id_vc}		
 	</select>
 	
-	<!-- 톡방 추가하기 쿼리문 --><!-- 오픈톡이랑 친구톡이랑 나눠야 하지 않나? -->
-	<insert id="createTalkRoom" parameterType="java.util.Map" >
-		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES (#{room_no_nu), #{room_name_vc}, 0)
+	<!-- 오픈톡방 추가하기 쿼리문 -->
+	<insert id="createOpenTalkRoom" parameterType="java.util.Map" >
+		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES (#{room_no_nu}, #{room_name_vc}, 0)
+	</insert>
+	
+	<!-- 친구톡방 추가하기 쿼리문 -->
+	<insert id="createBuddyTalkRoom" parameterType="java.util.Map" >
+		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES (#{room_no_nu}, #{room_name_vc}, 1)
 	</insert>
 	
 	<!-- 톡방  삭제 쿼리문 -->
@@ -61,9 +69,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		DELETE FROM MSGR_ROOM WHERE room_no_nu = #{room_no_nu}
 	</delete>
 	
-	<!-- 대화내용 삽입 쿼리문 -->
-	<insert id="insertChat" parameterType="java.util.MAP" >
-		INSERT 
+	<!-- 모든 대화내용 삽입 쿼리문 -->
+	<insert id="insertAllChat" parameterType="java.util.Map">
+		INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
+		VALUES(#{room_no_nu}, #{chat_no_nu}, #{mem_id_vc}, #{chat_vc}) 
 	</insert>
 	
 	<!-- 마지막 대화번호 가져오기 쿼리문 -->
@@ -77,7 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc})
 		AND rlist.mem_id_vc = #{rlist.mem_id_vc}
 		AND chat.roon_no_nu = #{chat.room_no_nu}
-	</select>
+	</select> 
 	
 	<!-- 회원탈퇴 쿼리문-->
 	<!-- 다중쿼리...? 쿼리 한문장 끝날때마다 ;세미콜론 필수 -->
@@ -89,7 +98,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		{
 		 CALL
 		  BEGIN
-		  	UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vd};
+		  	UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vc};
 		  	DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
 		  	DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc};
 		  	DELETE FROM MSGR_MEMBER WEHRE mem_id_vc = #{mem_id_vc};
@@ -97,15 +106,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		}
 	</delete>
 	
-	<!-- 친구삭제 쿼리문  다중 쿼리문 얘 또 써야 하나?--> <!-- 해당 쿼리문 다시 생각해 봐야함. -->
-	<delete id="deleteBuddy" parameterType="java.util.MAP" >
-		{
-		 CALL
+	<!-- 친구삭제 쿼리문  다중 쿼리문 얘 또 써야 하나?--> 
+	<delete id="deleteBuddy" parameterType="java.util.Map" >
+		{CALL
 		  BEGIN
 		  	DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
 		  	DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
 		  END
-		}
+		  }
 	</delete>
 	
 	<!-- 닉네임 변경 쿼리문 -->
@@ -113,9 +121,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc = #{mem_id_vc}
 	</update>
 	
-	<!-- 친구추가 쿼리문 --><!-- 여기도 확인해야 함 확인했음 210418 -->
+	<!-- 친구추가 쿼리문 --><!-- 여기도 확인해야 함 - 확인했음 210418 -->
 	<insert id ="makeBuddys" parameterType="java.util.Map" >
-		   INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq_nu.NEXTVAL, #{msgr_mem_id), #{msgr_buddy_id};
+		   INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq_nu.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc}
 	</insert>
-
+ 
 </mapper>
