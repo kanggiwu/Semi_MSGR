@@ -37,7 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ORDER BY room.room_no_nu
 	</select>
 
-	<!-- 친구목록 불러오기 쿼리문 -->
+	<!-- 친구목록 불러오기 쿼리문 --> <!-- 확인완료 -->
 	<select id="getBuddyList" parameterType="java.util.Map" resultType="java.util.Map">
 
 		SELECT M_BUDDY.buddy_id_vc, M_MEMBER.MEM_NICK_VC
