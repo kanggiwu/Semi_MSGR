@@ -57,14 +57,11 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("mem_pw_vc", pw);
 					msgrDAO.signIn(pMap.getMap());
-
-					
 				}
 					break;
 				case Protocol.LOGOUT: {// 로그아웃
 					msgrServer.globalList.remove(this);// 접속자 목록에서 삭제
 					// 현재 접속자에 대한 정보를 클라이언트가 알 필요는 없으니까, 메세지를 보낼 필요가 없다.?
-				
 				}
 					break;
 				case Protocol.CHANGE_NICKNAME: {// 닉네임변경
