@@ -11,18 +11,18 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class FriendListView extends JPanel implements ActionListener, ListSelectionListener {
-	MessengerClient	msgrClient		= null;
+public class BuddyListView extends JPanel implements ActionListener, ListSelectionListener {
+	MessengerClientView	msgrClient		= null;
 	String[]		friendName		= { "강지우", "유성열", "이민주", "임동혁" };
 	JList<String>	friendList		= null;
 	JScrollPane		scrollPane_list	= new JScrollPane(friendList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-	public FriendListView() {
+	public BuddyListView() {
 
 	}
 
-	public FriendListView(MessengerClient msgrClient) {
+	public BuddyListView(MessengerClientView msgrClient) {
 		friendList = new JList<String>();
 		this.msgrClient = msgrClient;
 		initDisplay();

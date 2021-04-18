@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class RoomListView extends JPanel implements MouseListener {
-	MessengerClient	msgrClient		= null;
+	MessengerClientView	msgrClient		= null;
 	String[]		roomName		= { "0번 방", "1번 방", "2번 방", "3번 방", "4번 방", "5번 방", "6번 방", "7번 방", "8번 방", "9번 방"
 	};
 	JList<String>	roomList		= new JList<>(roomName);
@@ -23,7 +23,7 @@ public class RoomListView extends JPanel implements MouseListener {
 
 	}
 
-	public RoomListView(MessengerClient msgrClient) {
+	public RoomListView(MessengerClientView msgrClient) {
 		this.msgrClient = msgrClient;
 		initDisplay();
 	}

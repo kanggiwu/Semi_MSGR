@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -14,19 +15,19 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 
-import messenger.util.Protocol;
-import messenger.util.Room;
+//import messenger.util.Room;
+import msgr.server.Protocol;
 
-public class MessengerClient extends JFrame implements ActionListener {
+public class MessengerClientView extends JFrame implements ActionListener {
 	SignInView			signInView			= null;
 	JTabbedPane			tabbedPane			= new JTabbedPane(JTabbedPane.LEFT);
-	FriendListView		friendListView		= null;
+	BuddyListView		buddyListView		= null;
 	RoomListView		roomListView		= null;
 	Socket				mySocket			= null;
 	ObjectInputStream	ois					= null;
 	ObjectOutputStream	oos					= null;
 	String				ip					= "127.0.0.1";
-	int					port				= 9234;
+	int					port				= 21430;
 	String				nickname			= null;
 
 	JMenuBar			menuBar				= null;
@@ -37,11 +38,7 @@ public class MessengerClient extends JFrame implements ActionListener {
 	String[]			talkRoomName		= { "오픈톡", "친구톡", "친구추가" };
 	JMenuItem[]			menuItem_talkRoom	= null;
 
-	public MessengerClient() {
-
-	}
-
-	public MessengerClient(SignInView signInView) {
+	public MessengerClientView(SignInView signInView) {
 		this.signInView = signInView;
 		nickname = signInView.getNickname();
 
@@ -59,21 +56,12 @@ public class MessengerClient extends JFrame implements ActionListener {
 		try {
 			mySocket = new Socket(ip, port);
 
-			// 해당 부분에서 스레드 없으면 대기타는 것 같음
 			oos = new ObjectOutputStream(mySocket.getOutputStream());
 			ois = new ObjectInputStream(mySocket.getInputStream());
-			// 톡방 정보 담기
-			Room room = new Room();
-			room.setTitle("스마트웹모바일 응용SW엔지니어");
-			room.setCurrent(10);
-			room.setState("대기");
-			// 100|나초보
-//			oos.writeObject(Protocol.ROOM_IN+Protocol.seperator+nickName+Protocol.seperator+room.getTitle());
-			oos.writeObject(Protocol.WAIT
-										+ Protocol.seperator + nickname
-										+ Protocol.seperator + room.getState());
-			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
-			msgrClientThread.start();// TalkClientThread의 run호출됨.-콜백함수
+
+			oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + nickname);
+//			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
+//			msgrClientThread.start();// TalkClientThread의 run호출됨.-콜백함수
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -81,9 +69,12 @@ public class MessengerClient extends JFrame implements ActionListener {
 	}
 
 	private void initDisplay() throws Exception {
-
-		friendListView = new FriendListView(this);
+		// 친구목록 패널 인스턴스화
+		buddyListView = new BuddyListView(this);
+		// 톡방목록 패널 인스턴스화
 		roomListView = new RoomListView(this);
+
+		/////////////////////// 메뉴 구성 시작 ///////////////////////
 		menuBar = new JMenuBar();
 		menu_myPage = new JMenu("마이페이지");
 		menuItem_myPage = new JMenuItem[myPageName.length];
@@ -99,17 +90,20 @@ public class MessengerClient extends JFrame implements ActionListener {
 		for (int i = 0; i < talkRoomName.length; i++) {
 			menuItem_talkRoom[i] = new JMenuItem(talkRoomName[i]);
 			menu_talkRoom.add(menuItem_talkRoom[i]);
-			menuItem_myPage[i].addActionListener(this);
+			menuItem_talkRoom[i].addActionListener(this);
 		}
 
-		tabbedPane.addTab("친구목록", friendListView);
+		menuBar.add(menu_myPage);
+		menuBar.add(menu_talkRoom);
+		/////////////////////// 메뉴 구성 끝 ///////////////////////
+
+		tabbedPane.addTab("친구목록", buddyListView);
 		tabbedPane.addTab("톡방목록", roomListView);
 		this.getContentPane().setBackground(Color.ORANGE);
 		tabbedPane.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		tabbedPane.setToolTipText("");
-		menuBar.add(menu_myPage);
-		menuBar.add(menu_talkRoom);
 
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setJMenuBar(menuBar);
 		this.setResizable(false);
 		this.add(tabbedPane);
@@ -121,12 +115,41 @@ public class MessengerClient extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 
-		if ("로그아웃".equals(command)) {
-			System.out.println("로그아웃버튼 눌렸음");
-			this.setVisible(false);
-			this.dispose();
-			new SignInView();
+		/////////////////////// 마이페이지 메뉴아이템 시작 ///////////////////////
+		if ("닉네임 변경".equals(command)) {
+
+			try {
+				oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + nickname);
+			}
+			catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
+		else if ("로그아웃".equals(command)) {
+			System.out.println("로그아웃 버튼");
+			this.setVisible(false);
+			this.dispose();
+			signInView.setVisible(true);
+		}
+
+		else if ("회원탈퇴".equals(command)) {
+			System.out.println("회원탈퇴 버튼");
+		}
+		/////////////////////// 마이페이지 메뉴아이템 끝 ///////////////////////
+
+		/////////////////////// 톡방 메뉴아이템 시작 ///////////////////////
+		else if ("오픈톡".equals(command)) {
+			System.out.println("오픈톡 버튼");
+		}
+
+		else if ("친구톡".equals(command)) {
+			System.out.println("친구톡 버튼");
+		}
+
+		else if ("친구추가".equals(command)) {
+			System.out.println("친구추가 버튼");
+		}
+		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
 	}
 }

@@ -20,15 +20,15 @@ import msgr.util.MessengerDAO;
 
 public class SignInView extends JFrame implements ActionListener {
 
-	private JLabel			label_id		= null;
-	private JLabel			label_pw		= null;
-	private JTextField		textField_id	= null;
-	private JPasswordField	pwField_pw		= null;
-	private JButton			button_signIn	= null;
-	private JButton			button_signUp	= null;
-	MessengerDAO			msgrDAO			= null;
-	private String			nickname		= "";
-	private MessengerClient	msgrClient		= null;
+	private JLabel				label_id		= null;
+	private JLabel				label_pw		= null;
+	private JTextField			textField_id	= null;
+	private JPasswordField		pwField_pw		= null;
+	private JButton				button_signIn	= null;
+	private JButton				button_signUp	= null;
+	MessengerDAO				msgrDAO			= null;
+	private String				nickname		= "";
+	private MessengerClientView	msgrClient		= null;
 
 	public SignInView() {
 		initDisplay();
@@ -115,7 +115,7 @@ public class SignInView extends JFrame implements ActionListener {
 					pwField_pw.setText("");
 
 					// 로그인 성공하면 MessengerClient 인스턴스화하고 서버와 연결
-					msgrClient = new MessengerClient(this);
+					msgrClient = new MessengerClientView(this);
 					msgrClient.getConnection();
 				}
 				// nickname이 초기값에서 바뀌지 않았으면 잘못 입력했다는 뜻
