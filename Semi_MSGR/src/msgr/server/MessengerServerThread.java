@@ -22,7 +22,7 @@ public class MessengerServerThread extends Thread {
 	MessengerMap				pMap			= null;
 	List<MessengerServerThread>	bubbyList		= null;
 	List<MessengerTalkRoom>		talkRoomList	= null;
-
+//깃허브 연습
 	public MessengerServerThread(MessagerServer msgrServer) {
 		this.msgrServer = msgrServer;
 	}
