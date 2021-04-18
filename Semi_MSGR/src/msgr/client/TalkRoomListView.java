@@ -2,6 +2,8 @@ package msgr.client;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
@@ -15,43 +17,42 @@ import javax.swing.JScrollPane;
 import msgr.map.MessengerMap;
 import msgr.util.MessengerDAO;
 
-public class BuddyListView extends JPanel implements MouseListener {
+public class TalkRoomListView extends JPanel implements MouseListener {
 	MessengerClientView			msgrClient		= null;
-	JList<Object>				buddyList		= null;
+	String[]					talkRoomName	= new String[50];
+	JList<Object>				talkRoomList	= null;
 	DefaultListModel<Object>	dlm				= new DefaultListModel<>();
 	JScrollPane					scrollPane_list	= null;
 
-	public BuddyListView() {
+	public TalkRoomListView() {
 
 	}
 
-	public void getBuddyList() {
-
-		MessengerDAO	dao		= MessengerDAO.getInstance();
-		MessengerMap	pMap	= MessengerMap.getInstance();
-		pMap.getMap().put("mem_id_vc", msgrClient.getId());
-		List<Map<String, Object>> tempList = dao.getBuddyList(pMap.getMap());
-
-		for (Map<String, Object> map : tempList) {
-			dlm.addElement(map.get("BUDDY_ID_VC"));
-		}
-		buddyList.setModel(dlm);
-	}
-
-	public BuddyListView(MessengerClientView msgrClient) {
+	public TalkRoomListView(MessengerClientView msgrClient) {
 		this.msgrClient = msgrClient;
 		initDisplay();
 	}
 
-	public void initDisplay() {
-		Font font = new Font("맑은 고딕", Font.PLAIN, 15);
-		buddyList = new JList<Object>();
-		buddyList.setFont(font);
-		buddyList.addMouseListener(this);
+	public void getTalkRoomList() {
 
-		getBuddyList();
-		scrollPane_list = new JScrollPane(buddyList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-									JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		MessengerDAO	dao		= MessengerDAO.getInstance();
+		MessengerMap	pMap	= MessengerMap.getInstance();
+		pMap.getMap().put("mem_id_vc", msgrClient.getId());
+		List<Map<String, Object>> tempList = dao.getTalkRoomList(pMap.getMap());
+
+		for (Map<String, Object> map : tempList) {
+			dlm.addElement(map.get("ROOM_NAME_VC"));
+		}
+		talkRoomList.setModel(dlm);
+	}
+
+	public void initDisplay() {
+		talkRoomList = new JList<Object>();
+		getTalkRoomList();
+		scrollPane_list = new JScrollPane(talkRoomList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		Font font = new Font("맑은 고딕", Font.PLAIN, 15);
+		talkRoomList.addMouseListener(this);
+		talkRoomList.setFont(font);
 		this.setLayout(new BorderLayout());
 		this.add("Center", scrollPane_list);
 		this.setSize(500, 400);
@@ -64,43 +65,38 @@ public class BuddyListView extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println(buddyList.getSelectedValue());
+		System.out.println(talkRoomList.getSelectedValue());
 
 		if (e.getClickCount() == 2) {
 
-			if (!"".equals(buddyList.getSelectedValue())) {
+			if (!"".equals(talkRoomList.getSelectedValue())) {
 				System.out.println("어떤 방이든 더블클릭됨");
 			}
 		}
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
+	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
+	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		Object obj = e.getSource();
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
 
-		if (obj == buddyList) {
-
-			if (e.isPopupTrigger()) {
-				msgrClient.getPopupMenu().show(this, e.getX(), e.getY());
-			}
-		}
 	}
+
 }

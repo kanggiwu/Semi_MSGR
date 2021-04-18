@@ -27,34 +27,42 @@ import msgr.util.MessengerDAO;
 
 public class MessengerClientView extends JFrame implements ActionListener {
 
-	SignInView			signInView			= null;
-	private JTabbedPane	tabbedPane			= new JTabbedPane(JTabbedPane.LEFT);
-	BuddyListView		buddyListView		= null;
-	RoomListView		roomListView		= null;
+	// 생성자에서 로그인뷰의 정보를 받아와야 하므로 전역변수 선언
+	// 탭과 탭에 들어갈 패널들(친구목록뷰, 톡방목록뷰)
+	SignInView			signInView				= null;
+	private JTabbedPane	tabbedPane				= new JTabbedPane(JTabbedPane.LEFT);
+	BuddyListView		buddyListView			= null;
+	TalkRoomListView	roomListView			= null;
 
-	private Socket		socket				= null;
-	ObjectInputStream	ois					= null;
-	ObjectOutputStream	oos					= null;
-	private String		ip					= "127.0.0.1";
-	private int			port				= 21430;
+	// 서버와 연결할 소켓, 스트림, 아이피, 포트
+	private Socket		socket					= null;
+	ObjectInputStream	ois						= null;
+	ObjectOutputStream	oos						= null;
+	private String		ip						= "127.0.0.1";
+	private int			port					= 21430;
 
-	private String		id					= "";
-	private String		nickname			= "";
+	// 사용자 아이디, 닉네임
+	private String		id						= "";
+	private String		nickname				= "";
 
-	private JMenuBar	menuBar				= null;
-	private JMenu		menu_myPage			= null;
-	private String[]	myPageName			= { "닉네임 변경", "로그아웃", "회원탈퇴" };
-	private JMenuItem[]	menuItem_myPage		= null;
-	private JMenu		menu_talkRoom		= null;
-	private String[]	talkRoomName		= { "오픈톡", "친구톡", "친구추가" };
-	private JMenuItem[]	menuItem_talkRoom	= null;
-	JPopupMenu			popupMenu			= null;
-	JMenuItem			popupItem			= null;
+	// 클라이언트 메뉴 구성
+	private JMenuBar	menuBar					= null;
+	private JMenu		menu_myPage				= null;
+	private String[]	myPageName				= { "닉네임 변경", "로그아웃", "회원탈퇴" };
+	private JMenuItem[]	menuItem_myPage			= null;
+	private JMenu		menu_talkRoom			= null;
+	private String[]	talkRoomName			= { "오픈톡", "친구톡", "친구추가" };
+	private JMenuItem[]	menuItem_talkRoom		= null;
 
+	// 우클릭 했을 때 뜨는 팝업메뉴
+	private JPopupMenu	popupMenu				= null;
+	private JMenuItem	menuItem_deleteBuddy	= null;
+
+	// 생성자에서 SignInView에서 받은 아이디, 닉네임을 저장함
 	public MessengerClientView(SignInView signInView) {
 		this.signInView = signInView;
 		this.id = signInView.getId();
-		nickname = signInView.getNickname();
+		this.nickname = signInView.getNickname();
 
 		try {
 			initDisplay();
@@ -65,6 +73,9 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 	}
 
+	/**
+	 * 로그인이 성공하면 소켓서버와 연결하고 스트림을 만드는 메서드
+	 */
 	public void getConnection() {
 		this.setTitle(nickname + "(" + id + ")님");
 
@@ -83,11 +94,16 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * MessengerClientView 화면 초기화
+	 * 
+	 * @throws Exception 예외가 없는데 뭘 던져야 하는 거지?
+	 */
 	private void initDisplay() throws Exception {
 		// 친구목록 패널 인스턴스화
 		buddyListView = new BuddyListView(this);
 		// 톡방목록 패널 인스턴스화
-		roomListView = new RoomListView(this);
+		roomListView = new TalkRoomListView(this);
 
 		/////////////////////// 메뉴 구성 시작 ///////////////////////
 		menuBar = new JMenuBar();
@@ -112,15 +128,20 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		menuBar.add(menu_talkRoom);
 		/////////////////////// 메뉴 구성 끝 ///////////////////////
 
-		popupItem = new JMenuItem("친구삭제");
+		/////////////////////// 팝업메뉴 구성 시작 ///////////////////////
+		menuItem_deleteBuddy = new JMenuItem("친구삭제");
+		menuItem_deleteBuddy.addActionListener(this);
 		popupMenu = new JPopupMenu();
-		popupMenu.add(popupItem);
+		popupMenu.add(menuItem_deleteBuddy);
+		/////////////////////// 팝업메뉴 구성 끝 ///////////////////////
 
+		/////////////////////// 탭 구성 시작 ///////////////////////
 		tabbedPane.addTab("친구목록", buddyListView);
 		tabbedPane.addTab("톡방목록", roomListView);
 		this.getContentPane().setBackground(Color.ORANGE);
 		tabbedPane.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		tabbedPane.setToolTipText("");
+		/////////////////////// 탭 구성 끝 ///////////////////////
 
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setJMenuBar(menuBar);
@@ -169,8 +190,12 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		else if ("친구추가".equals(command)) {
 			System.out.println("친구추가 버튼");
 		}
+
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
-	}
+		if ("친구삭제".equals(command)) {
+			System.out.println("친구삭제 메뉴아이템");
+		}
+	}// end of ActionPerformed()
 
 	public String getId() {
 		return id;
@@ -186,5 +211,9 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+
+	public JPopupMenu getPopupMenu() {
+		return popupMenu;
 	}
 }
