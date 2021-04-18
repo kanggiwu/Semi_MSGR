@@ -47,7 +47,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 회원가입 아이디 중복확인 메서드 
+	 * 회원가입의 아이디 중복확인 메서드 
 	 * SELECT mem_id_vc FROM msgr_member WHERE mem_id_vc = #{mem_id_vc}
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디를 저장해둔 Map
@@ -118,10 +118,10 @@ public class MessengerDAO {
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> getFriendList(Map<String, Object> pMap){
+	public List<Map<String, Object>> getBuddyList(Map<String, Object> pMap){
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getFriendList", pMap);
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getBuddyList", pMap);
 	
 		sqlSession.close();
 
@@ -164,7 +164,7 @@ public class MessengerDAO {
 	
 	
 	/**
-	 * 마지막 대화번호 가져오기 쿼리문
+	 * 마지막 대화번호 가져오기 메소드
 	 * SELECT chat_no_nu FROM(SELECT chat_no_nu) 
 	 * FROM MSGR_CHAT ORDER BY chat_no_nu DESC) WHERE ROWNUM =1
 	 * @param pMap
@@ -235,10 +235,10 @@ public class MessengerDAO {
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> deleteFriend(Map<String, Object> pMap){
+	public List<Map<String, Object>> deleteBuddy(Map<String, Object> pMap){
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.deleteFriend", pMap);
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.deleteBuddy", pMap);
 		
 		sqlSession.close();
 		
@@ -275,10 +275,10 @@ public class MessengerDAO {
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> makeFrineds(Map<String, Object> pMap){
+	public List<Map<String, Object>> makeBuddys(Map<String, Object> pMap){
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.makeFrineds", pMap);
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.makeBuddys", pMap);
 		
 		sqlSession.close();
 		
