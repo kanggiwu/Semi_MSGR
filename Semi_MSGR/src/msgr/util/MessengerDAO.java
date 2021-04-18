@@ -306,17 +306,15 @@ public class MessengerDAO {
 		return tempList;
 	}
 
-	public static void main(String[] args) {
-		MessengerDAO				dao		= new MessengerDAO();
-		MessengerMap				msgrMap	= MessengerMap.getInstance();
-		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-		msgrMap.getMap().put("mem_id_vc", "test1");
-		list = dao.getTalkRoomList(msgrMap.getMap());
-
-		for (Map<String, Object> map : list) {
-			System.out.println(map);
-		}
-
-	}
-
+//	public static void main(String[] args) {
+//		MessengerDAO				dao		= new MessengerDAO();
+//		MessengerMap				msgrMap	= MessengerMap.getInstance();
+//		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+//		msgrMap.getMap().put("mem_id_vc", "test1");
+//		list = dao.getTalkRoomList(msgrMap.getMap());
+//
+//		for (Map<String, Object> map : list) {
+//			System.out.println(map);
+//		}
+//	}
 }
