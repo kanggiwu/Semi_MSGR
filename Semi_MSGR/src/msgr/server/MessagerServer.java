@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -17,7 +18,7 @@ public class MessagerServer extends JFrame implements Runnable{
 	JScrollPane scrollPane = new JScrollPane(textArea_log,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	MessengerServerThread msgrServerThread = null;
-	List<MessengerTalkRoom> globalList = null;// 현재 접속중인 사람들 리스트
+	List<MessengerServerThread> globalList = null;// 현재 접속중인 사람들 리스트
 	List<MessengerTalkRoom> talkRoomList = null;// 방에 참여한 사람들 리스트
 	
 	
@@ -51,6 +52,7 @@ public class MessagerServer extends JFrame implements Runnable{
 	}
 	@Override
 	public void run() {
+		globalList = new Vector<>();// 접속한 클라이언트를 관리할 리스트 초기화
 		boolean isStop = false;
 		
 		try {
