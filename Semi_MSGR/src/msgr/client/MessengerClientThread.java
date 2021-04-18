@@ -23,7 +23,9 @@ public class MessengerClientThread extends Thread {
 	public MessengerClientThread(MessengerClient msgrClient) {
 		this.msgrClientThread = msgrClientThread;
 	}
-
+	public void hi () {
+		System.out.println( "bye 난 퇴근 해야할듯 .............");
+	}
 	public SimpleAttributeSet makeAttribute(String fcolor) {
 		SimpleAttributeSet sas = new SimpleAttributeSet();
 		sas.addAttribute(StyleConstants.ColorConstants.Foreground, new Color(Integer.parseInt(fcolor)));
