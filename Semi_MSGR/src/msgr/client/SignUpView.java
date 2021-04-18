@@ -15,8 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import messenger.map.MessengerMap;
-import messenger.util.MessengerDAO;
+import msgr.map.MessengerMap;
+import msgr.util.MessengerDAO;
 
 public class SignUpView extends JDialog implements ActionListener {
 
@@ -33,12 +33,14 @@ public class SignUpView extends JDialog implements ActionListener {
 	private JButton			button_close		= null;
 	private JButton			button_idCheck		= null;
 	MessengerDAO			dao					= null;
+	private String			id					= "";
+	private boolean			isChecked			= false;
 
-//	public SignUpView() {
-//		initDisplay();
-//	}
+	public SignUpView() {
+		initDisplay();
+	}
 
-	public void initDisplay() {
+	private void initDisplay() {
 		Font	font		= new Font("맑은 고딕", Font.BOLD, 14);
 		Font	labelFont	= new Font("맑은 고딕", Font.PLAIN, 12);
 
@@ -119,46 +121,60 @@ public class SignUpView extends JDialog implements ActionListener {
 		this.setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		SignUpView s = new SignUpView();
-		s.initDisplay();
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 
+		// 회원가입 버튼을 눌렀을 경우
 		if (obj == button_signUp) {
 
-			if ("".equals(textField_id.getText()) || "".equals(pwField_pw.getText())
-										|| "".equals(textField_nickname.getText())) {
+			if ("".equals(textField_id.getText()) || "".equals(pwField_pw.getText()) || "".equals(textField_nickname.getText())) {
+
+				// 중복확인을 했으나 아이디를 재입력했을 경우 다시 중복확인을 요청함
+				if (!id.equals(textField_id.getText())) {
+					isChecked = false;
+
+					if (!isChecked) {
+						JOptionPane.showMessageDialog(this, "아이디 중복확인을 해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
+				}
 				JOptionPane.showMessageDialog(this, "입력되지 않은 칸이 있습니다.", "경고", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 			else {
-				int				accept	= 0;
+
+				// 중복확인을 했으나 아이디를 재입력했을 경우 다시 중복확인을 요청함
+				if (!id.equals(textField_id.getText())) {
+					isChecked = false;
+
+					if (!isChecked) {
+						JOptionPane.showMessageDialog(this, "아이디 중복확인을 해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
+				}
+				int				idCheck	= 0;
 				MessengerMap	pMap	= MessengerMap.getInstance();
 				dao = MessengerDAO.getInstance();
-				pMap.getMap().put("id", textField_id.getText());
-				pMap.getMap().put("password", pwField_pw.getText());
-				pMap.getMap().put("nickname", textField_nickname.getText());
-				accept = dao.signUp(pMap.getMap());
+				pMap.getMap().put("mem_id_vc", textField_id.getText());
+				pMap.getMap().put("mem_pw_vc", pwField_pw.getText());
+				pMap.getMap().put("mem_nick_vc", textField_nickname.getText());
+				idCheck = dao.signUp(pMap.getMap());
 
-				if (accept == 1) {
+				if (idCheck == 1) {
 					JOptionPane.showMessageDialog(this, "회원가입 성공", "알림", JOptionPane.INFORMATION_MESSAGE);
 					this.dispose();
 				}
-
-				// 이부분은 쿼리문에서 아예 빠꾸먹어서 타지 않음 수정해야함//
-				else {
+				else if (idCheck == -1) {
 					JOptionPane.showMessageDialog(this, "회원가입 실패", "알림", JOptionPane.INFORMATION_MESSAGE);
 				}
-				// 이부분은 쿼리문에서 아예 빠꾸먹어서 타지 않음 수정해야함//
 			}
 		}
+		// 닫기 버튼을 눌렀을 경우
 		else if (obj == button_close) {
 			this.dispose();
 		}
+		// 중복확인 버튼을 눌렀을 경우
 		else if (obj == button_idCheck) {
 
 			if ("".equals(textField_id.getText())) {
@@ -167,22 +183,22 @@ public class SignUpView extends JDialog implements ActionListener {
 			}
 			else {
 				MessengerMap pMap = MessengerMap.getInstance();
-				pMap.getMap().put("id", textField_id.getText());
-				List<Map<String, Object>> vector = new Vector<>();
+				pMap.getMap().put("mem_id_vc", textField_id.getText());
+				List<Map<String, Object>> tempList = new Vector<>();
 				dao = MessengerDAO.getInstance();
-				vector = dao.idCheck(pMap.getMap());
-				System.out.println(vector);
+				tempList = dao.idCheck(pMap.getMap());
 
-				////////////////////// 여기 닉네임 안 겹칠 때 에러남 수정해야됨////////////////
-				if (vector.size() != 0 || textField_id.getText().equals(vector.get(0).get("ID"))) {
+				if (tempList.size() > 0) {
 					JOptionPane.showMessageDialog(this, "중복된 아이디입니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+					label_idCheck.setText("");
 				}
-				//////////////////// 여기 닉네임 안 겹칠 때 에러남 수정해야됨////////////////
-
-				if (vector.size() == 0) {
+				else {
+					label_idCheck.setText("");
 					JOptionPane.showMessageDialog(this, "가입 가능한 아이디입니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+					id = textField_id.getText();
+					isChecked = true;
 				}
 			}
-		}
+		} // end of 중복체크
 	}
 }
