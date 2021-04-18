@@ -19,7 +19,7 @@ public class MessengerClientThread extends Thread {
 	MessengerClientThread msgrClientThread = null;
 	String path = "C:\\Java\\dev_javaB\\dev_java\\src\\image\\";
 	String g_roomTitle = null;
-	int    protocol    = null;
+	
 	public MessengerClientThread(MessengerClient msgrClient) {
 		this.msgrClientThread = msgrClientThread;
 	}
