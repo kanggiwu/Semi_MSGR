@@ -55,7 +55,7 @@ public class Imoticon extends JDialog implements ActionListener {
 		pic4.setFont(new java.awt.Font("SansSerif", 0, 12));
 		pic4.setBorder(null);
 		this.getContentPane().setBackground(new Color(125, 144, 177));
-		this.setTitle("메세지 이미지");
+		this.setTitle("이모티콘");
 		this.getContentPane().add(jPanel1, null);
 		jPanel1.add(pic0, null);
 		jPanel1.add(pic1, null);
@@ -96,32 +96,32 @@ public class Imoticon extends JDialog implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
-
-		// JOptionPane.showMessageDialog(mr, "obj:"+obj);
-		if (obj == pic0) {// 고추
-			imgChoice = "RYAN1.png";
-			msgrChatView.message_process("이모티콘", imgChoice);
-			// this.setVisible(false);
-		}
-		else if (obj == pic1) {// 편지
-			imgChoice = "RYAN2.png";
-			msgrChatView.message_process("이모티콘", imgChoice);
-			// this.setVisible(false);
-		}
-		else if (obj == pic2) {// 평귄
-			imgChoice = "RYAN3.png";
-			msgrChatView.message_process("이모티콘", imgChoice);
-			// this.setVisible(false);
-		}
-		else if (obj == pic3) {// 선물
-			imgChoice = "RYAN4.png";
-			msgrChatView.message_process("이모티콘", imgChoice);
-			// this.setVisible(false);
-		}
-		else if (obj == pic4) {// 커피
-			imgChoice = "RYAN5.png";
-			msgrChatView.message_process("이모티콘", imgChoice);
-			// this.setVisible(false);
-		}
+//
+//		// JOptionPane.showMessageDialog(mr, "obj:"+obj);
+//		if (obj == pic0) {// 고추
+//			imgChoice = "RYAN1.png";
+//			msgrChatView.message_process("이모티콘", imgChoice);
+//			// this.setVisible(false);
+//		}
+//		else if (obj == pic1) {// 편지
+//			imgChoice = "RYAN2.png";
+//			msgrChatView.message_process("이모티콘", imgChoice);
+//			// this.setVisible(false);
+//		}
+//		else if (obj == pic2) {// 평귄
+//			imgChoice = "RYAN3.png";
+//			msgrChatView.message_process("이모티콘", imgChoice);
+//			// this.setVisible(false);
+//		}
+//		else if (obj == pic3) {// 선물
+//			imgChoice = "RYAN4.png";
+//			msgrChatView.message_process("이모티콘", imgChoice);
+//			// this.setVisible(false);
+//		}
+//		else if (obj == pic4) {// 커피
+//			imgChoice = "RYAN5.png";
+//			msgrChatView.message_process("이모티콘", imgChoice);
+//			// this.setVisible(false);
+//		}
 	}
 }
