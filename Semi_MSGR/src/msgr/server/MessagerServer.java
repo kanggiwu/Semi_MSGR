@@ -57,7 +57,7 @@ public class MessagerServer extends JFrame implements Runnable{
 		
 		try {
 			server = new ServerSocket(21430);// 포트번호 준비
-			textArea_log.append("서버가 준비되었습니다.");
+			textArea_log.append("서버가 준비되었습니다.\n");
 			
 			while(!isStop) {
 				client = server.accept();// 클라이언트 스레드를 기다림..

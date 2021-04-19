@@ -22,10 +22,21 @@ public class MessengerServerThread extends Thread {
 	MessengerMap				pMap			= null;
 	List<MessengerServerThread>	bubbyList		= null;
 	List<MessengerTalkRoom>		talkRoomList	= null;
+
 //깃허브 연습
 	public MessengerServerThread(MessagerServer msgrServer) {
 		this.msgrServer = msgrServer;
+		this.client = msgrServer.client;
+		try {
+			oos = new ObjectOutputStream(client.getOutputStream());
+			ois = new ObjectInputStream(client.getInputStream());
+			msgrServer.globalList.add(this);
+		}
+		catch (Exception e) {
+			e.getStackTrace();
+		}
 	}
+
 //깃 연습
 	public void run() {
 		String msg = null;
@@ -43,28 +54,35 @@ public class MessengerServerThread extends Thread {
 				StringTokenizer	token		= null;	// 토큰 선언
 				int				protocol	= -1;	// 프로토콜 선언
 
-				if (msg != null) {
-					token = new StringTokenizer(msg, Protocol.SEPERATOR);
-					protocol = Integer.parseInt(token.nextToken()); // 프로토콜 초기화
-				}
+				/*	if (msg != null) {
+						token = new StringTokenizer(msg, Protocol.SEPERATOR);
+						System.out.println(token);
+						protocol = Integer.parseInt(token.nextToken()); // 프로토콜 초기화
+					}*/
 
 				// 클라이언트에서 로그인 시, 친구리스트 출력 & 톡방리스트 출력 요청
 				switch (protocol) {
-				case Protocol.LOGIN: {// 로그인
-					// 프로토콜#id#pw
-					id = token.nextToken();
-					String pw = token.nextToken();
-					pMap.getMap().put("mem_id_vc", id);
-					pMap.getMap().put("mem_pw_vc", pw);
-					msgrDAO.signIn(pMap.getMap());
-				}
-					break;
+				/*	case Protocol.LOGIN: {// 로그인
+						// 프로토콜#id#pw
+						id = token.nextToken();
+						String pw = token.nextToken();
+						pMap.getMap().put("mem_id_vc", id);
+						pMap.getMap().put("mem_pw_vc", pw);
+						msgrDAO.signIn(pMap.getMap());
+					}
+						break;*/
 				case Protocol.LOGOUT: {// 로그아웃
+					msgrServer.textArea_log.append("로그아웃버튼 클릭" + msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 					msgrServer.globalList.remove(this);// 접속자 목록에서 삭제
+					String response = Integer.toString(Protocol.LOGOUT);
+					send(response);
 					// 현재 접속자에 대한 정보를 클라이언트가 알 필요는 없으니까, 메세지를 보낼 필요가 없다.?
 				}
 					break;
 				case Protocol.CHANGE_NICKNAME: {// 닉네임변경
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 					// 프로토콜# 기존 닉네임 # 이후 닉네임
 					String	nickname	= token.nextToken();
 					String	aftername	= token.nextToken();
@@ -76,10 +94,14 @@ public class MessengerServerThread extends Thread {
 												+ Protocol.SEPERATOR
 												+ aftername;
 					buddyCasting(response);// 접속해 있는 친구들에게 브로드 캐스팅
-					// msgrDAO.changeNickname(id,aftername);
+					pMap.getMap().put("mem_nick_vc", nickname);
+					pMap.getMap().put("mem_id_vc", id);
+					msgrDAO.changeNickname(pMap.getMap());
 				}
 					break;
 				case Protocol.MEM_DELETE: {// 회원탈퇴
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 					// 프로토콜#
 					msgrServer.globalList.remove(this);
 					String response = Integer.toString(Protocol.MEM_DELETE) + id;
@@ -88,47 +110,66 @@ public class MessengerServerThread extends Thread {
 				}
 					break;
 				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성
-
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 				}
 					break;
 				case Protocol.ROOM_CREATE_OPENTALK: {// 오픈톡 생성
-
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 				}
 					break;
 				case Protocol.ROOM_LIST: {// 톡방 리스트 출력
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 					List<String> talkRoomList = new Vector<>();
 					// talkRoomList.msgrDAO.getTalkRoomList();
 				}
 					break;
 				case Protocol.ROOM_IN: {// 톡방 참가
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 
 				}
 					break;
 				case Protocol.ROOM_IN_MEM: {// 톡방 참가 인원
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 
 				}
 					break;
 				case Protocol.ROOM_OUT: {// 톡방 닫기
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 
 				}
 					break;
 				case Protocol.ROOM_DELETE: {// 톡방 나가기
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 
 				}
 					break;
 				case Protocol.BUDDY_ADD: {// 친구추가
-
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 				}
 					break;
 				case Protocol.BUDDY_LIST: {// 친구목록 출력
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 					// bubbyList.getBuddyList();
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {// 친구 삭제
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 
 				}
 					break;
-				case Protocol.MESSAGE: {// 메시지 전송
+				case Protocol.SENDCHAT: {// 메시지 전송
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 					// 프로토롤#닉네임#메세지내용
 					String	nickname		= token.nextToken();
 					String	talkRoomFlag	= token.nextToken();
@@ -138,10 +179,14 @@ public class MessengerServerThread extends Thread {
 				}
 					break;
 				case Protocol.EMOTICON: {// 이모티콘 전송
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 
 				}
 					break;
 				case Protocol.ATTACHMENT: {// 파일 전송
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 
 				}
 					break run_start;
