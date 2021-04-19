@@ -38,6 +38,8 @@ public class MessengerClientThread extends Thread {
 							msg, Protocol.SEPERATOR);
 					protocol = Integer.parseInt(st.nextToken());
 				}
+				
+				
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.LOGIN: {}
