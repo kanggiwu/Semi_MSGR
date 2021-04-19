@@ -85,9 +85,9 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + nickname);
-//			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
-//			msgrClientThread.start();// TalkClientThread의 run호출됨.-콜백함수
+			oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + id);
+			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
+			msgrClientThread.start();
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());

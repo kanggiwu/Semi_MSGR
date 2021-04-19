@@ -65,7 +65,7 @@ public class MessengerChatView extends JDialog implements ActionListener {
 			messegeField.requestFocus();
 		}
 		else if (button_emoticon == obj) {
-			Imoticon imoticon = new Imoticon(this);
+			Emoticon emoticon = new Emoticon(this);
 		}
 	}
 }

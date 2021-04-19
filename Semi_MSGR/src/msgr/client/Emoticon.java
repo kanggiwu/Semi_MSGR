@@ -4,7 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class Imoticon extends JDialog implements ActionListener {
+public class Emoticon extends JDialog implements ActionListener {
 	JPanel				jPanel1			= new JPanel();
 	MessengerChatView	msgrChatView	= null;
 	JButton				pic0			= new JButton();
@@ -21,7 +21,7 @@ public class Imoticon extends JDialog implements ActionListener {
 	String				imgChoice		= "default";
 	String				path			= "src\\";
 
-	public Imoticon(MessengerChatView msgrChatView) {
+	public Emoticon(MessengerChatView msgrChatView) {
 		this.msgrChatView = msgrChatView;
 
 		try {

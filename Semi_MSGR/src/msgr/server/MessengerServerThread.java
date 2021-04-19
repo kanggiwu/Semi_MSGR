@@ -22,10 +22,13 @@ public class MessengerServerThread extends Thread {
 	MessengerMap				pMap			= null;
 	List<MessengerServerThread>	bubbyList		= null;
 	List<MessengerTalkRoom>		talkRoomList	= null;
+
 //깃허브 연습
 	public MessengerServerThread(MessagerServer msgrServer) {
 		this.msgrServer = msgrServer;
+		this.client = msgrServer.client;
 	}
+
 //깃 연습
 	public void run() {
 		String msg = null;
@@ -34,8 +37,12 @@ public class MessengerServerThread extends Thread {
 		boolean isStop = false;
 
 		try {
+			oos = new ObjectOutputStream(client.getOutputStream());
+			ois = new ObjectInputStream(client.getInputStream());
 			pMap = MessengerMap.getInstance();
 			msgrDAO = MessengerDAO.getInstance();
+
+			// while문
 			run_start: while (!isStop) {
 				msg = (String) ois.readObject();// 클라이언트에서 보낸 메시지 받기
 				msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
@@ -50,13 +57,14 @@ public class MessengerServerThread extends Thread {
 
 				// 클라이언트에서 로그인 시, 친구리스트 출력 & 톡방리스트 출력 요청
 				switch (protocol) {
-				case Protocol.LOGIN: {// 로그인
-					// 프로토콜#id#pw
+				case Protocol.LOGIN: {
 					id = token.nextToken();
-					String pw = token.nextToken();
+//					String pw = token.nextToken();
 					pMap.getMap().put("mem_id_vc", id);
-					pMap.getMap().put("mem_pw_vc", pw);
-					msgrDAO.signIn(pMap.getMap());
+					msgrDAO.getBuddyList(pMap.getMap());
+//					pMap.getMap().put("mem_pw_vc", pw);
+//					msgrDAO.signIn(pMap.getMap());
+					oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + "서버가 로그인 메시지 받아서 답장함");
 				}
 					break;
 				case Protocol.LOGOUT: {// 로그아웃
