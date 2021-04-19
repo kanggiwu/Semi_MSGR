@@ -27,6 +27,7 @@ public class SignInView extends JFrame implements ActionListener {
 	private JButton				button_signIn	= null;
 	private JButton				button_signUp	= null;
 	MessengerDAO				msgrDAO			= null;
+	private String				id				= "";
 	private String				nickname		= "";
 	private MessengerClientView	msgrClient		= null;
 
@@ -44,26 +45,32 @@ public class SignInView extends JFrame implements ActionListener {
 		button_signIn = new JButton("로그인");
 		button_signUp = new JButton("회원가입");
 		this.setLayout(null);
+		
 		// 아이디 레이블
 		label_id.setFont(font);
 		label_id.setBounds(40, 10, 100, 20);
 		this.add(label_id);
+		
 		// 아이디 텍스트필드
 		textField_id.setBounds(150, 10, 100, 20);
 		textField_id.addActionListener(this);
 		this.add(textField_id);
+		
 		// 비밀번호 레이블
 		label_pw.setFont(font);
 		label_pw.setBounds(40, 40, 100, 20);
 		this.add(label_pw);
+		
 		// 비밀번호 패스워드필드
 		pwField_pw.setBounds(150, 40, 100, 20);
 		this.add(pwField_pw);
+		
 		// 로그인 버튼
 		button_signIn.setFont(font);
 		button_signIn.setBounds(40, 70, 90, 30);
 		button_signIn.addActionListener(this);
 		this.add(button_signIn);
+		
 		// 회원가입 버튼
 		button_signUp.setFont(font);
 		button_signUp.setBounds(150, 70, 90, 30);
@@ -108,6 +115,7 @@ public class SignInView extends JFrame implements ActionListener {
 
 				// 리스트 길이가 0보다 크면 받아온 결과가 있다는 뜻
 				if (tempList.size() > 0) {
+					id = String.valueOf(tempList.get(0).get("MEM_ID_VC"));
 					nickname = String.valueOf(tempList.get(0).get("MEM_NICK_VC"));
 					JOptionPane.showMessageDialog(this, nickname + "님의 접속을 환영합니다.");
 					this.setVisible(false);
@@ -136,6 +144,14 @@ public class SignInView extends JFrame implements ActionListener {
 		}
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getNickname() {
 		return nickname;
 	}
@@ -143,4 +159,5 @@ public class SignInView extends JFrame implements ActionListener {
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
+
 }
