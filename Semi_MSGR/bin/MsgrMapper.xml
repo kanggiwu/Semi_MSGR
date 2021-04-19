@@ -8,6 +8,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="MsgrMapper">
 	<resultMap type="map" id="result" />
 
+<!--
+	Mybatis에서 insert, update, delete의 return은 int이다.
+	쿼리에서 resultType에 int를 선언하는 것이 아니라 자바 코드에서 리턴 타입을 int로 선언하는 것. 
+	Mybatis에서는 기본적으로 쿼리가 돌고 나면 업데이트 한 행의 개수를 리턴한다.
+	insert: 1(여러갱의 경우도 1)
+	update: 수정에 성공한 행의 개수 반환, 실패시 0 반환
+	delete: 삭제한 행의 개수를 반환.
+	
+	***resultType은 select 구문에만 존재 ***
+ -->
 	<!-- 로그인 쿼리문 --><!-- 확인 -->
 	<select id="signIn" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT mem_id_vc, mem_nick_vc
@@ -23,8 +33,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 회원가입 쿼리문 --><!-- 확인 -->
 	<insert id="signUp" parameterType="java.util.Map">
-		INSERT INTO msgr_member(mem_id_vc, mem_pw_vc, mem_nick_vc) VALUES (#{mem_id_vc}, #{mem_pw_vc},
-		#{mem_nick_vc})
+		INSERT INTO msgr_member(mem_id_vc, mem_pw_vc, mem_nick_vc) 
+		VALUES (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
 	</insert>
 
 	<!-- 톡방리스트 불러오기 쿼리문 --><!-- 확인 -->
@@ -38,7 +48,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 친구목록 불러오기 쿼리문 --> <!-- 확인 -->
 	<select id="getBuddyList" parameterType="java.util.Map" resultType="java.util.Map">
-
 		SELECT M_BUDDY.buddy_id_vc, M_MEMBER.MEM_NICK_VC
 		FROM msgr_member m_member, msgr_buddy m_buddy
 		WHERE M_MEMBER.MEM_ID_VC = M_BUDDY.buddy_id_vc
@@ -46,16 +55,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 
-	<!-- 오픈톡방 추가하기 쿼리문 -->
-	<insert id="createOpenTalkRoom" parameterType="java.util.Map">
-		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES
-		(#{room_no_nu}, #{room_name_vc}, 0)
+	<!-- 오픈톡방 추가하기 쿼리문 --><!-- 확인 -->
+	<insert id="createOpenTalkRoom" parameterType="java.util.Map" >
+		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
+		VALUES (#{room_no_nu}, #{room_name_vc}, 0)
 	</insert>
 
-	<!-- 친구톡방 추가하기 쿼리문 -->
+	<!-- 친구톡방 추가하기 쿼리문 --><!-- 확인 -->
 	<insert id="createBuddyTalkRoom" parameterType="java.util.Map">
-		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES
-		(#{room_no_nu}, #{room_name_vc}, 1)
+		INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
+		VALUES (#{room_no_nu}, #{room_name_vc}, 1)
 	</insert>
 
 	<!-- 톡방 삭제 쿼리문 -->
@@ -72,25 +81,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 마지막 대화번호 가져오기 쿼리문 -->
 	<select id="getLastChatNum" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat ORDER
-		BY chat_no_nu DESC) WHERE ROWNUM =1
+		SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat 
+		ORDER BY chat_no_nu DESC) WHERE ROWNUM =1
 	</select>
 
 	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 -->
 	<select id="getChatAfterJoin" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST
-		rlist
+		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST	rlist
 		WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc})
-		AND rlist.mem_id_vc =
-		#{rlist.mem_id_vc}
-		AND chat.roon_no_nu = #{chat.room_no_nu}
+		AND rlist.mem_id_vc = #{rlist.mem_id_vc}
+		AND chat.room_no_nu = #{chat.room_no_nu}
 
 	</select>
 
 	<!-- 회원탈퇴 쿼리문 -->
 	<!-- 다중쿼리...? 쿼리 한문장 끝날때마다 ;세미콜론 필수 -->
-
-	<!-- 1. msgr_chat 에서 mem_id_vc null로 바꾸기 2. 톡방 리스트에서 #{mem_id_vc 삭제} 3. 친구목록에서 #{mem_id_vc}삭제 4. 멤버에서 삭제 -->
+	<!-- 
+	1. msgr_chat 에서 mem_id_vc null로 바꾸기 
+	2. 톡방 리스트에서 #{mem_id_vc 삭제} 
+	3. 친구목록에서 #{mem_id_vc}삭제 
+	4. 멤버에서 삭제 -->
 	<delete id="deleteMember" parameterType="java.util.Map">
 		{
 		CALL
@@ -106,7 +116,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 친구삭제 쿼리문 다중 쿼리문 얘 또 써야 하나? -->
 	<delete id="deleteBuddy" parameterType="java.util.Map">
-		{CALL
+		{
+		CALL
 		BEGIN
 		DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
 		DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
@@ -116,13 +127,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 닉네임 변경 쿼리문 -->
 	<update id="changeNickname" parameterType="java.util.Map">
-		UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc =
-		#{mem_id_vc}
+		UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc = #{mem_id_vc}
 	</update>
 
-	<!-- 친구추가 쿼리문 --><!-- 여기도 확인해야 함 - 확인했음 210418 -->
+	<!-- 친구추가 쿼리문 --><!-- 확인 -->
 	<insert id="makeBuddys" parameterType="java.util.Map">
-		INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq_nu.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc}
+		INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) 
+		VALUES (buddy_seq_nu.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc}
 	</insert>
 
 </mapper>

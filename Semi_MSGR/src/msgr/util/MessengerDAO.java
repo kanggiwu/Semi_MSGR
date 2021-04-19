@@ -28,8 +28,12 @@ public class MessengerDAO {
 	SqlSessionFactory factory = null;
 
 	/**
-	 * alt + shift + j 로그인 메서드 SELECT mem_id_vc, mem_nick_vc FROM MSGR_MEMBER WHERE
-	 * mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
+	 * alt + shift + j 
+	 * 
+	 * 로그인 메서드 /확인
+	 * 
+	 * SELECT mem_id_vc, mem_nick_vc FROM MSGR_MEMBER 
+	 * WHERE mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디, 비밀번호를 저장해둔 Map
 	 * @return tempList - 아이디, 비밀번호 일치 시 아이디, 닉네임을 리스트로 리턴
@@ -45,8 +49,9 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 회원가입의 아이디 중복확인 메서드 SELECT mem_id_vc FROM msgr_member WHERE mem_id_vc =
-	 * #{mem_id_vc}
+	 * 회원가입의 아이디 중복확인 메서드 /확인
+	 * 
+	 * SELECT mem_id_vc FROM msgr_member WHERE mem_id_vc = #{mem_id_vc}
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디를 저장해둔 Map
 	 * @return tempList - 사용자가 입력한 아이디와 일치하는 아이디를 리스트로 리턴
@@ -61,8 +66,10 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 회원가입 메서드 INSERT INTO msgr_member (mem_id_vc, mem_pw_vc, mem_nick_vc) values
-	 * (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
+	 * 회원가입 메서드  /확인
+	 * 
+	 * INSERT INTO msgr_member (mem_id_vc, mem_pw_vc, mem_nick_vc) 
+	 * VALUES (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디, 비밀번호, 닉네임을 저장해둔 Map
 	 * @return accept - (1) : 회원가입 성공 (-1) : 회원가입 실패
@@ -87,10 +94,12 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 톡방리스트 불러오기 메서드 SELECT room.room_name_vc, room.room_no_nu FROM MSGR_ROOM room,
-	 * MSGR_ROOM_IN_LIST rlist WHERE room.room_no_nu = rlist.room_no_nu AND
-	 * rlist.mem_id_vc = #{mem_id_vc} ORDER BY room.room_no_nu ASC
+	 * 톡방리스트 불러오기 메서드 /확인
 	 * 
+	 * SELECT room.room_name_vc, room.room_no_nu FROM MSGR_ROOM room,MSGR_ROOM_IN_LIST rlist 
+	 * WHERE room.room_no_nu = rlist.room_no_nu 
+	 * AND rlist.mem_id_vc = #{mem_id_vc} ORDER BY room.room_no_nu ASC
+	 *  
 	 * @param pMap
 	 * @return
 	 */
@@ -105,8 +114,9 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구목록 불러오기 메서드 SELECT buddy_id_vc FROM MSGR_BUDDY WHERE mem_id_vc =
-	 * #{mem_id_vd} ORDER BY mem_id_vc
+	 * 친구목록 불러오기 메서드 /확인
+	 * 
+	 * SELECT buddy_id_vc FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vd} ORDER BY mem_id_vc
 	 * 
 	 * @param pMap
 	 * @return
@@ -122,41 +132,71 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 오픈톡방 추가하기 메소드
+	 * 오픈톡방 추가하기 메소드 /확인
 	 * 
-	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES
-	 * (#{room_no_nu), #{room_name_vc}, 0)
+	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
+	 * VALUES (#{room_no_nu), #{room_name_vc}, 0)
 	 * 
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> createOpenTalkRoom(Map<String, Object> pMap) {
+	public int createOpenTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.createOpenTalkRoom", pMap);
+		int createOpenTalkCheck = 0;
+		
+		try {
+			createOpenTalkCheck = sqlSession.insert("MsgrMapper.createOpenTalkRoom", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage()); //console 창에 에러이벤트에 대한 메시지를 가져와라. 
+			createOpenTalkCheck = -1;
+		}
+		
+		sqlSession.commit();
 
 		sqlSession.close();
-
-		return tempList;
+		return createOpenTalkCheck;
 	}
+//	public static void main(String[] args) {
+//		MessengerDAO				dao		= new MessengerDAO();
+//		MessengerMap				msgrMap	= MessengerMap.getInstance();
+//		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+//		msgrMap.getMap().put("room_no_nu", 5);
+//		msgrMap.getMap().put("room_name_vc", "톡방이름5");
+//
+//		
+//		int test = dao.createOpenTalkRoom(msgrMap.getMap());
+//		System.out.println(test);
+//		
+//	}
 
 	/**
-	 * 친구톡방 추가하기 메소드
+	 * 친구톡방 추가하기 메소드 /확인
 	 * 
-	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES
-	 * (#{room_no_nu), #{room_name_vc}, 1)
+	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
+	 * VALUES (#{room_no_nu), #{room_name_vc}, 1)
 	 * 
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> createBuddyTalkRoom(Map<String, Object> pMap) {
+	public int createBuddyTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.createBuddyTalkRoom", pMap);
-
+		int							createBuddyTalkCheck = 0;
+		
+		try {
+			createBuddyTalkCheck = sqlSession.insert("MsgrMapper.createBuddyTalkRoom", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			createBuddyTalkCheck = -1;
+		}
+		sqlSession.commit();
+		
 		sqlSession.close();
 
-		return tempList;
+		return createBuddyTalkCheck;
 	}
 
 	/**
@@ -196,7 +236,10 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 마지막 대화번호 가져오기 메소드 SELECT chat_no_nu FROM(SELECT chat_no_nu) FROM MSGR_CHAT
+	 * 마지막 대화번호 가져오기 메소드 
+	 * 
+	 * SELECT chat_no_nu FROM(SELECT chat_no_nu) 
+	 * FROM MSGR_CHAT 
 	 * ORDER BY chat_no_nu DESC) WHERE ROWNUM =1
 	 * 
 	 * @param pMap
@@ -213,10 +256,11 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 톡방 참가한 이후의 대화내용 가져오기 메소드 SELECT chat.chat_vc FROM MSGR_CHAT chat,
-	 * MSGR_ROOM_IN_LIST rlist WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM
-	 * MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc}) AND rlist.mem_id_vc =
-	 * #{rlist.mem_id_vc} AND chat.roon_no_nu = #{chat.room_no_nu}
+	 * 톡방 참가한 이후의 대화내용 가져오기 메소드 
+	 * 
+	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
+	 * WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc}) 
+	 * AND rlist.mem_id_vc = #{rlist.mem_id_vc} AND chat.roon_no_nu = #{chat.room_no_nu}
 	 * 
 	 * @param pMap
 	 * @return
@@ -232,10 +276,14 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 회원탈퇴 메소드 { CALL BEGIN UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc =
-	 * #{mem_id_vd}; DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
-	 * DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc}; DELETE FROM
-	 * MSGR__MEMBER WEHRE mem_id_vc = #{mem_id_vc}; END }
+	 * 회원탈퇴 메소드 
+	 * 
+	 * {
+	 * CALL BEGIN UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vd}; 
+	 * DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
+	 * DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc}; DELETE FROM MSGR__MEMBER WEHRE mem_id_vc = #{mem_id_vc}; 
+	 * END
+	 * }
 	 * 
 	 * @param pMap
 	 * @return
@@ -251,9 +299,14 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구삭제 메소드 { CALL BEGIN DELETE FROM MSGR_BUDDY WHERE buddy_id_vc =
-	 * #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc}; DELETE FROM MSGR_BUDDY WHERE
-	 * buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc}; END }
+	 * 친구삭제 메소드 
+	 * 
+	 * {
+	 * CALL
+	 * BEGIN DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc}; 
+	 * DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
+	 * END
+	 * }
 	 * 
 	 * @param pMap
 	 * @return
@@ -271,8 +324,8 @@ public class MessengerDAO {
 	/**
 	 * 닉네임 변경 메소드
 	 * 
-	 * UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc =
-	 * #{mem_id_vc}
+	 * UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} 
+	 * WHERE mem_id_vc = #{mem_id_vc}
 	 * 
 	 * @param pMap
 	 * @return
@@ -290,8 +343,8 @@ public class MessengerDAO {
 	/**
 	 * 친구추가 메소드
 	 * 
-	 * INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES
-	 * (buddy_seq_nu.NEXTVAL, #{msgr_mem_id), #{msgr_buddy_id};
+	 * INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) 
+	 * VALUES (buddy_seq_nu.NEXTVAL, #{msgr_mem_id), #{msgr_buddy_id}
 	 * 
 	 * @param pMap
 	 * @return
@@ -306,15 +359,21 @@ public class MessengerDAO {
 		return tempList;
 	}
 
-//	public static void main(String[] args) {
-//		MessengerDAO				dao		= new MessengerDAO();
-//		MessengerMap				msgrMap	= MessengerMap.getInstance();
-//		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-//		msgrMap.getMap().put("mem_id_vc", "test1");
-//		list = dao.getTalkRoomList(msgrMap.getMap());
-//
 //		for (Map<String, Object> map : list) {
+//			
 //			System.out.println(map);
 //		}
-//	}
+	public static void main(String[] args) {
+		MessengerDAO				dao		= new MessengerDAO();
+		MessengerMap				msgrMap	= MessengerMap.getInstance();
+		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+		
+		msgrMap.getMap().put("room_no_nu", 6);
+		msgrMap.getMap().put("room_name_vc", "톡방이름6");
+
+		
+		int test = dao.createBuddyTalkRoom(msgrMap.getMap());
+		System.out.println(test);
+		
+	}
 }
