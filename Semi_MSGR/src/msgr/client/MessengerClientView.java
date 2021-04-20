@@ -35,7 +35,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	TalkRoomListView	roomListView			= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
-	private Socket		socket					= null;
+	Socket		socket					= null;
 	ObjectInputStream	ois						= null;
 	ObjectOutputStream	oos						= null;
 	private String		ip						= "127.0.0.1";
