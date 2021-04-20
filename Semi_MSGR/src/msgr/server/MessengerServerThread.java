@@ -1,5 +1,6 @@
 package msgr.server;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import msgr.client.BuddyListView;
 import msgr.map.MessengerMap;
 import msgr.util.MessengerDAO;
 
@@ -20,13 +22,14 @@ public class MessengerServerThread extends Thread {
 	String						nickname		= null;
 	MessengerDAO				msgrDAO			= null;
 	MessengerMap				pMap			= null;
-	List<MessengerServerThread>	bubbyList		= null;
+	List<MessengerServerThread>	buddyList		= null;
 	List<MessengerTalkRoom>		talkRoomList	= null;
 
 //깃허브 연습
 	public MessengerServerThread(MessagerServer msgrServer) {
 		this.msgrServer = msgrServer;
 		this.client = msgrServer.client;
+
 		try {
 			oos = new ObjectOutputStream(client.getOutputStream());
 			ois = new ObjectInputStream(client.getInputStream());
@@ -40,13 +43,16 @@ public class MessengerServerThread extends Thread {
 //깃 연습
 	public void run() {
 		String msg = null;
-		bubbyList = new Vector<>();
+		buddyList = new Vector<>();
 		talkRoomList = new Vector<>();
 		boolean isStop = false;
 
 		try {
 			pMap = MessengerMap.getInstance();
 			msgrDAO = MessengerDAO.getInstance();
+
+			///////////////////////////////////// while문
+			///////////////////////////////////// 시작/////////////////////////////////////
 			run_start: while (!isStop) {
 				msg = (String) ois.readObject();// 클라이언트에서 보낸 메시지 받기
 				msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
@@ -54,59 +60,79 @@ public class MessengerServerThread extends Thread {
 				StringTokenizer	token		= null;	// 토큰 선언
 				int				protocol	= -1;	// 프로토콜 선언
 
-				/*	if (msg != null) {
-						token = new StringTokenizer(msg, Protocol.SEPERATOR);
-						System.out.println(token);
-						protocol = Integer.parseInt(token.nextToken()); // 프로토콜 초기화
-					}*/
+				if (msg != null) {
+					token = new StringTokenizer(msg, Protocol.SEPERATOR);
+					System.out.println(token);
+					protocol = Integer.parseInt(token.nextToken()); // 프로토콜 초기화
+				}
 
 				// 클라이언트에서 로그인 시, 친구리스트 출력 & 톡방리스트 출력 요청
 				switch (protocol) {
-				/*	case Protocol.LOGIN: {// 로그인
-						// 프로토콜#id#pw
-						id = token.nextToken();
-						String pw = token.nextToken();
-						pMap.getMap().put("mem_id_vc", id);
-						pMap.getMap().put("mem_pw_vc", pw);
-						msgrDAO.signIn(pMap.getMap());
-					}
-						break;*/
+				// 100 # id
+				case Protocol.LOGIN: {// 로그인
+					id = token.nextToken();
+					msgrServer.textArea_log.append(msg + "님이 로그인\n");// 클라이언트에서 받은 메시지 로그창에 출력
+				}
+					break;
+
+				// 120 # id
 				case Protocol.LOGOUT: {// 로그아웃
-					msgrServer.textArea_log.append("로그아웃버튼 클릭" + msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.append(msg + "님이 로그아웃\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
 					msgrServer.globalList.remove(this);// 접속자 목록에서 삭제
 					String response = Integer.toString(Protocol.LOGOUT);
 					send(response);
+					isStop = true;
 					// 현재 접속자에 대한 정보를 클라이언트가 알 필요는 없으니까, 메세지를 보낼 필요가 없다.?
 				}
 					break;
+
+				// 130 # id # aftername
 				case Protocol.CHANGE_NICKNAME: {// 닉네임변경
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
-					// 프로토콜# 기존 닉네임 # 이후 닉네임
-					String	nickname	= token.nextToken();
+
+					token.nextToken(); // id는 버린다. 로그용
 					String	aftername	= token.nextToken();
-					this.nickname = aftername;
-					// 접속해 있고, 친구목록에 있는 모든 클라이언트에게 브로드 캐스팅
-					String response = Protocol.CHANGE_NICKNAME
-												+ Protocol.SEPERATOR
-												+ nickname
-												+ Protocol.SEPERATOR
-												+ aftername;
-					buddyCasting(response);// 접속해 있는 친구들에게 브로드 캐스팅
-					pMap.getMap().put("mem_nick_vc", nickname);
+					String	response	= "";
+
 					pMap.getMap().put("mem_id_vc", id);
-					msgrDAO.changeNickname(pMap.getMap());
+					pMap.getMap().put("mem_nick_vc", nickname);
+
+					// 리턴 타입 인티저로 바뀔 예정 1이면 업데이트 성공, else 실패
+					int result = msgrDAO.changeNickname(pMap.getMap());
+
+					if (result == 1) {
+						nickname = aftername;
+					}
+					response = Protocol.CHANGE_NICKNAME
+												+ Protocol.SEPERATOR
+												+ id
+												+ Protocol.SEPERATOR
+												+ nickname;
+					// 접속해 있는 친구들에게 브로드 캐스팅
+					buddyCasting(response);
+					/* 사용자 본인에게 닉네임 변경 결과 전송
+					 * 바뀌었을 경우 바뀐 닉네임 else 원래 닉네임
+					 * 을 정의서에 추가해주기~
+					 * 
+					 */
+					send(response);
+
 				}
 					break;
+
+				// 140#
 				case Protocol.MEM_DELETE: {// 회원탈퇴
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로 스크롤
-					// 프로토콜#
 					msgrServer.globalList.remove(this);
+
 					String response = Integer.toString(Protocol.MEM_DELETE) + id;
+					pMap.getMap().put("mem_id_vc", id);
+					msgrDAO.deleteMember(pMap.getMap());
 					buddyCasting(response);
-					// msgrDAO.deleteMember();
+
 				}
 					break;
 				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성
@@ -197,38 +223,75 @@ public class MessengerServerThread extends Thread {
 			e.getStackTrace();
 		}
 
+		// 여기서 소켓 이상하게 닫힐 수도 있음..
+		finally {
+
+			try {
+				if (client != null)
+					client.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}// ======================== end of run
 
-	private void send(String msg) {
+	private void send(String response) {
 
 		try {
-			oos.writeObject(msg);
+			oos.writeObject(response);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void broadCasting(String msg) {// 접속한 모든 사람들에게 브로드캐스팅
+	private void broadCasting(String response) {// 접속한 모든 사람들에게 브로드캐스팅
 		// 오픈톡방 리스트 출력
 
 		for (MessengerServerThread msgrServerThread : msgrServer.globalList) {
-			msgrServerThread.send(msg);
+			msgrServerThread.send(response);
 		}
 	}
 
-	private void buddyCasting(String msg) {// 접속한 친구들한테만 브로드캐스팅
-		// 친구리스트 출력
+	private void removeBuddy(String response) {// 접속한 친구들한테만 브로드캐스팅
 
-		for (MessengerServerThread globalThread : msgrServer.globalList) {
+		for (int i = 0; i < msgrServer.globalList.size(); i++) {
 
-			for (MessengerServerThread bubbyThread : bubbyList) {
+			for (int j = 0; j < msgrServer.globalList.get(i).buddyList.size(); j++) {
 
-				if (globalThread == bubbyThread) {
-					bubbyThread.send(msg);
+				if (msgrServer.globalList.get(i).buddyList.get(j).id == this.id) {
+					msgrServer.globalList.get(i).buddyList.remove(this);
 				}
 			}
 		}
-	}
 
+		for (MessengerServerThread globalThread : msgrServer.globalList) {
+
+			for (MessengerServerThread bubbyThread : buddyList) {
+
+				if (globalThread.id == bubbyThread.id) {
+					buddyList.remove(this);
+				}
+			}
+		}
+	}// end of buddyCasting()
+
+	private void buddyCasting(String response) {// 접속한 친구들한테만 브로드캐스팅
+		// 친구리스트 출력
+
+		// 접속 중인 사용자 수만큼 루프
+		for (MessengerServerThread globalThread : msgrServer.globalList) {
+
+			// 현재 스레드의 친구목록 수만큼 루프
+			for (MessengerServerThread bubbyThread : buddyList) {
+
+				// 접속 중인 사용자 아이디 == 친구 아이디 ? 접속중인 친구에게 전송
+				if (globalThread.id == bubbyThread.id) {
+					bubbyThread.send(response);
+				}
+			}
+		}
+	}// end of buddyCasting()
 }

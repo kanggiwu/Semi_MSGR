@@ -13,12 +13,13 @@ import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
 	MessengerClientView	msgrClientView	= null;
-	Socket				Server			= null;
+	Socket				socket			= null;
 	ObjectOutputStream	oos				= null;
 	ObjectInputStream	ois				= null;
 
 	public MessengerClientThread(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
+		this.socket = msgrClientView.socket;
 	}
 
 	public void run() {
@@ -84,7 +85,7 @@ public class MessengerClientThread extends Thread {
 				case Protocol.BUDDY_DELETE: {
 				}
 					break;
-				case Protocol.MESSAGE: {
+				case Protocol.SENDCHAT: {
 				}
 					break;
 				case Protocol.EMOTICON: {
