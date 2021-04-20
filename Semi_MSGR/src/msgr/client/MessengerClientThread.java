@@ -1,21 +1,22 @@
 package msgr.client;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
 import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
-	MessengerClientView	msgrClientView	= null;
-	Socket				socket			= null;
-	ObjectOutputStream	oos				= null;
-	ObjectInputStream	ois				= null;
+	MessengerClientView msgrClientView = null;
+	Socket socket = null;
 
 	public MessengerClientThread(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
@@ -23,17 +24,17 @@ public class MessengerClientThread extends Thread {
 	}
 
 	public void run() {
-		String	msg		= null;
-		boolean	isStop	= false;
+		String msg = null;
+		boolean isStop = false;
 
 		while (!isStop) {// 무한루프 방지코드를 꼭 추가하자 - 변수처리하자, 조건식을 활용하자
 
 			try {
 				// 100|나초보
-				msg = (String) msgrClientView.ois.readObject();
+				msg = msgrClientView.br.readLine();
 				JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
-				StringTokenizer	st			= null;
-				int				protocol	= 0;
+				StringTokenizer st = null;
+				int protocol = 0;
 
 				if (msg != null) {
 					st = new StringTokenizer(msg, Protocol.SEPERATOR);
@@ -47,6 +48,10 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.LOGOUT: {
+					msgrClientView.setVisible(false);
+					msgrClientView.dispose();
+					msgrClientView.signInView.setVisible(true);
+					isStop = true;
 				}
 					break;
 				case Protocol.CHANGE_NICKNAME: {
@@ -77,6 +82,7 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_ADD: {
+					
 				}
 					break;
 				case Protocol.BUDDY_LIST: {
@@ -101,9 +107,14 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					socket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

@@ -4,59 +4,63 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 
-import msgr.map.MessengerMap;
 //import messenger.util.Room;
 import msgr.server.Protocol;
-import msgr.util.MessengerDAO;
 
 public class MessengerClientView extends JFrame implements ActionListener {
 
 	// 생성자에서 로그인뷰의 정보를 받아와야 하므로 전역변수 선언
 	// 탭과 탭에 들어갈 패널들(친구목록뷰, 톡방목록뷰)
-	SignInView			signInView				= null;
-	private JTabbedPane	tabbedPane				= new JTabbedPane(JTabbedPane.LEFT);
-	BuddyListView		buddyListView			= null;
-	TalkRoomListView	roomListView			= null;
+	SignInView signInView = null;
+	private JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+	BuddyListView buddyListView = null;
+	TalkRoomListView roomListView = null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
-	Socket		socket					= null;
-	ObjectInputStream	ois						= null;
-	ObjectOutputStream	oos						= null;
-	private String		ip						= "127.0.0.1";
-	private int			port					= 21430;
+	Socket socket = null;
+	ObjectOutputStream oos = null;
+	ObjectInputStream ois = null;
+	PrintWriter pw = null;
+	BufferedReader br = null;
+	private String ip = "127.0.0.1";
+	private int port = 21430;
 
 	// 사용자 아이디, 닉네임
-	private String		id						= "";
-	private String		nickname				= "";
+	private String id = "";
+	private String nickname = "";
 
 	// 클라이언트 메뉴 구성
-	private JMenuBar	menuBar					= null;
-	private JMenu		menu_myPage				= null;
-	private String[]	myPageName				= { "닉네임 변경", "로그아웃", "회원탈퇴" };
-	private JMenuItem[]	menuItem_myPage			= null;
-	private JMenu		menu_talkRoom			= null;
-	private String[]	talkRoomName			= { "오픈톡", "친구톡", "친구추가" };
-	private JMenuItem[]	menuItem_talkRoom		= null;
+	private JMenuBar menuBar = null;
+	private JMenu menu_myPage = null;
+	private String[] myPageName = { "닉네임 변경", "로그아웃", "회원탈퇴" };
+	private JMenuItem[] menuItem_myPage = null;
+	private JMenu menu_talkRoom = null;
+	private String[] talkRoomName = { "오픈톡", "친구톡", "친구추가" };
+	private JMenuItem[] menuItem_talkRoom = null;
 
 	// 우클릭 했을 때 뜨는 팝업메뉴
-	private JPopupMenu	popupMenu				= null;
-	private JMenuItem	menuItem_deleteBuddy	= null;
+	private JPopupMenu popupMenu = null;
+	private JMenuItem menuItem_deleteBuddy = null;
 
 	// 생성자에서 SignInView에서 받은 아이디, 닉네임을 저장함
 	public MessengerClientView(SignInView signInView) {
@@ -66,8 +70,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		try {
 			initDisplay();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -84,12 +87,16 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
+			pw = new PrintWriter(socket.getOutputStream());
+			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-			oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + id);
+			pw.println(Protocol.LOGIN + Protocol.SEPERATOR + id);
+			pw.flush();
+
+			// oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + id);
 			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
 			msgrClientThread.start();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 	}
@@ -157,20 +164,18 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		/////////////////////// 마이페이지 메뉴아이템 시작 ///////////////////////
 		if ("닉네임 변경".equals(command)) {
-
-			try {
-				oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + nickname);
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
+			String aftername = JOptionPane.showInputDialog(this, "변경할 닉네임을 입력하세요", "닉네임 변경", JOptionPane.YES_NO_OPTION);
+			if ("".equals(aftername)) {
+				System.out.println("취소버튼 누른 거 같음");
+			} else {
+				pw.println(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + aftername);
+				pw.flush();
 			}
 		}
 
 		else if ("로그아웃".equals(command)) {
-			System.out.println("로그아웃 버튼");
-			this.setVisible(false);
-			this.dispose();
-			signInView.setVisible(true);
+			pw.println(Protocol.LOGOUT + Protocol.SEPERATOR + id);
+			pw.flush();
 		}
 
 		else if ("회원탈퇴".equals(command)) {
@@ -189,6 +194,19 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		else if ("친구추가".equals(command)) {
 			System.out.println("친구추가 버튼");
+
+			pw.println(Protocol.BUDDY_ADD + Protocol.SEPERATOR + id);
+			pw.flush();
+
+			List<Map<String, Object>> list = new Vector<>();
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("testKey", "testValue");
+			list.add(map);
+			try {
+				oos.writeObject(list);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
