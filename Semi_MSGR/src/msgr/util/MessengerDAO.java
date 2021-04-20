@@ -200,55 +200,43 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 톡방 삭제 메소드
+	 * 톡방 삭제 메소드 /확인 
 	 * 
 	 * DELETE FROM MSGR_ROOM WHERE room_no_nu = #{room_no_nu}
 	 * 
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> deleteTalkRoom(Map<String, Object> pMap) {
+	public int deleteTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.deleteTalkRoom", pMap);
-
+		int deleteTalkRoomCheck = 0;
+		
+		try {
+			deleteTalkRoomCheck = sqlSession.delete("MsgrMapper.deleteTalkRoom", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			deleteTalkRoomCheck = -1;
+		}
+		sqlSession.commit();
 		sqlSession.close();
 
-		return tempList;
+		return deleteTalkRoomCheck;
 	}
 
-	/////////////////////////// 얘가 문제임/////////////////////////////////
 	/**
-	 * 모든 대화내용 삽입 쿼리문 INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc,
-	 * chat_vc) VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
+	 * 대화내용 삽입(매번) 쿼리문 
+	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
+	 * VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	 * 
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> insertAllChat(Map<String, Object> pMap) {
+	public List<Map<String, Object>> insertChat(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.insertAllChat", pMap);
-
-		sqlSession.close();
-
-		return tempList;
-	}
-
-	/**
-	 * 마지막 대화번호 가져오기 메소드 
-	 * 
-	 * SELECT chat_no_nu FROM(SELECT chat_no_nu) 
-	 * FROM MSGR_CHAT 
-	 * ORDER BY chat_no_nu DESC) WHERE ROWNUM =1
-	 * 
-	 * @param pMap
-	 * @return
-	 */
-	public List<Map<String, Object>> getLastChatNum(Map<String, Object> pMap) {
-		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getLastChatNum", pMap);
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.insertChat", pMap);
 
 		sqlSession.close();
 
@@ -279,7 +267,9 @@ public class MessengerDAO {
 	 * 회원탈퇴 메소드 
 	 * 
 	 * {
-	 * CALL BEGIN UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vd}; 
+	 * CALL 
+	 * BEGIN 
+	 * UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vc}; 
 	 * DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
 	 * DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc}; DELETE FROM MSGR__MEMBER WEHRE mem_id_vc = #{mem_id_vc}; 
 	 * END
@@ -291,8 +281,8 @@ public class MessengerDAO {
 	public List<Map<String, Object>> deleteMember(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.deleteMember", pMap);
-
+		int deleteMemberCheck = 0;
+		
 		sqlSession.close();
 
 		return tempList;
@@ -322,7 +312,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 닉네임 변경 메소드
+	 * 닉네임 변경 메소드 /확인 
 	 * 
 	 * UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} 
 	 * WHERE mem_id_vc = #{mem_id_vc}
@@ -330,14 +320,22 @@ public class MessengerDAO {
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> changeNickname(Map<String, Object> pMap) {
+	public int changeNickname(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.changeNickname", pMap);
-
+		int changeNickNameCheck = 0;
+		
+		try {
+			changeNickNameCheck = sqlSession.update("MsgrMapper.changeNickname", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			changeNickNameCheck = -1;
+		}
+		sqlSession.commit();
 		sqlSession.close();
 
-		return tempList;
+		return changeNickNameCheck;
 	}
 
 	/**
@@ -349,31 +347,42 @@ public class MessengerDAO {
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> makeBuddys(Map<String, Object> pMap) {
+	public int makeBuddys(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.makeBuddys", pMap);
-
+		int makeBuddysCheck = 0;
+		
+		try {
+			makeBuddysCheck = sqlSession.insert("MsgrMapper.makeBuddys", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			makeBuddysCheck = -1;
+		}
+		sqlSession.commit();
 		sqlSession.close();
 
-		return tempList;
+		return makeBuddysCheck;
 	}
-
-//		for (Map<String, Object> map : list) {
-//			
-//			System.out.println(map);
-//		}
 	public static void main(String[] args) {
 		MessengerDAO				dao		= new MessengerDAO();
 		MessengerMap				msgrMap	= MessengerMap.getInstance();
 		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
 		
-		msgrMap.getMap().put("room_no_nu", 6);
-		msgrMap.getMap().put("room_name_vc", "톡방이름6");
-
+		msgrMap.getMap().put("room_no_nu", 3);
+		msgrMap.getMap().put("chat_no_nu", 1);
+		msgrMap.getMap().put("mem_id_vc", "test1");
+		msgrMap.getMap().put("chat_vc", "저도 반가워요");
 		
-		int test = dao.createBuddyTalkRoom(msgrMap.getMap());
-		System.out.println(test);
 		
+		list = dao.insertChat(msgrMap.getMap());
+		
+		for (Map<String, Object> map : list) {
+			
+			System.out.println(map);
+		}
+		
+		System.out.println(list);
+		//(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	}
 }
