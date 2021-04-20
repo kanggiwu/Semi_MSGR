@@ -67,50 +67,43 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		VALUES (#{room_no_nu}, #{room_name_vc}, 1)
 	</insert>
 
-	<!-- 톡방 삭제 쿼리문 -->
+	<!-- 톡방 삭제 쿼리문 --><!-- 확인 -->
 	<delete id="deleteTalkRoom" parameterType="java.util.Map">
 		DELETE FROM msgr_room WHERE room_no_nu = #{room_no_nu}
 	</delete>
 
 
-	<!-- 모든 대화내용 삽입 쿼리문 -->
-	<insert id="insertAllChat" parameterType="java.util.Map">
+	<!-- 대화내용 삽입 쿼리문 -->
+	<insert id="insertChat" parameterType="java.util.Map">
 		INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc)
 		VALUES(#{room_no_nu}, #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	</insert>
 
-	<!-- 마지막 대화번호 가져오기 쿼리문 -->
-	<select id="getLastChatNum" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat 
-		ORDER BY chat_no_nu DESC) WHERE ROWNUM =1
-	</select>
 
 	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 -->
 	<select id="getChatAfterJoin" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST	rlist
+		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
 		WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc})
-		AND rlist.mem_id_vc = #{rlist.mem_id_vc}
-		AND chat.room_no_nu = #{chat.room_no_nu}
-
+		AND rlist.mem_id_vc = #{mem_id_vc}
+		AND chat.room_no_nu = #{room_no_nu}
 	</select>
 
-	<!-- 회원탈퇴 쿼리문 -->
+	
 	<!-- 다중쿼리...? 쿼리 한문장 끝날때마다 ;세미콜론 필수 -->
 	<!-- 
 	1. msgr_chat 에서 mem_id_vc null로 바꾸기 
 	2. 톡방 리스트에서 #{mem_id_vc 삭제} 
 	3. 친구목록에서 #{mem_id_vc}삭제 
 	4. 멤버에서 삭제 -->
+	
+	<!-- 회원탈퇴 쿼리문 -->
 	<delete id="deleteMember" parameterType="java.util.Map">
-		{
-		CALL
-		BEGIN
+		
 		UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vc};
 		DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
 		DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc};
 		DELETE FROM MSGR_MEMBER WEHRE mem_id_vc = #{mem_id_vc};
-		END
-		}
+		
 	</delete>
 
 
@@ -119,21 +112,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		{
 		CALL
 		BEGIN
-		DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
-		DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
+			DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
+			DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
 		END
 		}
 	</delete>
 
-	<!-- 닉네임 변경 쿼리문 -->
+	<!-- 닉네임 변경 쿼리문 --><!-- 확인 -->
 	<update id="changeNickname" parameterType="java.util.Map">
 		UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc = #{mem_id_vc}
 	</update>
 
-	<!-- 친구추가 쿼리문 --><!-- 확인 -->
+	<!-- 친구추가 쿼리문 --><!-- 다시체크 -->
 	<insert id="makeBuddys" parameterType="java.util.Map">
-		INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) 
-		VALUES (buddy_seq_nu.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc}
+		INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc});
+		INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{buddy_id_vc}, #{mem_id_vc});	
 	</insert>
 
 </mapper>
