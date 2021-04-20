@@ -15,9 +15,10 @@ public class Protocol {
 	public static final int BUDDY_ADD =300;//친구추가
 	public static final int BUDDY_LIST =310;//친구목록
 	public static final int BUDDY_DELETE =320;//친구삭제
-	public static final int MESSAGE =400 ;//메시지 전송
+	public static final int SENDCHAT =400 ;//메시지 전송
 	public static final int EMOTICON = 401;//이모티콘 전송
 	public static final int ATTACHMENT =403 ;//파일전송
+	public static final int STORECHAT=410 ;//대화내용저장
 	public static final int FLAG_OPEN_ROOM =0;//오픈톡방 구분
 	public static final int FLAG_BUDDY_ROOM=1;//친구톡방 구분
 	public static final String SEPERATOR = "#";
