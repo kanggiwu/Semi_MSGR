@@ -113,8 +113,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		CALL
 		BEGIN
 			DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
-			DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
-		END
+			DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{mem_id_vc} AND mem_id_vc = #{buddy_id_vc};
 		}
 	</delete>
 

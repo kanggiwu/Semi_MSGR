@@ -278,14 +278,22 @@ public class MessengerDAO {
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> deleteMember(Map<String, Object> pMap) {
+	public int deleteMember(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
 		int deleteMemberCheck = 0;
 		
+		try {
+			deleteMemberCheck = sqlSession.delete("MsgrMapper.deleteMember", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			deleteMemberCheck = -1;
+		}
+		sqlSession.commit();
 		sqlSession.close();
 
-		return tempList;
+		return deleteMemberCheck;
 	}
 
 	/**
@@ -293,7 +301,8 @@ public class MessengerDAO {
 	 * 
 	 * {
 	 * CALL
-	 * BEGIN DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc}; 
+	 * BEGIN 
+	 * DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc}; 
 	 * DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
 	 * END
 	 * }
@@ -301,14 +310,23 @@ public class MessengerDAO {
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> deleteBuddy(Map<String, Object> pMap) {
+	public int deleteBuddy(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.deleteBuddy", pMap);
-
+		//List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.deleteBuddy", pMap);
+		int deleteBuddyCheck = 0;
+		
+		try {
+			deleteBuddyCheck = sqlSession.delete("MsgrMapper.deleteBuddy", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			deleteBuddyCheck = -1;
+		}
+		sqlSession.commit();
 		sqlSession.close();
 
-		return tempList;
+		return deleteBuddyCheck;
 	}
 
 	/**
@@ -369,20 +387,22 @@ public class MessengerDAO {
 		MessengerMap				msgrMap	= MessengerMap.getInstance();
 		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
 		
-		msgrMap.getMap().put("room_no_nu", 3);
-		msgrMap.getMap().put("chat_no_nu", 1);
-		msgrMap.getMap().put("mem_id_vc", "test1");
-		msgrMap.getMap().put("chat_vc", "저도 반가워요");
+		msgrMap.getMap().put("mem_id_vc", "test10");
 		
 		
-		list = dao.insertChat(msgrMap.getMap());
 		
-		for (Map<String, Object> map : list) {
+		int test = dao.deleteMember(msgrMap.getMap());
+		System.out.println(test);
+		
+		
+//		list = dao.insertChat(msgrMap.getMap());
+		
+//		for (Map<String, Object> map : list) {
 			
-			System.out.println(map);
-		}
+//			System.out.println(map);
+//		}
 		
-		System.out.println(list);
-		//(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
+//		System.out.println(list);
+		
 	}
 }
