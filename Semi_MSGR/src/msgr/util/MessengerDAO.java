@@ -395,7 +395,7 @@ public class MessengerDAO {
 		System.out.println(test);
 		
 		
-//		list = dao.insertChat(msgrMap.getMap());
+//		list =  dao.insertChat(msgrMap.getMap());
 		
 //		for (Map<String, Object> map : list) {
 			
@@ -403,6 +403,7 @@ public class MessengerDAO {
 //		}
 		
 //		System.out.println(list);
+		
 		
 	}
 }
