@@ -226,23 +226,50 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 대화내용 삽입(매번) 쿼리문 
+	 * 대화내용 삽입(매번) 쿼리문 /확인
 	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
 	 * VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	 * 
 	 * @param pMap
 	 * @return
 	 */
-	public List<Map<String, Object>> insertChat(Map<String, Object> pMap) {
+	public int insertChat(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.insertChat", pMap);
-
+		int insertChatCheck = 0;
+		
+		try {
+			insertChatCheck = sqlSession.insert("MsgrMapper.insertChat", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			insertChatCheck = -1;
+		}
+		
+		sqlSession.commit();
 		sqlSession.close();
 
-		return tempList;
+		return insertChatCheck;
 	}
 
+	/**
+	 * 마지막 대화번호 가지고 오기  쿼리문 /확인
+	 *
+	 * SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat ORDER BY chat_no_nu DESC)
+	 * WHERE ROWNUM = 1	 
+	 * 
+	 * @param pMap
+	 * @return
+	 */
+	public List<Map<String, Object>> getLastChatNum(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getLastChatNum", pMap);
+		
+		sqlSession.close();
+		
+		return tempList;
+	}
 	/**
 	 * 톡방 참가한 이후의 대화내용 가져오기 메소드 
 	 * 
@@ -264,7 +291,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 회원탈퇴 메소드 
+	 * 회원탈퇴 메소드 /확인
 	 * 
 	 * {
 	 * CALL 
@@ -297,7 +324,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구삭제 메소드 
+	 * 친구삭제 메소드 /확인 그런데 성공시 1이 아니라 -1이 출력 됨 
 	 * 
 	 * {
 	 * CALL
@@ -357,10 +384,15 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구추가 메소드
+	 * 친구추가 메소드 /확인
 	 * 
-	 * INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) 
-	 * VALUES (buddy_seq_nu.NEXTVAL, #{msgr_mem_id), #{msgr_buddy_id}
+	 * {CALL
+			DECLARE
+			BEGIN
+				INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc});
+				INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{buddy_id_vc}, #{mem_id_vc});
+			END
+		}	
 	 * 
 	 * @param pMap
 	 * @return
@@ -382,27 +414,29 @@ public class MessengerDAO {
 
 		return makeBuddysCheck;
 	}
+	
 	public static void main(String[] args) {
 		MessengerDAO				dao		= new MessengerDAO();
 		MessengerMap				msgrMap	= MessengerMap.getInstance();
 		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
 		
-		msgrMap.getMap().put("mem_id_vc", "test10");
+		
+		msgrMap.getMap().put("room_no_nu", 2);
 		
 		
 		
-		int test = dao.deleteMember(msgrMap.getMap());
-		System.out.println(test);
+//		int test = dao.deleteMember(msgrMap.getMap());
+//		System.out.println(test);
 		
 		
-//		list =  dao.insertChat(msgrMap.getMap());
-		
-//		for (Map<String, Object> map : list) {
+		list =  dao.getLastChatNum(msgrMap.getMap());
+	
+		for (Map<String, Object> map : list) {
 			
-//			System.out.println(map);
-//		}
+			System.out.println(map);
+		}
 		
-//		System.out.println(list);
+		System.out.println(list);
 		
 		
 	}
