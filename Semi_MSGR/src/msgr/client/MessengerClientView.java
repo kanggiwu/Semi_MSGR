@@ -80,6 +80,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	 * 로그인이 성공하면 소켓서버와 연결하고 스트림을 만드는 메서드
 	 */
 	public void getConnection() {
+
 		this.setTitle(nickname + "(" + id + ")님");
 
 		try {

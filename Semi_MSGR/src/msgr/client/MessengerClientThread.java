@@ -1,14 +1,9 @@
 package msgr.client;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
@@ -44,7 +39,13 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.LOGIN: {
-					System.out.println(st.nextToken());
+					// ois 받는다 list list map 형태로 받아서
+					// view 준비하시고 쏘세요
+					// 참고 getBuddyList
+					// 		getTalkRoomList
+					  
+					List<String> lt = (List<String>)msgrClientView.ois.readObject();
+					System.out.println(lt);
 				}
 					break;
 				case Protocol.LOGOUT: {
