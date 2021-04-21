@@ -40,8 +40,6 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	Socket socket = null;
 	ObjectOutputStream oos = null;
 	ObjectInputStream ois = null;
-	PrintWriter pw = null;
-	BufferedReader br = null;
 	private String ip = "127.0.0.1";
 	private int port = 21430;
 
@@ -88,13 +86,8 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
-			pw = new PrintWriter(socket.getOutputStream());
-			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-			pw.println(Protocol.LOGIN + Protocol.SEPERATOR + id);
-			pw.flush();
-
-			// oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + id);
+			oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + id);
 			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
 			msgrClientThread.start();
 		} catch (Exception e) {
@@ -169,14 +162,20 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			if ("".equals(aftername)) {
 				System.out.println("취소버튼 누른 거 같음");
 			} else {
-				pw.println(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + aftername);
-				pw.flush();
+				try {
+					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + aftername);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 
 		else if ("로그아웃".equals(command)) {
-			pw.println(Protocol.LOGOUT + Protocol.SEPERATOR + id);
-			pw.flush();
+			try {
+				oos.writeObject(Protocol.LOGOUT + Protocol.SEPERATOR + id);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		else if ("회원탈퇴".equals(command)) {
@@ -196,8 +195,11 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		else if ("친구추가".equals(command)) {
 			System.out.println("친구추가 버튼");
 
-			pw.println(Protocol.BUDDY_ADD + Protocol.SEPERATOR + id);
-			pw.flush();
+			try {
+				oos.writeObject(Protocol.BUDDY_ADD + Protocol.SEPERATOR + id);
+			} catch (IOException e2) {
+				e2.printStackTrace();
+			}
 
 			List<Map<String, Object>> list = new Vector<>();
 			Map<String, Object> map = new HashMap<String, Object>();

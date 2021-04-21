@@ -2,7 +2,6 @@ package msgr.client;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -11,11 +10,13 @@ import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
 	MessengerClientView msgrClientView = null;
+	MessengerChatView msgrChatView = null;
 	Socket socket = null;
 
 	public MessengerClientThread(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
 		this.socket = msgrClientView.socket;
+		this.msgrChatView = msgrClientView.roomListView.msgrChatView;
 	}
 
 	public void run() {
@@ -26,7 +27,7 @@ public class MessengerClientThread extends Thread {
 
 			try {
 				// 100|나초보
-				msg = msgrClientView.br.readLine();
+				msg = (String) msgrClientView.ois.readObject();
 				JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 				StringTokenizer st = null;
 				int protocol = 0;
@@ -39,13 +40,7 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.LOGIN: {
-					// ois 받는다 list list map 형태로 받아서
-					// view 준비하시고 쏘세요
-					// 참고 getBuddyList
-					// 		getTalkRoomList
-					  
-					List<String> lt = (List<String>)msgrClientView.ois.readObject();
-					System.out.println(lt);
+
 				}
 					break;
 				case Protocol.LOGOUT: {
@@ -83,6 +78,12 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_ADD: {
+					// 21.04.21. 21:27 유성열 수정
+					// 400 # 보낸사람ID # 안녕하세요 
+					String speaker = st.nextToken();
+					String message = st.nextToken();
+					
+					
 					
 				}
 					break;
@@ -93,6 +94,7 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.SENDCHAT: {
+
 				}
 					break;
 				case Protocol.EMOTICON: {
