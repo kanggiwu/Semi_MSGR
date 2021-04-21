@@ -40,7 +40,7 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.LOGIN: {
-
+					
 				}
 					break;
 				case Protocol.LOGOUT: {
@@ -78,13 +78,6 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_ADD: {
-					// 21.04.21. 21:27 유성열 수정
-					// 400 # 보낸사람ID # 안녕하세요 
-					String speaker = st.nextToken();
-					String message = st.nextToken();
-					
-					
-					
 				}
 					break;
 				case Protocol.BUDDY_LIST: {
@@ -94,7 +87,12 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.SENDCHAT: {
-
+					// 21.04.21. 21:27 유성열 수정
+					// 400 # 보낸사람ID # 안녕하세요 
+					String speaker = st.nextToken();
+					String message = st.nextToken();
+					
+					
 				}
 					break;
 				case Protocol.EMOTICON: {
