@@ -65,7 +65,7 @@ public class MessengerServerThread extends Thread {
 																											// 스크롤
 				StringTokenizer token = null; // 토큰 선언
 				int protocol = -1; // 프로토콜 선언
-
+     
 				if (msg != null) {
 					token = new StringTokenizer(msg, Protocol.SEPERATOR);
 					protocol = Integer.parseInt(token.nextToken()); // 프로토콜 초기화
@@ -111,7 +111,7 @@ public class MessengerServerThread extends Thread {
 					}
 					
 					send(response);
-					
+					System.out.println(response);
 					
 					
 				}
@@ -305,12 +305,6 @@ public class MessengerServerThread extends Thread {
 		// 여기서 소켓 이상하게 닫힐 수도 있음..
 		finally {
 
-			try {
-				if (client != null)
-					client.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 
 	}// ======================== end of run
