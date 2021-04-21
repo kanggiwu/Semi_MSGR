@@ -2,7 +2,11 @@ package msgr.client;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
@@ -40,7 +44,22 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.LOGIN: {
-					
+					Map<String, Object> tempMap = new HashMap<>();
+					List<Map<String, Object>> tempList = new Vector<>();
+					int roomNum = Integer.parseInt(st.nextToken());
+
+					for (int i = 0; i < roomNum; i++) {
+						tempMap.put("talkTitle", st.nextToken());
+						// 이건 int로 파싱해야 될 수도 있음
+						tempMap.put("talkNo", st.nextToken());
+						// 이건 int로 파싱해야 될 수도 있음
+						// 또는 삭제
+						tempMap.put("isPrivate", st.nextToken());
+						tempList.add(tempMap);
+					}
+					for (Map<String, Object> map : tempList) {
+						System.out.println(map);
+					}
 				}
 					break;
 				case Protocol.LOGOUT: {
@@ -88,11 +107,10 @@ public class MessengerClientThread extends Thread {
 					break;
 				case Protocol.SENDCHAT: {
 					// 21.04.21. 21:27 유성열 수정
-					// 400 # 보낸사람ID # 안녕하세요 
+					// 400 # 보낸사람ID # 안녕하세요
 					String speaker = st.nextToken();
 					String message = st.nextToken();
-					
-					
+
 				}
 					break;
 				case Protocol.EMOTICON: {
