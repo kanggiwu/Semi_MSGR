@@ -48,7 +48,6 @@ public class MessengerServerThread extends Thread {
 		}
 	}
 
-	// 깃 연습
 	public void run() {
 		String msg = null;
 		buddyList = new Vector<>();
@@ -80,6 +79,16 @@ public class MessengerServerThread extends Thread {
 				case Protocol.LOGIN: {// 로그인
 					id = token.nextToken();
 					msgrServer.textArea_log.append(msg + "님이 로그인\n");// 클라이언트에서 받은 메시지 로그창에 출력
+				
+					//친구목록 & 톡방 목록 출력
+					
+					List<String> list = new Vector<>();
+					list.add("겨울왕국 돌멩이");
+					list.add("겨울왕국 족장돌멩이");
+					
+					pw.println(Protocol.LOGIN);
+					pw.flush();
+					oos.writeObject(list);
 				}
 					break;
 
