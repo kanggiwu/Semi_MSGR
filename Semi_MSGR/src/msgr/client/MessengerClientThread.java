@@ -44,8 +44,6 @@ public class MessengerClientThread extends Thread {
 					// 참고 getBuddyList
 					// 		getTalkRoomList
 					  
-					List<String> lt = (List<String>)msgrClientView.ois.readObject();
-					System.out.println(lt);
 				}
 					break;
 				case Protocol.LOGOUT: {

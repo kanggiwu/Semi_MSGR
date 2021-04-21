@@ -81,14 +81,40 @@ public class MessengerServerThread extends Thread {
 					msgrServer.textArea_log.append(msg + "님이 로그인\n");// 클라이언트에서 받은 메시지 로그창에 출력
 				
 					//친구목록 & 톡방 목록 출력
+
+					pMap.getMap().put("mem_id_vc", id);//클라이언트가 받아온 id를 map 넣는다.
+					List<Map<String,Object>> roomList = msgrDAO.getTalkRoomList(pMap.getMap());//id를 파라미터로 넘겨준 뒤 마이바티스를 통해 해당하는 id가 참여한 톡방리스트를 받아온다
+					//톡방이름, 톡방번호, 톡방 종류
 					
-					List<String> list = new Vector<>();
-					list.add("겨울왕국 돌멩이");
-					list.add("겨울왕국 족장돌멩이");
+					for(Map<String, Object> map : roomList) {//받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
+						MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
+						String talkTitle =(String)map.get("ROOM_NAME_VC");
+						int talk_no = (int)map.get("ROOM_NO_NU");
+						int is_private = (int)map.get("IS_PRIVATE_YN");
+						
+						msgrTalkRoom.setMsgrTalkRoom(talkTitle, talk_no, is_private);
+						talkRoomList.add(msgrTalkRoom);// 톡방리스트에 만들어준 톡방을 넣어준다.
+					}
 					
-					pw.println(Protocol.LOGIN);
-					pw.flush();
-					oos.writeObject(list);
+					//클라이언트스레드에게 프로토콜, 방 개수, 톡방이름, 톡방 번호, 톡방 종류에 대해 송신한다.
+					//100 # 톡방개수 # 톡방이름 # 톡방 번호 # 톡방종류 #이름& 번호& 종류 톡방개수만큼 반복
+					String response = Protocol.LOGIN 
+												+ Protocol.SEPERATOR
+												+talkRoomList.size();
+					for(MessengerTalkRoom msgrTalkRoom :talkRoomList) {
+						response += Protocol.SEPERATOR;
+						response += msgrTalkRoom.getTalkTitle();
+						response += Protocol.SEPERATOR;
+						response += msgrTalkRoom.getTalk_no();
+						response += Protocol.SEPERATOR;
+						response += msgrTalkRoom.getIs_private();
+					}
+					oos.writeObject(response);
+					
+					
+					
+					
+					
 				}
 					break;
 
