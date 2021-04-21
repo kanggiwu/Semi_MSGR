@@ -31,34 +31,34 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 	// 생성자에서 로그인뷰의 정보를 받아와야 하므로 전역변수 선언
 	// 탭과 탭에 들어갈 패널들(친구목록뷰, 톡방목록뷰)
-	SignInView signInView = null;
-	private JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-	BuddyListView buddyListView = null;
-	TalkRoomListView roomListView = null;
+	SignInView			signInView				= null;
+	private JTabbedPane	tabbedPane				= new JTabbedPane(JTabbedPane.LEFT);
+	BuddyListView		buddyListView			= null;
+	TalkRoomListView	roomListView			= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
-	Socket socket = null;
-	ObjectOutputStream oos = null;
-	ObjectInputStream ois = null;
-	private String ip = "127.0.0.1";
-	private int port = 21430;
+	Socket				socket					= null;
+	ObjectOutputStream	oos						= null;
+	ObjectInputStream	ois						= null;
+	private String		ip						= "127.0.0.1";
+	private int			port					= 21430;
 
 	// 사용자 아이디, 닉네임
-	private String id = "";
-	private String nickname = "";
+	private String		id						= "";
+	private String		nickname				= "";
 
 	// 클라이언트 메뉴 구성
-	private JMenuBar menuBar = null;
-	private JMenu menu_myPage = null;
-	private String[] myPageName = { "닉네임 변경", "로그아웃", "회원탈퇴" };
-	private JMenuItem[] menuItem_myPage = null;
-	private JMenu menu_talkRoom = null;
-	private String[] talkRoomName = { "오픈톡", "친구톡", "친구추가" };
-	private JMenuItem[] menuItem_talkRoom = null;
+	private JMenuBar	menuBar					= null;
+	private JMenu		menu_myPage				= null;
+	private String[]	myPageName				= { "닉네임 변경", "로그아웃", "회원탈퇴" };
+	private JMenuItem[]	menuItem_myPage			= null;
+	private JMenu		menu_talkRoom			= null;
+	private String[]	talkRoomName			= { "오픈톡", "친구톡", "친구추가" };
+	private JMenuItem[]	menuItem_talkRoom		= null;
 
 	// 우클릭 했을 때 뜨는 팝업메뉴
-	private JPopupMenu popupMenu = null;
-	private JMenuItem menuItem_deleteBuddy = null;
+	private JPopupMenu	popupMenu				= null;
+	private JMenuItem	menuItem_deleteBuddy	= null;
 
 	// 생성자에서 SignInView에서 받은 아이디, 닉네임을 저장함
 	public MessengerClientView(SignInView signInView) {
@@ -68,10 +68,10 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		try {
 			initDisplay();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -87,10 +87,11 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + id);
+			oos.writeObject(Protocol.SIGNIN + Protocol.SEPERATOR + id);
 			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
 			msgrClientThread.start();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 	}
@@ -154,26 +155,37 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String command = e.getActionCommand();
+		String	command		= e.getActionCommand();
+		String	aftername	= "";
 
 		/////////////////////// 마이페이지 메뉴아이템 시작 ///////////////////////
 		if ("닉네임 변경".equals(command)) {
-			String aftername = JOptionPane.showInputDialog(this, "변경할 닉네임을 입력하세요", "닉네임 변경", JOptionPane.YES_NO_OPTION);
-			if ("".equals(aftername)) {
-				System.out.println("취소버튼 누른 거 같음");
-			} else {
+
+			// break가 있어야 할 것 같은데
+			while ("".equals(aftername)) {
+				aftername = JOptionPane.showInputDialog(this, "변경할 닉네임을 입력하세요", "닉네임 변경", JOptionPane.YES_NO_OPTION);
+			}
+
+			if (aftername == null) {
+				System.out.println("취소버튼");
+			}
+			else {
+
 				try {
 					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + aftername);
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				}
+				catch (IOException ioe) {
+					System.out.println(ioe.getMessage());
 				}
 			}
 		}
 
 		else if ("로그아웃".equals(command)) {
+
 			try {
-				oos.writeObject(Protocol.LOGOUT + Protocol.SEPERATOR + id);
-			} catch (IOException e1) {
+				oos.writeObject(Protocol.SIGNOUT + Protocol.SEPERATOR + id);
+			}
+			catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}
@@ -197,17 +209,20 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 			try {
 				oos.writeObject(Protocol.BUDDY_ADD + Protocol.SEPERATOR + id);
-			} catch (IOException e2) {
+			}
+			catch (IOException e2) {
 				e2.printStackTrace();
 			}
 
-			List<Map<String, Object>> list = new Vector<>();
-			Map<String, Object> map = new HashMap<String, Object>();
+			List<Map<String, Object>>	list	= new Vector<>();
+			Map<String, Object>			map		= new HashMap<String, Object>();
 			map.put("testKey", "testValue");
 			list.add(map);
+
 			try {
 				oos.writeObject(list);
-			} catch (IOException e1) {
+			}
+			catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}

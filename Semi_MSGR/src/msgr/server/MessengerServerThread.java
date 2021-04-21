@@ -1,36 +1,28 @@
 package msgr.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import msgr.client.BuddyListView;
 import msgr.map.MessengerMap;
 import msgr.util.MessengerDAO;
 
 public class MessengerServerThread extends Thread {
 
-	MessagerServer msgrServer = null;
-	Socket client = null;
-	ObjectOutputStream oos = null;
-	ObjectInputStream ois = null;
-	PrintWriter pw = null;
-	BufferedReader br = null;
-	String id = null;
-	String nickname = null;
-	MessengerDAO msgrDAO = null;
-	MessengerMap pMap = null;
-	List<MessengerServerThread> buddyList = null;
-	List<MessengerTalkRoom> talkRoomList = null;
+	MessagerServer				msgrServer		= null;
+	Socket						client			= null;
+	ObjectOutputStream			oos				= null;
+	ObjectInputStream			ois				= null;
+	String						id				= "";
+	String						nickname		= "";
+	MessengerDAO				msgrDAO			= null;
+	MessengerMap				pMap			= null;
+	List<MessengerServerThread>	buddyList		= null;
+	List<MessengerTalkRoom>		talkRoomList	= null;
 
 	// 깃허브 연습
 	public MessengerServerThread(MessagerServer msgrServer) {
@@ -41,13 +33,14 @@ public class MessengerServerThread extends Thread {
 			oos = new ObjectOutputStream(client.getOutputStream());
 			ois = new ObjectInputStream(client.getInputStream());
 			msgrServer.globalList.add(this);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.getStackTrace();
 		}
 	}
 
 	public void run() {
-		String msg = null;
+		String msg = "";
 		buddyList = new Vector<>();
 		talkRoomList = new Vector<>();
 		boolean isStop = false;
@@ -56,16 +49,15 @@ public class MessengerServerThread extends Thread {
 			pMap = MessengerMap.getInstance();
 			msgrDAO = MessengerDAO.getInstance();
 
-			///////////////////////////////////// while문
-			///////////////////////////////////// 시작/////////////////////////////////////
+			//////////////////// while문 시작////////////////////
 			run_start: while (!isStop) {
-				msg = (String)ois.readObject();// 클라이언트에서 보낸 메시지 받기
+				msg = (String) ois.readObject();// 클라이언트에서 보낸 메시지 받기
 				msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 				msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로
 																											// 스크롤
-				StringTokenizer token = null; // 토큰 선언
-				int protocol = -1; // 프로토콜 선언
-     
+				StringTokenizer	token		= null;	// 토큰 선언
+				int				protocol	= -1;	// 프로토콜 선언
+
 				if (msg != null) {
 					token = new StringTokenizer(msg, Protocol.SEPERATOR);
 					protocol = Integer.parseInt(token.nextToken()); // 프로토콜 초기화
@@ -74,57 +66,70 @@ public class MessengerServerThread extends Thread {
 				// 클라이언트에서 로그인 시, 친구리스트 출력 & 톡방리스트 출력 요청
 				switch (protocol) {
 				// 100 # id
-				case Protocol.LOGIN: {// 로그인
+				case Protocol.SIGNIN: {// 로그인
+
+					MessengerTalkRoom msgrTalkRoom = null;
+
 					id = token.nextToken();
 					msgrServer.textArea_log.append(msg + "님이 로그인\n");// 클라이언트에서 받은 메시지 로그창에 출력
-				
-					//친구목록 & 톡방 목록 출력
 
-					pMap.getMap().put("mem_id_vc", id);//클라이언트가 받아온 id를 map 넣는다.
-					List<Map<String,Object>> roomList = msgrDAO.getTalkRoomList(pMap.getMap());//id를 파라미터로 넘겨준 뒤 마이바티스를 통해 해당하는 id가 참여한 톡방리스트를 받아온다
-					//톡방이름, 톡방번호, 톡방 종류
-					
-					for(Map<String, Object> map : roomList) {//받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
-						MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
-						String talkTitle =(String)map.get("ROOM_NAME_VC");
-						int talk_no = (int)map.get("ROOM_NO_NU");
-						int is_private = (int)map.get("IS_PRIVATE_YN");
-						
-						msgrTalkRoom.setMsgrTalkRoom(talkTitle, talk_no, is_private);
+					// 친구목록 & 톡방 목록 출력
+
+					pMap.getMap().put("mem_id_vc", id);// 클라이언트가 받아온 id를 map 넣는다.
+					List<Map<String, Object>> roomList = msgrDAO.getTalkRoomList(pMap.getMap());// id를 파라미터로 넘겨준 뒤 마이바티스를 통해 해당하는 id가 참여한
+																								// 톡방리스트를 받아온다
+					// 톡방이름, 톡방번호, 톡방 종류
+
+					System.out.println("for루프 전");
+
+					for (Map<String, Object> map : roomList) {
+						System.out.println(map);
+					}
+
+					for (Map<String, Object> map : roomList) {// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
+						msgrTalkRoom = new MessengerTalkRoom();
+						System.out.println("톡룸 인스턴스화");
+						String room_name = (String) map.get("ROOM_NAME_VC");
+						System.out.println("변수하나넣고");
+						// 해당 부분에서 멈춰버려서 오브젝트를 스트링으로 바꾸고 파스인트를 하니까 됨
+						// int room_no = (int) map.get("ROOM_NO_NU"));
+						int room_no = Integer.parseInt(map.get("ROOM_NO_NU").toString());
+						System.out.println("변수둘넣고");
+						int is_private = Integer.parseInt(map.get("IS_PRIVATE_YN").toString());
+						System.out.println("변수셋넣고");
+
+						msgrTalkRoom.setMsgrTalkRoom(room_name, room_no, is_private);
 						talkRoomList.add(msgrTalkRoom);// 톡방리스트에 만들어준 톡방을 넣어준다.
 					}
-					
-					
-					
-					//클라이언트스레드에게 프로토콜, 방 개수, 톡방이름, 톡방 번호, 톡방 종류에 대해 송신한다.
-					//100 # 톡방개수 # 톡방이름 # 톡방 번호 # 톡방종류 #이름& 번호& 종류 톡방개수만큼 반복
-					String response = Protocol.LOGIN 
-												+ Protocol.SEPERATOR
-												+talkRoomList.size();
-					for(MessengerTalkRoom msgrTalkRoom :talkRoomList) {
+					System.out.println("for루프 빠져나옴");
+
+					// 클라이언트스레드에게 프로토콜, 방 개수, 톡방이름, 톡방 번호, 톡방 종류에 대해 송신한다.
+					// 100 # 톡방개수 # 톡방이름 # 톡방 번호 # 톡방종류 #이름& 번호& 종류 톡방개수만큼 반복
+					String response = Protocol.SIGNIN + Protocol.SEPERATOR + talkRoomList.size();
+
+					System.out.println("2번째 for루프 전");
+
+					for (MessengerTalkRoom index : talkRoomList) {
 						response += Protocol.SEPERATOR;
-						response += msgrTalkRoom.getTalkTitle();
+						response += index.getTalkTitle();
 						response += Protocol.SEPERATOR;
-						response += msgrTalkRoom.getTalk_no();
+						response += index.getTalk_no();
 						response += Protocol.SEPERATOR;
-						response += msgrTalkRoom.getIs_private();
+						response += index.getIs_private();
 					}
-					
 					send(response);
 					System.out.println(response);
-					
-					
 				}
 					break;
 
 				// 120 # id
-				case Protocol.LOGOUT: {// 로그아웃
+				case Protocol.SIGNOUT: {// 로그아웃
 					msgrServer.textArea_log.append(msg + "님이 로그아웃\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
-																												// 아래로
-																												// 스크롤
+
+					// 로그 맨 아래로 스크롤
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					msgrServer.globalList.remove(this);// 접속자 목록에서 삭제
-					String response = Protocol.LOGOUT + Protocol.SEPERATOR + id;
+					String response = Protocol.SIGNOUT + Protocol.SEPERATOR + id;
 					System.out.println(id);
 					send(response);
 					isStop = true;
@@ -134,34 +139,33 @@ public class MessengerServerThread extends Thread {
 
 				// 130 # id # aftername
 				case Protocol.CHANGE_NICKNAME: {// 닉네임변경
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
-																												// 아래로
-																												// 스크롤
-
-					token.nextToken(); // id는 버린다. 로그용
-					String aftername = token.nextToken();
-					String response = "";
-
-					pMap.getMap().put("mem_id_vc", id);
-					pMap.getMap().put("mem_nick_vc", nickname);
-
-					// 리턴 타입 인티저로 바뀔 예정 1이면 업데이트 성공, else 실패
-					int result = msgrDAO.changeNickname(pMap.getMap());
-
-					if (result == 1) {
-						nickname = aftername;
-					}
-					response = Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname;
-					// 접속해 있는 친구들에게 브로드 캐스팅
-					buddyCasting(response);
-					/* 사용자 본인에게 닉네임 변경 결과 전송
-					 * 바뀌었을 경우 바뀐 닉네임 else 원래 닉네임
-					 * 을 정의서에 추가해주기~
-					 * 
-					 */
-					send(response);
-
+//					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+//					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
+//																												// 아래로
+//																												// 스크롤
+//
+//					token.nextToken(); // id는 버린다. 로그용
+//					String	aftername	= token.nextToken();
+//					String	response	= "";
+//
+//					pMap.getMap().put("mem_id_vc", id);
+//					pMap.getMap().put("mem_nick_vc", nickname);
+//
+//					// 리턴 타입 인티저로 바뀔 예정 1이면 업데이트 성공, else 실패
+//					int result = msgrDAO.changeNickname(pMap.getMap());
+//
+//					if (result == 1) {
+//						nickname = aftername;
+//					}
+//					response = Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname;
+//					// 접속해 있는 친구들에게 브로드 캐스팅
+//					buddyCasting(response);
+//					/* 사용자 본인에게 닉네임 변경 결과 전송
+//					 * 바뀌었을 경우 바뀐 닉네임 else 원래 닉네임
+//					 * 을 정의서에 추가해주기~
+//					 * 
+//					 */
+//					send(response);
 				}
 					break;
 
@@ -240,15 +244,6 @@ public class MessengerServerThread extends Thread {
 				case Protocol.BUDDY_ADD: {// 친구추가
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
-
-					pw.println(Protocol.BUDDY_ADD + Protocol.SEPERATOR + id);
-					pw.flush();
-					// 스크롤
-					List<Map<String, Object>> list = new Vector<>();
-					Map<String, Object> map = new HashMap<String, Object>();
-
-					list = (List<Map<String, Object>>) ois.readObject();
-					System.out.println(list.get(0).get("testKey"));
 				}
 					break;
 				case Protocol.BUDDY_LIST: {// 친구목록 출력
@@ -273,9 +268,9 @@ public class MessengerServerThread extends Thread {
 																												// 아래로
 																												// 스크롤
 					// 프로토롤#닉네임#메세지내용
-					String nickname = token.nextToken();
-					String talkRoomFlag = token.nextToken();
-					String chat = token.nextToken();
+					String	nickname		= token.nextToken();
+					String	talkRoomFlag	= token.nextToken();
+					String	chat			= token.nextToken();
 					// 방에 참여한 사람들에게만 메시지 전송
 					// broadCating
 				}
@@ -298,23 +293,18 @@ public class MessengerServerThread extends Thread {
 					break run_start;
 				}// ========================== end of switch
 			} // ====================== end of while
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.getStackTrace();
 		}
-
-		// 여기서 소켓 이상하게 닫힐 수도 있음..
-		finally {
-
-		}
-
 	}// ======================== end of run
 
 	private void send(String response) {
 
 		try {
-			pw.println(response);
-			pw.flush();
-		} catch (Exception e) {
+			oos.writeObject(response);
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

@@ -14,9 +14,9 @@ import javax.swing.JOptionPane;
 import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
-	MessengerClientView msgrClientView = null;
-	MessengerChatView msgrChatView = null;
-	Socket socket = null;
+	MessengerClientView	msgrClientView	= null;
+	MessengerChatView	msgrChatView	= null;
+	Socket				socket			= null;
 
 	public MessengerClientThread(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
@@ -25,8 +25,8 @@ public class MessengerClientThread extends Thread {
 	}
 
 	public void run() {
-		String msg = null;
-		boolean isStop = false;
+		String	msg		= null;
+		boolean	isStop	= false;
 
 		while (!isStop) {// 무한루프 방지코드를 꼭 추가하자 - 변수처리하자, 조건식을 활용하자
 
@@ -34,36 +34,37 @@ public class MessengerClientThread extends Thread {
 				// 100|나초보
 				msg = (String) msgrClientView.ois.readObject();
 				JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
-				StringTokenizer st = null;
-				int protocol = 0;
+				StringTokenizer	token		= null;
+				int				protocol	= 0;
 
 				if (msg != null) {
-					st = new StringTokenizer(msg, Protocol.SEPERATOR);
-					protocol = Integer.parseInt(st.nextToken());
+					token = new StringTokenizer(msg, Protocol.SEPERATOR);
+					protocol = Integer.parseInt(token.nextToken());
 				}
 
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
-				case Protocol.LOGIN: {
-					Map<String, Object> tempMap = new HashMap<>();
-					List<Map<String, Object>> tempList = new Vector<>();
-					int roomNum = Integer.parseInt(st.nextToken());
+				case Protocol.SIGNIN: {
+					List<Map<String, Object>>	tempList	= new Vector<>();
+					Map<String, Object>			tempMap		= new HashMap<>();
+					int							roomNum		= Integer.parseInt(token.nextToken());
 
 					for (int i = 0; i < roomNum; i++) {
-						tempMap.put("talkTitle", st.nextToken());
+						tempMap.put("talkTitle", token.nextToken());
 						// 이건 int로 파싱해야 될 수도 있음
-						tempMap.put("talkNo", st.nextToken());
+						tempMap.put("talkNo", token.nextToken());
 						// 이건 int로 파싱해야 될 수도 있음
 						// 또는 삭제
-						tempMap.put("isPrivate", st.nextToken());
+						tempMap.put("isPrivate", token.nextToken());
 						tempList.add(tempMap);
 					}
+
 					for (Map<String, Object> map : tempList) {
 						System.out.println(map);
 					}
 				}
 					break;
-				case Protocol.LOGOUT: {
+				case Protocol.SIGNOUT: {
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
 					msgrClientView.signInView.setVisible(true);
@@ -109,8 +110,8 @@ public class MessengerClientThread extends Thread {
 				case Protocol.SENDCHAT: {
 					// 21.04.21. 21:27 유성열 수정
 					// 400 # 보낸사람ID # 안녕하세요
-					String speaker = st.nextToken();
-					String message = st.nextToken();
+					String	speaker	= token.nextToken();
+					String	message	= token.nextToken();
 
 				}
 					break;
@@ -127,13 +128,17 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				}
-			} catch (IOException ie) {
-				ie.printStackTrace();
-			} catch (ClassNotFoundException cnfe) {
+			}
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+			catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
-			} catch (HeadlessException he) {
+			}
+			catch (HeadlessException he) {
 				he.printStackTrace();
-			} catch (NumberFormatException nfe) {
+			}
+			catch (NumberFormatException nfe) {
 				nfe.printStackTrace();
 			}
 		}
