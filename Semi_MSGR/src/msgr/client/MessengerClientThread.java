@@ -1,5 +1,6 @@
 package msgr.client;
 
+import java.awt.HeadlessException;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -126,14 +127,14 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			} catch (IOException ie) {
+				ie.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			} catch (HeadlessException he) {
+				he.printStackTrace();
+			} catch (NumberFormatException nfe) {
+				nfe.printStackTrace();
 			}
 		}
 	}
