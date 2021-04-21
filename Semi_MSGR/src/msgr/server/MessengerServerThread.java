@@ -40,8 +40,6 @@ public class MessengerServerThread extends Thread {
 		try {
 			oos = new ObjectOutputStream(client.getOutputStream());
 			ois = new ObjectInputStream(client.getInputStream());
-			pw = new PrintWriter(client.getOutputStream());
-			br = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			msgrServer.globalList.add(this);
 		} catch (Exception e) {
 			e.getStackTrace();
@@ -61,7 +59,7 @@ public class MessengerServerThread extends Thread {
 			///////////////////////////////////// while문
 			///////////////////////////////////// 시작/////////////////////////////////////
 			run_start: while (!isStop) {
-				msg = br.readLine();// 클라이언트에서 보낸 메시지 받기
+				msg = (String)ois.readObject();// 클라이언트에서 보낸 메시지 받기
 				msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 				msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨 아래로
 																											// 스크롤
@@ -96,6 +94,8 @@ public class MessengerServerThread extends Thread {
 						talkRoomList.add(msgrTalkRoom);// 톡방리스트에 만들어준 톡방을 넣어준다.
 					}
 					
+					
+					
 					//클라이언트스레드에게 프로토콜, 방 개수, 톡방이름, 톡방 번호, 톡방 종류에 대해 송신한다.
 					//100 # 톡방개수 # 톡방이름 # 톡방 번호 # 톡방종류 #이름& 번호& 종류 톡방개수만큼 반복
 					String response = Protocol.LOGIN 
@@ -109,9 +109,8 @@ public class MessengerServerThread extends Thread {
 						response += Protocol.SEPERATOR;
 						response += msgrTalkRoom.getIs_private();
 					}
-					oos.writeObject(response);
 					
-					
+					send(response);
 					
 					
 					
