@@ -13,12 +13,12 @@ import javax.swing.JOptionPane;
 
 import msgr.server.Protocol;
 
-public class MessengerClientThread extends Thread {
+public class MessengerClientThread2 extends Thread {
 	MessengerClientView	msgrClientView	= null;
 	MessengerChatView	msgrChatView	= null;
 	Socket				socket			= null;
 
-	public MessengerClientThread(MessengerClientView msgrClientView) {
+	public MessengerClientThread2(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
 		this.socket = msgrClientView.socket;
 		this.msgrChatView = msgrClientView.roomListView.msgrChatView;
@@ -45,17 +45,23 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.SIGNIN: {
-					List<Map<String, Object>>	roomList	= (List) msgrClientView.ois.readObject();
-					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
+					List<Map<String, Object>>	tempList	= new Vector<>();
+					Map<String, Object>			tempMap		= new HashMap<>();
+					int							roomNum		= Integer.parseInt(token.nextToken());
 
-					for (Map<String, Object> map : roomList) {
-						System.out.println(map);
+					for (int i = 0; i < roomNum; i++) {
+						tempMap.put("talkTitle", token.nextToken());
+						// 이건 int로 파싱해야 될 수도 있음
+						tempMap.put("talkNo", token.nextToken());
+						// 이건 int로 파싱해야 될 수도 있음
+						// 또는 삭제
+						tempMap.put("isPrivate", token.nextToken());
+						tempList.add(tempMap);
 					}
 
-					for (Map<String, Object> map : buddyList) {
+					for (Map<String, Object> map : tempList) {
 						System.out.println(map);
 					}
-
 				}
 					break;
 				case Protocol.SIGNOUT: {
@@ -96,7 +102,6 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_LIST: {
-
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {
