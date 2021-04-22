@@ -87,7 +87,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			oos.writeObject(Protocol.SIGNIN + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname);
+			oos.writeObject(Protocol.SIGNIN + Protocol.SEPERATOR + id);
 			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
 			msgrClientThread.start();
 		}

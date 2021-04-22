@@ -65,7 +65,7 @@ public class MessengerServerThread extends Thread {
 				switch (protocol) {
 				/*	(((((수신))))) 100 # id # nickname
 					(((((송신))))) 프로토콜(String) | 톡방리스트 | 친구리스트*/
-				case Protocol.SIGNIN: {// 로그인
+				case Protocol.SIGNIN: {// 로그인.======================================================================>완료
 					String response = null;
 					id = token.nextToken();
 					nickname = token.nextToken();
@@ -93,7 +93,7 @@ public class MessengerServerThread extends Thread {
 					break;
 
 				// 120 # id
-				case Protocol.SIGNOUT: {// 로그아웃
+				case Protocol.SIGNOUT: {// 로그아웃============================================================================>완료
 					msgrServer.textArea_log.append(msg + "님이 로그아웃\n");// 클라이언트에서 받은 메시지 로그창에 출력
 
 					// 로그 맨 아래로 스크롤
@@ -108,33 +108,32 @@ public class MessengerServerThread extends Thread {
 					break;
 
 				// 130 # id # aftername
-				case Protocol.CHANGE_NICKNAME: {// 닉네임변경
+				case Protocol.CHANGE_NICKNAME: {// 닉네임변경=======================================================>완료
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-//																												
-//
-//					token.nextToken(); // id는 버린다. 로그용
-//					String	aftername	= token.nextToken();
-//					String	response	= "";
-//
-//					pMap.getMap().put("mem_id_vc", id);
-//					pMap.getMap().put("mem_nick_vc", nickname);
-//
-//					// 리턴 타입 인티저로 바뀔 예정 1이면 업데이트 성공, else 실패
-//					int result = msgrDAO.changeNickname(pMap.getMap());
-//
-//					if (result == 1) {
-//						nickname = aftername;
-//					}
-//					response = Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname;
-//					// 접속해 있는 친구들에게 브로드 캐스팅
-//					buddyCasting(response);
-//					/* 사용자 본인에게 닉네임 변경 결과 전송
-//					 * 바뀌었을 경우 바뀐 닉네임 else 원래 닉네임
-//					 * 을 정의서에 추가해주기~
-//					 * 
-//					 */
-//					send(response);
+					String	response	= null;																				
+
+					token.nextToken(); // id는 버린다. 로그용
+					String	aftername	= token.nextToken();
+					
+					//닉네임 변경 여부 받기
+					pMap.getMap().put("mem_id_vc", id);
+					pMap.getMap().put("mem_nick_vc", nickname);
+					int result = msgrDAO.changeNickname(pMap.getMap());
+
+					if (result == 1) {
+						nickname = aftername;
+					}
+					System.out.println(result);
+					response = Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname;
+					// 접속해 있는 친구들에게 브로드 캐스팅
+					buddyCasting(response);
+					/* 사용자 본인에게 닉네임 변경 결과 전송
+					 * 바뀌었을 경우 바뀐 닉네임 else 원래 닉네임
+					 * 을 정의서에 추가해주기~
+					 * 
+					 */
+					send(response);
 				}
 					break;
 
@@ -167,15 +166,52 @@ public class MessengerServerThread extends Thread {
 				case Protocol.ROOM_LIST: {// 톡방 리스트 출력
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-					List<String> talkRoomList = new Vector<>();
-					// talkRoomList.msgrDAO.getTalkRoomList();
+					String response = null;
+				
+					// 톡방 목록을 DB에서 받아오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> roomList = msgrDAO.getTalkRoomList(pMap.getMap());// id를 파라미터로 넘겨준 뒤 마이바티스를 통해 해당하는 id가 참여한
+																								// 톡방리스트를 받아온다
+					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
+					setTalkRoomList(roomList);
+				
+					response = Integer.toString(Protocol.ROOM_LIST);
+					send(response);// 톡방 리스트 출력 프로토콜 전송
+					send(roomList);// 톡방 리스트 전송
+				
+				
+				
 				}
 					break;
+					
+					
+					/*	(수신) 211 # 톡방번호
+					 *	(송신) 211 # 톡방 이름 | 참가한 후 채팅내용
+					 */
 				case Protocol.ROOM_IN: {// 톡방 참가
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-
+					String response = null;
+					String talkTitle = null;
+					int room_no = Integer.parseInt(token.nextToken());
+					
+					//톡방 참가한 이후의 대화내용 가져오기
+					pMap.getMap().put("room_no_nu", room_no);
+					List<Map<String,Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
+					
+					//톡방 번호가 같은 톡방의 제목을 받아옴
+					for (MessengerTalkRoom map : talkRoomList) {
+						if(map.getTalk_no()==room_no)
+							talkTitle = map.getTalkTitle();
+					}
+					
+					response = Protocol.ROOM_IN
+								+Protocol.SEPERATOR
+								+talkTitle;
+					send(response);
+					send(chatList);
 				}
+				
 					break;
 				case Protocol.ROOM_IN_MEM: {// 톡방 참가 인원
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
@@ -276,6 +312,7 @@ public class MessengerServerThread extends Thread {
 	}// end of buddyCasting()
 
 	public void setTalkRoomList(List<Map<String, Object>> roomList) {
+		this.talkRoomList = new Vector<>();
 		MessengerTalkRoom msgrTalkRoom = null;
 
 		for (Map<String, Object> map : roomList) {
