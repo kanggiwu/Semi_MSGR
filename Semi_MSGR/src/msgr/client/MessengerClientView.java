@@ -4,26 +4,28 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 
-import msgr.map.MessengerMap;
 //import messenger.util.Room;
 import msgr.server.Protocol;
-import msgr.util.MessengerDAO;
 
 public class MessengerClientView extends JFrame implements ActionListener {
 
@@ -35,9 +37,9 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	TalkRoomListView	roomListView			= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
-	Socket		socket					= null;
-	ObjectInputStream	ois						= null;
+	Socket				socket					= null;
 	ObjectOutputStream	oos						= null;
+	ObjectInputStream	ois						= null;
 	private String		ip						= "127.0.0.1";
 	private int			port					= 21430;
 
@@ -70,13 +72,13 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
 	 * 로그인이 성공하면 소켓서버와 연결하고 스트림을 만드는 메서드
 	 */
 	public void getConnection() {
+
 		this.setTitle(nickname + "(" + id + ")님");
 
 		try {
@@ -85,7 +87,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			oos.writeObject(Protocol.LOGIN + Protocol.SEPERATOR + id);
+			oos.writeObject(Protocol.SIGNIN + Protocol.SEPERATOR + id);
 			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
 			msgrClientThread.start();
 		}
@@ -153,24 +155,39 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String command = e.getActionCommand();
+		String	command		= e.getActionCommand();
+		String	aftername	= "";
 
 		/////////////////////// 마이페이지 메뉴아이템 시작 ///////////////////////
 		if ("닉네임 변경".equals(command)) {
 
-			try {
-				oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + nickname);
+			// break가 있어야 할 것 같은데
+			while ("".equals(aftername)) {
+				aftername = JOptionPane.showInputDialog(this, "변경할 닉네임을 입력하세요", "닉네임 변경", JOptionPane.YES_NO_OPTION);
 			}
-			catch (IOException e1) {
-				e1.printStackTrace();
+
+			if (aftername == null) {
+				System.out.println("취소버튼");
+			}
+			else {
+
+				try {
+					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + aftername);
+				}
+				catch (IOException ioe) {
+					System.out.println(ioe.getMessage());
+				}
 			}
 		}
 
 		else if ("로그아웃".equals(command)) {
-			System.out.println("로그아웃 버튼");
-			this.setVisible(false);
-			this.dispose();
-			signInView.setVisible(true);
+
+			try {
+				oos.writeObject(Protocol.SIGNOUT + Protocol.SEPERATOR + id);
+			}
+			catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		else if ("회원탈퇴".equals(command)) {
@@ -189,6 +206,25 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		else if ("친구추가".equals(command)) {
 			System.out.println("친구추가 버튼");
+
+			try {
+				oos.writeObject(Protocol.BUDDY_ADD + Protocol.SEPERATOR + id);
+			}
+			catch (IOException e2) {
+				e2.printStackTrace();
+			}
+
+			List<Map<String, Object>>	list	= new Vector<>();
+			Map<String, Object>			map		= new HashMap<String, Object>();
+			map.put("testKey", "testValue");
+			list.add(map);
+
+			try {
+				oos.writeObject(list);
+			}
+			catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////

@@ -1,11 +1,13 @@
 package msgr.client;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.awt.HeadlessException;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
@@ -13,13 +15,13 @@ import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
 	MessengerClientView	msgrClientView	= null;
+	MessengerChatView	msgrChatView	= null;
 	Socket				socket			= null;
-	ObjectOutputStream	oos				= null;
-	ObjectInputStream	ois				= null;
 
 	public MessengerClientThread(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
 		this.socket = msgrClientView.socket;
+		this.msgrChatView = msgrClientView.roomListView.msgrChatView;
 	}
 
 	public void run() {
@@ -32,21 +34,41 @@ public class MessengerClientThread extends Thread {
 				// 100|나초보
 				msg = (String) msgrClientView.ois.readObject();
 				JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
-				StringTokenizer	st			= null;
+				StringTokenizer	token		= null;
 				int				protocol	= 0;
 
 				if (msg != null) {
-					st = new StringTokenizer(msg, Protocol.SEPERATOR);
-					protocol = Integer.parseInt(st.nextToken());
+					token = new StringTokenizer(msg, Protocol.SEPERATOR);
+					protocol = Integer.parseInt(token.nextToken());
 				}
 
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
-				case Protocol.LOGIN: {
-					System.out.println(st.nextToken());
+				case Protocol.SIGNIN: {
+					List<Map<String, Object>>	tempList	= new Vector<>();
+					Map<String, Object>			tempMap		= new HashMap<>();
+					int							roomNum		= Integer.parseInt(token.nextToken());
+
+					for (int i = 0; i < roomNum; i++) {
+						tempMap.put("talkTitle", token.nextToken());
+						// 이건 int로 파싱해야 될 수도 있음
+						tempMap.put("talkNo", token.nextToken());
+						// 이건 int로 파싱해야 될 수도 있음
+						// 또는 삭제
+						tempMap.put("isPrivate", token.nextToken());
+						tempList.add(tempMap);
+					}
+
+					for (Map<String, Object> map : tempList) {
+						System.out.println(map);
+					}
 				}
 					break;
-				case Protocol.LOGOUT: {
+				case Protocol.SIGNOUT: {
+					msgrClientView.setVisible(false);
+					msgrClientView.dispose();
+					msgrClientView.signInView.setVisible(true);
+					isStop = true;
 				}
 					break;
 				case Protocol.CHANGE_NICKNAME: {
@@ -86,6 +108,11 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.SENDCHAT: {
+					// 21.04.21. 21:27 유성열 수정
+					// 400 # 보낸사람ID # 안녕하세요
+					String	speaker	= token.nextToken();
+					String	message	= token.nextToken();
+
 				}
 					break;
 				case Protocol.EMOTICON: {
@@ -102,8 +129,17 @@ public class MessengerClientThread extends Thread {
 					break;
 				}
 			}
-			catch (Exception e) {
-				e.printStackTrace();
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+			catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			}
+			catch (HeadlessException he) {
+				he.printStackTrace();
+			}
+			catch (NumberFormatException nfe) {
+				nfe.printStackTrace();
 			}
 		}
 	}

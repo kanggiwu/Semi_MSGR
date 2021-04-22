@@ -18,11 +18,12 @@ import msgr.map.MessengerMap;
 import msgr.util.MessengerDAO;
 
 public class TalkRoomListView extends JPanel implements MouseListener {
-	MessengerClientView			msgrClient		= null;
-	String[]					talkRoomName	= new String[50];
-	JList<Object>				talkRoomList	= null;
-	DefaultListModel<Object>	dlm				= new DefaultListModel<>();
-	JScrollPane					scrollPane_list	= null;
+	MessengerClientView msgrClient = null;
+	String[] talkRoomName = new String[50];
+	JList<Object> talkRoomList = null;
+	DefaultListModel<Object> dlm = new DefaultListModel<>();
+	JScrollPane scrollPane_list = null;
+	MessengerChatView msgrChatView = null;
 
 	public TalkRoomListView() {
 
@@ -35,8 +36,8 @@ public class TalkRoomListView extends JPanel implements MouseListener {
 
 	public void getTalkRoomList() {
 
-		MessengerDAO	dao		= MessengerDAO.getInstance();
-		MessengerMap	pMap	= MessengerMap.getInstance();
+		MessengerDAO dao = MessengerDAO.getInstance();
+		MessengerMap pMap = MessengerMap.getInstance();
 		pMap.getMap().put("mem_id_vc", msgrClient.getId());
 		List<Map<String, Object>> tempList = dao.getTalkRoomList(pMap.getMap());
 
@@ -49,7 +50,8 @@ public class TalkRoomListView extends JPanel implements MouseListener {
 	public void initDisplay() {
 		talkRoomList = new JList<Object>();
 		getTalkRoomList();
-		scrollPane_list = new JScrollPane(talkRoomList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane_list = new JScrollPane(talkRoomList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		Font font = new Font("맑은 고딕", Font.PLAIN, 15);
 		talkRoomList.addMouseListener(this);
 		talkRoomList.setFont(font);
@@ -70,7 +72,8 @@ public class TalkRoomListView extends JPanel implements MouseListener {
 		if (e.getClickCount() == 2) {
 
 			if (!"".equals(talkRoomList.getSelectedValue())) {
-				System.out.println("어떤 방이든 더블클릭됨");
+				msgrChatView = new MessengerChatView();
+				msgrChatView.initDisplay();
 			}
 		}
 	}

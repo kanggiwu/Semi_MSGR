@@ -13,15 +13,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class MessagerServer extends JFrame implements Runnable {
-	ServerSocket				server				= null;
-	Socket						client				= null;
-	JTextArea					textArea_log		= new JTextArea();
-	JScrollPane					scrollPane			= new JScrollPane(textArea_log, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	MessengerServerThread		msgrServerThread	= null;
-	List<MessengerServerThread>	globalList			= null;																		// 현재 접속중인
-	List<MessengerTalkRoom>		talkRoomList		= null;																		// 방에 참여한
-																																// 사람들 리스트
+	ServerSocket server = null;
+	Socket client = null;
+	JTextArea textArea_log = new JTextArea();
+	JScrollPane scrollPane = new JScrollPane(textArea_log, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	MessengerServerThread msgrServerThread = null;
+	List<MessengerServerThread> globalList = null; // 현재 접속중인
+	List<MessengerTalkRoom> talkRoomList = null; // 방에 참여한
+													// 사람들 리스트
 
 	public void initDisplay() {
 		// 윈도우 창 닫으면 서버와 클라이언트를 종료하고 창을 종료한다.
@@ -32,8 +32,7 @@ public class MessagerServer extends JFrame implements Runnable {
 					server.close();
 					client.close();
 					System.exit(0);
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -61,15 +60,13 @@ public class MessagerServer extends JFrame implements Runnable {
 			server = new ServerSocket(21430);// 포트번호 준비
 			textArea_log.append("서버가 준비되었습니다.\n");
 
-			
-			while(!isStop) {
+			while (!isStop) {
 				client = server.accept();// 클라이언트 스레드를 기다림..
 				textArea_log.append(client.toString() + "\n");// 포트번호 출력 테스트
 				msgrServerThread = new MessengerServerThread(this);
 				msgrServerThread.start();
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
