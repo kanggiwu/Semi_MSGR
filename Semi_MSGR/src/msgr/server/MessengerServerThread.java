@@ -89,6 +89,7 @@ public class MessengerServerThread extends Thread {
 					send(response);// 로그인 프로토콜 전송
 					send(roomList);// 톡방 리스트 전송
 					send(buddyList);// 친구 리스트 전송
+
 				}
 					break;
 
@@ -252,17 +253,21 @@ public class MessengerServerThread extends Thread {
 
 				}
 					break;
+				// 400 # nickname # 메시지
 				case Protocol.SENDCHAT: {// 메시지 전송
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
-																												// 아래로
-																												// 스크롤
-					// 프로토롤#닉네임#메세지내용
-					String	nickname		= token.nextToken();
-					String	talkRoomFlag	= token.nextToken();
-					String	chat			= token.nextToken();
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
+					String	nickname	= token.nextToken();
+//					String	talkRoomFlag	= token.nextToken();
+					String	chat		= token.nextToken();
+
+					String	response	= Protocol.SENDCHAT + Protocol.SEPERATOR + nickname + Protocol.SEPERATOR + chat;
+
+					// 테스트용) 모든 스레드에게 브로드캐스팅 하는 걸로
+					broadCasting(response);
+
 					// 방에 참여한 사람들에게만 메시지 전송
-					// broadCating
+					// broadCasting
 				}
 					break;
 				case Protocol.EMOTICON: {// 이모티콘 전송

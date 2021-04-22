@@ -18,7 +18,7 @@ import msgr.map.MessengerMap;
 import msgr.util.MessengerDAO;
 
 public class TalkRoomListView extends JPanel implements MouseListener {
-	MessengerClientView msgrClient = null;
+	MessengerClientView msgrClientView = null;
 	String[] talkRoomName = new String[50];
 	JList<Object> talkRoomList = null;
 	DefaultListModel<Object> dlm = new DefaultListModel<>();
@@ -30,7 +30,7 @@ public class TalkRoomListView extends JPanel implements MouseListener {
 	}
 
 	public TalkRoomListView(MessengerClientView msgrClient) {
-		this.msgrClient = msgrClient;
+		this.msgrClientView = msgrClient;
 		initDisplay();
 	}
 
@@ -38,7 +38,7 @@ public class TalkRoomListView extends JPanel implements MouseListener {
 
 		MessengerDAO dao = MessengerDAO.getInstance();
 		MessengerMap pMap = MessengerMap.getInstance();
-		pMap.getMap().put("mem_id_vc", msgrClient.getId());
+		pMap.getMap().put("mem_id_vc", msgrClientView.getId());
 		List<Map<String, Object>> tempList = dao.getTalkRoomList(pMap.getMap());
 
 		for (Map<String, Object> map : tempList) {
@@ -72,7 +72,7 @@ public class TalkRoomListView extends JPanel implements MouseListener {
 		if (e.getClickCount() == 2) {
 
 			if (!"".equals(talkRoomList.getSelectedValue())) {
-				msgrChatView = new MessengerChatView();
+				msgrChatView = new MessengerChatView(this);
 				msgrChatView.initDisplay();
 			}
 		}

@@ -21,7 +21,7 @@ public class MessengerClientThread extends Thread {
 	public MessengerClientThread(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
 		this.socket = msgrClientView.socket;
-		this.msgrChatView = msgrClientView.roomListView.msgrChatView;
+
 	}
 
 	public void run() {
@@ -49,6 +49,7 @@ public class MessengerClientThread extends Thread {
 					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
 
 					for (Map<String, Object> map : roomList) {
+
 						System.out.println(map);
 					}
 
@@ -103,10 +104,14 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.SENDCHAT: {
+					this.msgrChatView = msgrClientView.roomListView.msgrChatView;
 					// 21.04.21. 21:27 유성열 수정
-					// 400 # 보낸사람ID # 안녕하세요
-					String	speaker	= token.nextToken();
-					String	message	= token.nextToken();
+					// 400 # nickname # 안녕하세요
+					String	nickname	= token.nextToken();
+					String	message		= token.nextToken();
+
+					System.out.println(msgrChatView);
+					msgrChatView.chatArea.append(nickname + "] " + message + "\n");
 
 				}
 					break;
