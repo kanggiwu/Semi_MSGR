@@ -13,15 +13,15 @@ import msgr.util.MessengerDAO;
 
 public class MessengerServerThread extends Thread {
 
-	MessagerServer				msgrServer		= null;
-	Socket						client			= null;
-	ObjectOutputStream			oos				= null;
-	ObjectInputStream			ois				= null;
-	String						id				= "";
-	String						nickname		= "";
-	MessengerDAO				msgrDAO			= null;
-	MessengerMap				pMap			= null;
-	List<MessengerTalkRoom>		talkRoomList	= null;
+	MessagerServer			msgrServer		= null;
+	Socket					client			= null;
+	ObjectOutputStream		oos				= null;
+	ObjectInputStream		ois				= null;
+	String					id				= "";
+	String					nickname		= "";
+	MessengerDAO			msgrDAO			= null;
+	MessengerMap			pMap			= null;
+	List<MessengerTalkRoom>	talkRoomList	= null;
 
 	// 깃허브 연습
 	public MessengerServerThread(MessagerServer msgrServer) {
@@ -72,24 +72,23 @@ public class MessengerServerThread extends Thread {
 
 					// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.append(msg + "님이 로그인\n");
-					
-					//톡방 목록을 DB에서 받아오기
+
+					// 톡방 목록을 DB에서 받아오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> roomList = msgrDAO.getTalkRoomList(pMap.getMap());// id를 파라미터로 넘겨준 뒤 마이바티스를 통해 해당하는 id가 참여한
 																								// 톡방리스트를 받아온다
 					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
 					setTalkRoomList(roomList);
 
-					//친구 목록 DB에서 받아오기
+					// 친구 목록 DB에서 받아오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> buddyList = msgrDAO.getBuddyList(pMap.getMap());
-					
-										
-					//클라이언트 스레드에 메시지 전송
+
+					// 클라이언트 스레드에 메시지 전송
 					response = Integer.toString(Protocol.SIGNIN);
-					send(response);//로그인 프로토콜 전송
-					send(roomList);//톡방 리스트 전송
-					send(buddyList);//친구 리스트 전송
+					send(response);// 로그인 프로토콜 전송
+					send(roomList);// 톡방 리스트 전송
+					send(buddyList);// 친구 리스트 전송
 				}
 					break;
 
@@ -142,17 +141,16 @@ public class MessengerServerThread extends Thread {
 				/*	(((((수신))))) 140
 				(((((송신))))) 140 # id */
 				case Protocol.MEM_DELETE: {// 회원탈퇴
-					msgrServer.textArea_log.append(msg + id+ "님이 회원탈퇴\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.append(msg + id + "님이 회원탈퇴\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-					
-					//DB에 해당하는 회원 정보 삭제
+
+					// DB에 해당하는 회원 정보 삭제
 					pMap.getMap().put("mem_id_vc", id);
 					msgrDAO.deleteMember(pMap.getMap());
 
 					String response = Integer.toString(Protocol.MEM_DELETE) + id;
 					buddyCasting(response);
 					msgrServer.globalList.remove(this);
-					
 
 				}
 					break;
@@ -194,9 +192,7 @@ public class MessengerServerThread extends Thread {
 				case Protocol.ROOM_DELETE: {// 톡방 나가기
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-					
-					
-					
+
 				}
 					break;
 
@@ -209,10 +205,7 @@ public class MessengerServerThread extends Thread {
 				case Protocol.BUDDY_LIST: {// 친구목록 출력
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨// 아래로// 스크롤
-					
-				
-					
-					
+
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {// 친구 삭제
@@ -261,10 +254,9 @@ public class MessengerServerThread extends Thread {
 	}// ======================== end of run
 
 	private void send(Object response) {
-		
+
 		try {
-			oos.writeObject(response)
-			;
+			oos.writeObject(response);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -273,29 +265,26 @@ public class MessengerServerThread extends Thread {
 
 	private void broadCasting(Object response) {// 접속한 모든 사람들에게 브로드캐스팅
 		// 오픈톡방 리스트 출력
-		
+
 		for (MessengerServerThread msgrServerThread : msgrServer.globalList) {
 			msgrServerThread.send(response);
 		}
 	}
 
-	
-	
-	
-
 	private void buddyCasting(Object response) {// 접속한 친구들한테만 브로드캐스팅
 
 	}// end of buddyCasting()
 
-	public void setTalkRoomList(List<Map<String,Object>> roomList) {
+	public void setTalkRoomList(List<Map<String, Object>> roomList) {
 		MessengerTalkRoom msgrTalkRoom = null;
+
 		for (Map<String, Object> map : roomList) {
 			msgrTalkRoom = new MessengerTalkRoom();
-			String room_name = (String) map.get("ROOM_NAME_VC");
+			String	room_name	= (String) map.get("ROOM_NAME_VC");
 			// 해당 부분에서 멈춰버려서 오브젝트를 스트링으로 바꾸고 파스인트를 하니까 됨
 			// int room_no = (int) map.get("ROOM_NO_NU"));
-			int room_no = Integer.parseInt(map.get("ROOM_NO_NU").toString());
-			int is_private = Integer.parseInt(map.get("IS_PRIVATE_YN").toString());
+			int		room_no		= Integer.parseInt(map.get("ROOM_NO_NU").toString());
+			int		is_private	= Integer.parseInt(map.get("IS_PRIVATE_YN").toString());
 
 			msgrTalkRoom.setMsgrTalkRoom(room_name, room_no, is_private);
 			talkRoomList.add(msgrTalkRoom);// 톡방리스트에 만들어준 톡방을 넣어준다.

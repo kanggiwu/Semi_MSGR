@@ -45,17 +45,17 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.SIGNIN: {
-					List<Map<String,Object>> roomList = (List)msgrClientView.ois.readObject();
-					List<Map<String,Object>> buddyList = (List)msgrClientView.ois.readObject();
-					
+					List<Map<String, Object>>	roomList	= (List) msgrClientView.ois.readObject();
+					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
+
 					for (Map<String, Object> map : roomList) {
 						System.out.println(map);
 					}
-					
+
 					for (Map<String, Object> map : buddyList) {
 						System.out.println(map);
 					}
-					
+
 				}
 					break;
 				case Protocol.SIGNOUT: {
@@ -96,9 +96,7 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_LIST: {
-				
-					
-					
+
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {
