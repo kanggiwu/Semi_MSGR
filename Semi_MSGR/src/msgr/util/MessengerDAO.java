@@ -100,8 +100,8 @@ public class MessengerDAO {
 	 * WHERE room.room_no_nu = rlist.room_no_nu 
 	 * AND rlist.mem_id_vc = #{mem_id_vc} ORDER BY room.room_no_nu ASC
 	 *  
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 아이디를 저장해둔 Map
+	 * @return tempList - 사용자가 입력한 아이디와 일치하는 톡방 이름, 톡방 번호를 리스트로 리턴
 	 */
 	public List<Map<String, Object>> getTalkRoomList(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -114,12 +114,12 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구목록 불러오기 메서드 /확인
+	 * 친구리스트 불러오기 메서드 /확인
 	 * 
 	 * SELECT buddy_id_vc FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vd} ORDER BY mem_id_vc
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 아이디를 저장해둔 Map
+	 * @return tempList - 사용자가 입력한 아이디의 친구들을  리스트로 리턴
 	 */
 	public List<Map<String, Object>> getBuddyList(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -137,8 +137,8 @@ public class MessengerDAO {
 	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
 	 * VALUES (#{room_no_nu), #{room_name_vc}, 0)
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 톡방 번호, 톡방 이름을 저장한 Map
+	 * @return accept - (1) : 오픈톡방 추가 성공 (-1) : 오픈톡방 추가 실패
 	 */
 	public int createOpenTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -158,18 +158,6 @@ public class MessengerDAO {
 		sqlSession.close();
 		return createOpenTalkCheck;
 	}
-//	public static void main(String[] args) {
-//		MessengerDAO				dao		= new MessengerDAO();
-//		MessengerMap				msgrMap	= MessengerMap.getInstance();
-//		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-//		msgrMap.getMap().put("room_no_nu", 5);
-//		msgrMap.getMap().put("room_name_vc", "톡방이름5");
-//
-//		
-//		int test = dao.createOpenTalkRoom(msgrMap.getMap());
-//		System.out.println(test);
-//		
-//	}
 
 	/**
 	 * 친구톡방 추가하기 메소드 /확인
@@ -177,8 +165,8 @@ public class MessengerDAO {
 	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
 	 * VALUES (#{room_no_nu), #{room_name_vc}, 1)
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 톡방번호, 톡방이름을 저장한 Map
+	 * @return accept - (1) : 친구톡방 추가 성공 (-1) : 친구톡방 추가 실패
 	 */
 	public int createBuddyTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -204,8 +192,8 @@ public class MessengerDAO {
 	 * 
 	 * DELETE FROM MSGR_ROOM WHERE room_no_nu = #{room_no_nu}
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 톡방 번호를 저장한 Map
+	 * @return accept - (1) : 톡방 삭제 성공 (-1) : 톡방 삭제 실패
 	 */
 	public int deleteTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -226,12 +214,12 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 대화내용 삽입(매번) 쿼리문 /확인
+	 * 대화내용 전송 쿼리문 /확인
 	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
 	 * VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 톡방 번호, 채팅 번호, 아이디, 대화내용을 저장한 Map
+	 * @return accept - (1) : 대화내용 전송 성공 (-1) : 대화내용 전송 실패
 	 */
 	public int insertChat(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -253,13 +241,12 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 마지막 대화번호 가지고 오기  쿼리문 /확인
+	 * 마지막 대화 번호 가지고 오기  쿼리문 /확인
 	 *
 	 * SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat ORDER BY chat_no_nu DESC)
 	 * WHERE ROWNUM = 1	 
 	 * 
-	 * @param pMap
-	 * @return
+	 * @return tempList - 마지막 대화 번호를 리스트로 리턴  
 	 */
 	public List<Map<String, Object>> getLastChatNum(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -273,12 +260,14 @@ public class MessengerDAO {
 	/**
 	 * 톡방 참가한 이후의 대화내용 가져오기 메소드 
 	 * 
-	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
-	 * WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc}) 
-	 * AND rlist.mem_id_vc = #{rlist.mem_id_vc} AND chat.roon_no_nu = #{chat.room_no_nu}
+	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
+		WHERE rlist.room_no_nu = chat.room_no_nu
+		AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
+		AND rlist.mem_id_vc = #{mem_id_vc}
+		AND chat.room_no_nu = #{room_no_nu}
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap- 사용자가 입력한 아이디, 톡방 번호가 저장된 Map
+	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 대화 내용을 리스트로 리턴  
 	 */
 	public List<Map<String, Object>> getChatAfterJoin(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -302,8 +291,9 @@ public class MessengerDAO {
 	 * END
 	 * }
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 아이디를 저장한 Map
+	 * @return accept - (-1) : 회원 탈퇴 성공 (1) : 회원 탈퇴 실패 
+	 * 			
 	 */
 	public int deleteMember(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -324,7 +314,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구삭제 메소드 /확인 그런데 성공시 1이 아니라 -1이 출력 됨 
+	 * 친구 삭제 메소드 /확인
 	 * 
 	 * {
 	 * CALL
@@ -334,8 +324,8 @@ public class MessengerDAO {
 	 * END
 	 * }
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 아이디와 친구 아이디를 저장한 Map
+	 * @return accept - (-1) : 친구 삭제 성공 (1) : 친구 삭제 실패 
 	 */
 	public int deleteBuddy(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -362,8 +352,8 @@ public class MessengerDAO {
 	 * UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} 
 	 * WHERE mem_id_vc = #{mem_id_vc}
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 아이디와 닉네임을 저장한 Map
+	 * @return accept - (1) : 닉네임 변경 성공 (-1) : 닉네임 변경 실패 
 	 */
 	public int changeNickname(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -384,7 +374,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구추가 메소드 /확인
+	 * 친구 추가 메소드 /확인
 	 * 
 	 * {CALL
 			DECLARE
@@ -394,8 +384,8 @@ public class MessengerDAO {
 			END
 		}	
 	 * 
-	 * @param pMap
-	 * @return
+	 * @param pMap - 사용자가 입력한 아이디와 친구 아이디를 저장한 Map
+	 * @return accept - (-1) : 친구 추가 전송 성공 (1) : 친구 추가 실패 
 	 */
 	public int makeBuddys(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -414,29 +404,5 @@ public class MessengerDAO {
 
 		return makeBuddysCheck;
 	}
-//	public static void main(String[] args) {
-//		MessengerDAO				dao		= new MessengerDAO();
-//		MessengerMap				msgrMap	= MessengerMap.getInstance();
-//		List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-//		
-//		msgrMap.getMap().put("mem_id_vc", "test10");
-//		
-//		
-//		
-//		int test = dao.deleteMember(msgrMap.getMap());
-//		System.out.println(test);
-//		
-//		
-////		list =  dao.insertChat(msgrMap.getMap());
-//		
-////		for (Map<String, Object> map : list) {
-//			
-////			System.out.println(map);
-////		}
-//		
-////		System.out.println(list);
-//		
-//		
-//	}
 
 }
