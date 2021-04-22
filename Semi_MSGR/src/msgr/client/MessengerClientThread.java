@@ -45,32 +45,16 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.SIGNIN: {
-					List<Map<String, Object>>	tempList	= new Vector<>();
-					Map<String, Object>			tempMap		= null;
-					int							roomNum		= Integer.parseInt(token.nextToken());
-
-					for (int i = 0; i < roomNum; i++) {
-						tempMap		= new HashMap<>();
-						tempMap.put("talkTitle", token.nextToken());
-						// 이건 int로 파싱해야 될 수도 있음
-						tempMap.put("talkNo", token.nextToken());
-						// 이건 int로 파싱해야 될 수도 있음
-						// 또는 삭제
-						tempMap.put("isPrivate", token.nextToken());
-						tempList.add(tempMap);
-					}
-
-					for (Map<String, Object> map : tempList) {
+					List<Map<String,Object>> roomList = (List)msgrClientView.ois.readObject();
+					List<Map<String,Object>> buddyList = (List)msgrClientView.ois.readObject();
+					
+					for (Map<String, Object> map : roomList) {
 						System.out.println(map);
 					}
 					
-					
-					List<Map<String, Object>> buddyList = (List)msgrClientView.ois.readObject();
 					for (Map<String, Object> map : buddyList) {
 						System.out.println(map);
 					}
-					
-					
 					
 				}
 					break;
