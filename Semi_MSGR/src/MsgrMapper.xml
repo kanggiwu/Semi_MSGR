@@ -88,7 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 --><!-- 미확인 : 참가시간, 대화 작성 시간 컬럼 만들어서 비교하는게 어떤지 다시 생각해보기  -->
 	<select id="getChatAfterJoin" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
+		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist <!-- msgr room in list가 여기 왜 들어가지? -->
 		WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc}) 
 		AND rlist.mem_id_vc = #{mem_id_vc} AND chat.room_no_nu = #{room_no_nu}
 	</select>
