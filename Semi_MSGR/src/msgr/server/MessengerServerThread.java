@@ -117,7 +117,14 @@ public class MessengerServerThread extends Thread {
 						response += Protocol.SEPERATOR;
 						response += index.getIs_private();
 					}
+
 					send(response);
+
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> buddyList = msgrDAO.getBuddyList(pMap.getMap());
+					
+					oos.writeObject(buddyList);
+					
 					System.out.println(response);
 				}
 					break;
@@ -233,10 +240,13 @@ public class MessengerServerThread extends Thread {
 					break;
 				case Protocol.ROOM_DELETE: {// 톡방 나가기
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
-																												// 아래로
-																												// 스크롤
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨// 아래로// 스크롤
 
+					
+					
+					
+					
+					
 				}
 					break;
 
@@ -248,10 +258,11 @@ public class MessengerServerThread extends Thread {
 					break;
 				case Protocol.BUDDY_LIST: {// 친구목록 출력
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
-																												// 아래로
-																												// 스크롤
-					// bubbyList.getBuddyList();
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨// 아래로// 스크롤
+					
+				
+					
+					
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {// 친구 삭제

@@ -13,12 +13,12 @@ import javax.swing.JOptionPane;
 
 import msgr.server.Protocol;
 
-public class MessengerClientThread extends Thread {
+public class MessengerClientThread2 extends Thread {
 	MessengerClientView	msgrClientView	= null;
 	MessengerChatView	msgrChatView	= null;
 	Socket				socket			= null;
 
-	public MessengerClientThread(MessengerClientView msgrClientView) {
+	public MessengerClientThread2(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
 		this.socket = msgrClientView.socket;
 		this.msgrChatView = msgrClientView.roomListView.msgrChatView;
@@ -46,11 +46,10 @@ public class MessengerClientThread extends Thread {
 				switch (protocol) {
 				case Protocol.SIGNIN: {
 					List<Map<String, Object>>	tempList	= new Vector<>();
-					Map<String, Object>			tempMap		= null;
+					Map<String, Object>			tempMap		= new HashMap<>();
 					int							roomNum		= Integer.parseInt(token.nextToken());
 
 					for (int i = 0; i < roomNum; i++) {
-						tempMap		= new HashMap<>();
 						tempMap.put("talkTitle", token.nextToken());
 						// 이건 int로 파싱해야 될 수도 있음
 						tempMap.put("talkNo", token.nextToken());
@@ -63,15 +62,6 @@ public class MessengerClientThread extends Thread {
 					for (Map<String, Object> map : tempList) {
 						System.out.println(map);
 					}
-					
-					
-					List<Map<String, Object>> buddyList = (List)msgrClientView.ois.readObject();
-					for (Map<String, Object> map : buddyList) {
-						System.out.println(map);
-					}
-					
-					
-					
 				}
 					break;
 				case Protocol.SIGNOUT: {
@@ -112,9 +102,6 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_LIST: {
-				
-					
-					
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {
