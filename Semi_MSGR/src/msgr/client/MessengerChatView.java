@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -14,19 +15,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import msgr.server.Protocol;
+
 public class MessengerChatView extends JDialog implements ActionListener {
 
-	private JPanel		centerPanel		= new JPanel(new BorderLayout());
-	private JPanel		southPanel		= new JPanel(new BorderLayout());
-	private JTextArea	chatArea		= new JTextArea();
-	private JScrollPane	scrollPane_chat	= new JScrollPane(chatArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+	private JPanel		centerPanel			= new JPanel(new BorderLayout());
+	private JPanel		southPanel			= new JPanel(new BorderLayout());
+	JTextArea			chatArea			= new JTextArea();
+	private JScrollPane	scrollPane_chat		= new JScrollPane(chatArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	private JTextField	messegeField	= new JTextField();
-	private JButton		button_send		= new JButton("전송");
-	private JButton		button_emoticon	= new JButton("이모티콘");
+	private JTextField	messegeField		= new JTextField();
+	private JButton		button_send			= new JButton("전송");
+	private JButton		button_emoticon		= new JButton("이모티콘");
+	TalkRoomListView	talkRoomListView	= null;
 
-	public MessengerChatView() {
-
+	public MessengerChatView(TalkRoomListView talkRoomListView) {
+		this.talkRoomListView = talkRoomListView;
 	}
 
 	public void initDisplay() {
@@ -49,18 +53,21 @@ public class MessengerChatView extends JDialog implements ActionListener {
 		this.setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		MessengerChatView mcv = new MessengerChatView();
-		mcv.initDisplay();
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 
 		if (messegeField == obj || button_send == obj) {
 
-			chatArea.append(messegeField.getText() + "\n");
+			// 400 # nickname # 메시지
+			try {
+				talkRoomListView.msgrClientView.oos.writeObject(
+											Protocol.SENDCHAT + Protocol.SEPERATOR + talkRoomListView.msgrClientView.getNickname()
+																		+ Protocol.SEPERATOR + messegeField.getText());
+			}
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 			messegeField.setText("");
 			messegeField.requestFocus();
 		}

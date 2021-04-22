@@ -16,7 +16,7 @@ import msgr.map.MessengerMap;
 import msgr.util.MessengerDAO;
 
 public class BuddyListView extends JPanel implements MouseListener {
-	MessengerClientView			msgrClient		= null;
+	MessengerClientView			msgrClientView		= null;
 	JList<Object>				buddyList		= null;
 	DefaultListModel<Object>	dlm				= new DefaultListModel<>();
 	JScrollPane					scrollPane_list	= null;
@@ -29,7 +29,7 @@ public class BuddyListView extends JPanel implements MouseListener {
 
 		MessengerDAO	dao		= MessengerDAO.getInstance();
 		MessengerMap	pMap	= MessengerMap.getInstance();
-		pMap.getMap().put("mem_id_vc", msgrClient.getId());
+		pMap.getMap().put("mem_id_vc", msgrClientView.getId());
 		List<Map<String, Object>> tempList = dao.getBuddyList(pMap.getMap());
 
 		for (Map<String, Object> map : tempList) {
@@ -38,8 +38,8 @@ public class BuddyListView extends JPanel implements MouseListener {
 		buddyList.setModel(dlm);
 	}
 
-	public BuddyListView(MessengerClientView msgrClient) {
-		this.msgrClient = msgrClient;
+	public BuddyListView(MessengerClientView msgrClientView) {
+		this.msgrClientView = msgrClientView;
 		initDisplay();
 	}
 
@@ -64,12 +64,11 @@ public class BuddyListView extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println(buddyList.getSelectedValue());
 
 		if (e.getClickCount() == 2) {
 
 			if (!"".equals(buddyList.getSelectedValue())) {
-				System.out.println("어떤 방이든 더블클릭됨");
+				System.out.println(buddyList.getSelectedValue());
 			}
 		}
 	}
@@ -99,7 +98,7 @@ public class BuddyListView extends JPanel implements MouseListener {
 		if (obj == buddyList) {
 
 			if (e.isPopupTrigger()) {
-				msgrClient.getPopupMenu().show(this, e.getX(), e.getY());
+				msgrClientView.getPopupMenu().show(this, e.getX(), e.getY());
 			}
 		}
 	}
