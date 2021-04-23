@@ -55,7 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 마지막 톡방 번호 가져오기 쿼리문 -->
-	<select id="getLastRoomNum" parameterType="java.util.Map" resultType="java.util.Map">
+	<select id="getLastRoomNum" parameterType="java.util.Map" resultType="int">
 		SELECT room_no_nu FROM MSGR_ROOM WHERE ROWNUM = 1 ORDER BY room_no_nu DESC
 	</select>
 
