@@ -88,8 +88,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		VALUES(#{room_no_nu}, #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	</insert>
 	
-	<!-- 방별로 마지막 대화번호 가져오기 쿼리문 --><!-- 확인 -->
-	<select id="getLastChatNum" parameterType="java.util.Map" resultType="java.util.Map">
+	<!-- 마지막 대화번호 가져오기 쿼리문 --><!-- 확인 -->
+	<select id="getLastChatNum" parameterType="java.util.Map" resultType="int">
 		SELECT chat_no_nu 
 		FROM(SELECT chat_no_nu FROM msgr_chat WHERE room_no_nu = #{room_no_nu} ORDER BY chat_no_nu DESC)
 		WHERE ROWNUM = 1	 

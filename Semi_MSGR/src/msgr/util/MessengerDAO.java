@@ -288,28 +288,29 @@ public class MessengerDAO {
 	/**
 	 * 마지막 대화 번호 가지고 오기 메서드 /확인
 	 *
-	 * SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat ORDER BY chat_no_nu DESC)
-	 * WHERE ROWNUM = 1	 
+	 *SELECT chat_no_nu 
+	 *FROM(SELECT chat_no_nu FROM msgr_chat WHERE room_no_nu = #{room_no_nu} ORDER BY chat_no_nu DESC)
+	 *WHERE ROWNUM = 1
 	 * 
-	 * @return tempList - 마지막 대화 번호를 리스트로 리턴  
+	 * @return tempList - 마지막 대화 번호를 리턴  
 	 */
-	public List<Map<String, Object>> getLastChatNum(Map<String, Object> pMap) {
+	public int getLastChatNum(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getLastChatNum", pMap);
+		int	tempInt	= sqlSession.selectOne("MsgrMapper.getLastChatNum", pMap);
 		
 		sqlSession.close();
 		
-		return tempList;
+		return tempInt;
 	}
 	/**
 	 * 톡방 참가한 이후의 대화내용 가져오기 메서드 /확인 
 	 * 
 	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
-		WHERE rlist.room_no_nu = chat.room_no_nu
-		AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
-		AND rlist.mem_id_vc = #{mem_id_vc}
-		AND chat.room_no_nu = #{room_no_nu}
+	 * WHERE rlist.room_no_nu = chat.room_no_nu
+	 * AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
+	 * AND rlist.mem_id_vc = #{mem_id_vc}
+	 * AND chat.room_no_nu = #{room_no_nu}
 	 * 
 	 * @param pMap- 사용자가 입력한 아이디, 톡방 번호가 저장된 Map
 	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 대화 내용을 리스트로 리턴  
@@ -350,7 +351,9 @@ public class MessengerDAO {
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
-			deleteMemberCheck = -1;
+			System.out.println("실패");
+			deleteMemberCheck = 0;
+			
 		}
 		sqlSession.commit();
 		sqlSession.close();
@@ -439,6 +442,7 @@ public class MessengerDAO {
 		
 		try {
 			makeBuddysCheck = sqlSession.insert("MsgrMapper.makeBuddys", pMap);
+			System.out.println("성공");
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -450,5 +454,16 @@ public class MessengerDAO {
 		return makeBuddysCheck;
 	}
 
-
+	public static void main(String[] args) {
+	MessengerDAO				dao		= new MessengerDAO();
+	MessengerMap				msgrMap	= MessengerMap.getInstance();
+	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+	
+	msgrMap.getMap().put("mem_id_vc", "test14");
+	
+	
+	int test = dao.deleteMember(msgrMap.getMap());
+	System.out.println(test);
+	
+	}
 }
