@@ -48,18 +48,12 @@ public class MessengerClientThread extends Thread {
 					List<Map<String, Object>>	roomList	= (List) msgrClientView.ois.readObject();
 					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
 
-					for (Map<String, Object> map : roomList) {
-
-						System.out.println(map);
-					}
-
-					for (Map<String, Object> map : buddyList) {
-						System.out.println(map);
-					}
+					
 
 				}
 					break;
 				case Protocol.SIGNOUT: {
+					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
 					msgrClientView.signInView.setVisible(true);
@@ -67,9 +61,18 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.CHANGE_NICKNAME: {
+					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
+					// 130 # mem_id_vc # nickname
+					String	nickname	= token.nextToken();
+					msgrClientView.setTitle(nickname);
 				}
 					break;
 				case Protocol.MEM_DELETE: {
+					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
+					msgrClientView.setVisible(false);
+					msgrClientView.dispose();
+					msgrClientView.signInView.setVisible(true);
+					isStop = true;
 				}
 					break;
 				case Protocol.ROOM_CREATE_BUDDY: {
