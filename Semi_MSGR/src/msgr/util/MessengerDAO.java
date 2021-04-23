@@ -138,10 +138,10 @@ public class MessengerDAO {
 	 * 
 	 * @return - 마지막 톡방 번호를 리스트로 리턴 
 	 */
-	public List<Map<String, Object>> getLastRoomNum(Map<String, Object> pMap) {
+	public List<Map<String, Object>> getLastRoomNum() {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getLastRoomNum", pMap);
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getLastRoomNum");
 		
 		sqlSession.close();
 		
