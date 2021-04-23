@@ -16,26 +16,14 @@ import msgr.map.MessengerMap;
 import msgr.util.MessengerDAO;
 
 public class BuddyListView extends JPanel implements MouseListener {
-	MessengerClientView			msgrClientView		= null;
+	MessengerClientView			msgrClientView	= null;
 	JList<Object>				buddyList		= null;
 	DefaultListModel<Object>	dlm				= new DefaultListModel<>();
 	JScrollPane					scrollPane_list	= null;
+	Font						font			= new Font("맑은 고딕", Font.PLAIN, 15);
 
 	public BuddyListView() {
 
-	}
-
-	public void getBuddyList() {
-
-		MessengerDAO	dao		= MessengerDAO.getInstance();
-		MessengerMap	pMap	= MessengerMap.getInstance();
-		pMap.getMap().put("mem_id_vc", msgrClientView.getId());
-		List<Map<String, Object>> tempList = dao.getBuddyList(pMap.getMap());
-
-		for (Map<String, Object> map : tempList) {
-			dlm.addElement(map.get("BUDDY_ID_VC"));
-		}
-		buddyList.setModel(dlm);
 	}
 
 	public BuddyListView(MessengerClientView msgrClientView) {
@@ -43,17 +31,22 @@ public class BuddyListView extends JPanel implements MouseListener {
 		initDisplay();
 	}
 
-	public void initDisplay() {
-		Font font = new Font("맑은 고딕", Font.PLAIN, 15);
+	public void getBuddyList(List<Map<String, Object>> pList) {
 		buddyList = new JList<Object>();
 		buddyList.setFont(font);
 		buddyList.addMouseListener(this);
 
-		getBuddyList();
+		for (Map<String, Object> map : pList) {
+			dlm.addElement(map.get("BUDDY_ID_VC"));
+		}
+		buddyList.setModel(dlm);
 		scrollPane_list = new JScrollPane(buddyList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 									JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		this.setLayout(new BorderLayout());
 		this.add("Center", scrollPane_list);
+	}
+
+	public void initDisplay() {
+		this.setLayout(new BorderLayout());
 		this.setSize(500, 400);
 		this.setVisible(true);
 	}
