@@ -189,22 +189,22 @@ public class MessengerServerThread extends Thread {
 					
 					//마지막 톡방 번호를 받아오고
 					int lastTalk_no = -1;
-//					lastTalk_no = msgrDAO.getLastRoomNum();
+					Map<String,Object> lastTalk_no_map= msgrDAO.getLastRoomNum();
 					
-					String talkTitle = nickname +"님";
+					String room_name = nickname +"님";
 					
 					List<Map<String,Object>> createBuddyTalk = new ArrayList<>();
 					createBuddyTalk = (List)ois.readObject();
 					
 					for (Map<String,Object> buddy : createBuddyTalk) {
-						talkTitle += ", " + buddy.get("mem_nick_vc")
+						room_name += ", " + buddy.get("mem_nick_vc")
 													+"님";
 					}
-					talkTitle += "의 방입니다.";
-					System.out.println("방이름:"+talkTitle);	
+					room_name += "의 방입니다.";
+					System.out.println("방이름:"+room_name);	
 					//방을 만들고
 					pMap.getMap().put("room_no_nu", ++lastTalk_no);
-					pMap.getMap().put("room_name_vc",talkTitle);
+					pMap.getMap().put("room_name_vc",room_name);
 					checkDao = msgrDAO.createBuddyTalkRoom(pMap.getMap());
 					System.out.println("친구톡방 생성 DB에 연결 성공유무:"+checkDao);
 					//해당하는 방에 참여자들을 추가해준다.
@@ -218,11 +218,29 @@ public class MessengerServerThread extends Thread {
 						System.out.println("친구톡방에 친구들 들어갔는지 DB에 연결 성공유무:"+checkDao + i++);						
 					}
 					
+					//톡방리스트에 톡방 추가
+					MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
+					msgrTalkRoom.setMsgrTalkRoom(room_name, lastTalk_no, 1);
+					talkRoomList.add(msgrTalkRoom);
+					
 				}
 					break;
 				case Protocol.ROOM_CREATE_OPENTALK: {// 오픈톡 생성
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
+
+					int checkDao = -3;
+					int lastTalk_no = -1;
+					lastTalk_no = msgrDAO.getLastRoomNum();
+					String room_name = nickname+ "님의 오픈톡방입니다.";
+					//방을 만들고
+					pMap.getMap().put("room_no_nu", ++lastTalk_no);
+					pMap.getMap().put("room_name_vc",room_name);
+					checkDao = msgrDAO.createBuddyTalkRoom(pMap.getMap());
+					System.out.println("오픈톡방 생성 DB에 연결 성공유무:"+checkDao);
+					
+					
+					
 				}
 					break;
 				case Protocol.ROOM_LIST: {// 톡방 리스트 출력
@@ -243,11 +261,29 @@ public class MessengerServerThread extends Thread {
 
 				}
 					break;
-
-				/*	(수신) 211 # 톡방번호
-				 *	(송신) 211 # 톡방 이름 | 참가한 후 채팅내용
+					/*
+					 * (수신) 211 # 톡방번호 # 톡방이름
+					 * (송신) 
+					 */
+				case Protocol.ROOM_PARTICIPATE:{ // 톡방 참가
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
+					
+					int checkDAO = -3;
+					int talk_no = Integer.parseInt(token.nextToken());
+					
+					
+					pMap.getMap().put("room_no_nu",talk_no);
+					checkDAO = msgrDAO.getLastChatNum();
+					
+					
+					
+				} 
+					break;
+				/*	(수신) 212 # 톡방번호
+				 *	(송신) 212 # 톡방 이름 | 참가한 후 채팅내용
 				 */
-				case Protocol.ROOM_IN: {// 톡방 참가
+				case Protocol.ROOM_IN: {// 톡방 입장
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response	= null;
@@ -397,6 +433,8 @@ public class MessengerServerThread extends Thread {
 
 	}// end of buddyCasting()
 
+	
+	
 	public void setTalkRoomList(List<Map<String, Object>> roomList) {
 		this.talkRoomList = new Vector<>();
 		MessengerTalkRoom msgrTalkRoom = null;
