@@ -9,7 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<resultMap type="map" id="result" />
 
 <!--
-	Mybatis에서 insert, update, delete의 return은 int이다.
+	Mybatis에서 insert, update, delete의 return은 int이다.`
 	쿼리에서 resultType에 int를 선언하는 것이 아니라 자바 코드에서 리턴 타입을 int로 선언하는 것. 
 	Mybatis에서는 기본적으로 쿼리가 돌고 나면 업데이트 한 행의 개수를 리턴한다.
 	insert: 1(여러갱의 경우도 1)
@@ -81,22 +81,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 방별로 마지막 대화번호 가져오기 쿼리문 --><!-- 확인 -->
 	<select id="getLastChatNum" parameterType="java.util.Map" resultType="java.util.Map">
-	 SELECT chat_no_nu 
-	 FROM(SELECT chat_no_nu FROM msgr_chat WHERE room_no_nu = #{room_no_nu} ORDER BY chat_no_nu DESC)
-	 WHERE ROWNUM = 1	 
+		SELECT chat_no_nu 
+		FROM(SELECT chat_no_nu FROM msgr_chat WHERE room_no_nu = #{room_no_nu} ORDER BY chat_no_nu DESC)
+		WHERE ROWNUM = 1	 
 	</select>
 
-	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 --><!-- 미확인 : 참가시간, 대화 작성 시간 컬럼 만들어서 비교하는게 어떤지 다시 생각해보기  -->
+	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 --><!-- 확인 -->
 	<select id="getChatAfterJoin" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist <!-- msgr room in list가 여기 왜 들어가지? -->
-		WHERE chat.chat_no_nu > (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc=#{mem_id_vc}) 
-		AND rlist.mem_id_vc = #{mem_id_vc} AND chat.room_no_nu = #{room_no_nu}
+		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
+		WHERE rlist.room_no_nu = chat.room_no_nu
+		AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
+		AND rlist.mem_id_vc = #{mem_id_vc}
+		AND chat.room_no_nu = #{room_no_nu}
 	</select>
 
 	
 	<!-- 다중쿼리: 쿼리 한문장 끝날때마다 ;세미콜론 필수 -->
+	<!-- 정상 출력 값이 -1 이다.  -->
+	<!-- {CALL
+			DECLARE
+			BEGIN
+			 	다중쿼리문 
+			END
+		 } 
+		 									-->
 	
-	<!-- 회원탈퇴 쿼리문 --><!-- 확인 ** 성공시 -1 뜸 -->
+	<!-- 회원탈퇴 쿼리문 --><!-- 확인  -->
 	<delete id="deleteMember" parameterType="java.util.Map">
 		{CALL
 			DECLARE
@@ -109,7 +119,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		}
 	</delete>
 
-	<!-- 친구삭제 쿼리문 --><!-- 확인 **쿼리는 돌아가는데 성공 시 1이 아니라 -1이 뜸 -->
+	<!-- 친구삭제 쿼리문 --><!-- 확인 -->
 	<delete id="deleteBuddy" parameterType="java.util.Map">
 		{CALL
 			DECLARE
@@ -125,7 +135,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc = #{mem_id_vc}
 	</update>
 
-	<!-- 친구추가 쿼리문 --><!-- 확인 / 성공시 -1 -->
+	<!-- 친구추가 쿼리문 --><!-- 확인  -->
 	<insert id="makeBuddys" parameterType="java.util.Map">
 		{CALL
 			DECLARE

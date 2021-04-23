@@ -21,7 +21,7 @@ public class MessengerClientThread extends Thread {
 	public MessengerClientThread(MessengerClientView msgrClientView) {
 		this.msgrClientView = msgrClientView;
 		this.socket = msgrClientView.socket;
-		this.msgrChatView = msgrClientView.roomListView.msgrChatView;
+
 	}
 
 	public void run() {
@@ -45,33 +45,18 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.SIGNIN: {
-					List<Map<String, Object>>	tempList	= new Vector<>();
-					Map<String, Object>			tempMap		= null;
-					int							roomNum		= Integer.parseInt(token.nextToken());
+					List<Map<String, Object>>	roomList	= (List) msgrClientView.ois.readObject();
+					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
 
-					for (int i = 0; i < roomNum; i++) {
-						tempMap		= new HashMap<>();
-						tempMap.put("talkTitle", token.nextToken());
-						// 이건 int로 파싱해야 될 수도 있음
-						tempMap.put("talkNo", token.nextToken());
-						// 이건 int로 파싱해야 될 수도 있음
-						// 또는 삭제
-						tempMap.put("isPrivate", token.nextToken());
-						tempList.add(tempMap);
-					}
+					for (Map<String, Object> map : roomList) {
 
-					for (Map<String, Object> map : tempList) {
 						System.out.println(map);
 					}
-					
-					
-					List<Map<String, Object>> buddyList = (List)msgrClientView.ois.readObject();
+
 					for (Map<String, Object> map : buddyList) {
 						System.out.println(map);
 					}
-					
-					
-					
+
 				}
 					break;
 				case Protocol.SIGNOUT: {
@@ -112,19 +97,21 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_LIST: {
-				
-					
-					
+
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {
 				}
 					break;
 				case Protocol.SENDCHAT: {
+					this.msgrChatView = msgrClientView.roomListView.msgrChatView;
 					// 21.04.21. 21:27 유성열 수정
-					// 400 # 보낸사람ID # 안녕하세요
-					String	speaker	= token.nextToken();
-					String	message	= token.nextToken();
+					// 400 # nickname # 안녕하세요
+					String	nickname	= token.nextToken();
+					String	message		= token.nextToken();
+
+					System.out.println(msgrChatView);
+					msgrChatView.chatArea.append(nickname + "] " + message + "\n");
 
 				}
 					break;

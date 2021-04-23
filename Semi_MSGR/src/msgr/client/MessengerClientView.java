@@ -87,7 +87,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			oos.writeObject(Protocol.SIGNIN + Protocol.SEPERATOR + id);
+			oos.writeObject(Protocol.SIGNIN + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname);
 			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
 			msgrClientThread.start();
 		}
@@ -172,7 +172,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			else {
 
 				try {
-					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + aftername);
+					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + aftername);
 				}
 				catch (IOException ioe) {
 					System.out.println(ioe.getMessage());
