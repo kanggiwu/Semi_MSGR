@@ -172,7 +172,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			else {
 
 				try {
-					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + aftername);
+					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + aftername + Protocol.SEPERATOR + id);
 				}
 				catch (IOException ioe) {
 					System.out.println(ioe.getMessage());
@@ -192,6 +192,12 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		else if ("회원탈퇴".equals(command)) {
 			System.out.println("회원탈퇴 버튼");
+			try {
+				oos.writeObject(Protocol.MEM_DELETE + Protocol.SEPERATOR + id);
+			} catch (IOException memdel) {
+				// TODO Auto-generated catch block
+				memdel.printStackTrace();
+			}
 		}
 		/////////////////////// 마이페이지 메뉴아이템 끝 ///////////////////////
 
