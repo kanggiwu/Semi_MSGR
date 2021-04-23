@@ -15,6 +15,7 @@ public class Protocol {
 	public static final int		ROOM_DELETE				= 220;	// 톡방 삭제
 	public static final int		BUDDY_ADD				= 300;	// 친구추가
 	public static final int		BUDDY_LIST				= 310;	// 친구목록
+	public static final int		BUDDY_LIST_UPDATE		= 311;	// 친구목록 갱신 (서버스레드->클라이언트스레드: 회원탈퇴 시 해당하는 아이디 삭제를 요청)
 	public static final int		BUDDY_DELETE			= 320;	// 친구삭제
 	public static final int		SENDCHAT				= 400;	// 메시지 전송
 	public static final int		EMOTICON				= 401;	// 이모티콘 전송
