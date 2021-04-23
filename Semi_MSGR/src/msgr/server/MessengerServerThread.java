@@ -189,7 +189,7 @@ public class MessengerServerThread extends Thread {
 					
 					//마지막 톡방 번호를 받아오고
 					int lastTalk_no = -1;
-//					lastTalk_no = msgrDAO.getLastTalkNum();
+//					lastTalk_no = msgrDAO.getLastRoomNum();
 					
 					String talkTitle = nickname +"님";
 					
@@ -201,43 +201,22 @@ public class MessengerServerThread extends Thread {
 													+"님";
 					}
 					talkTitle += "의 방입니다.";
-										
+					System.out.println("방이름:"+talkTitle);	
 					//방을 만들고
 					pMap.getMap().put("room_no_nu", ++lastTalk_no);
 					pMap.getMap().put("room_name_vc",talkTitle);
 					checkDao = msgrDAO.createBuddyTalkRoom(pMap.getMap());
 					System.out.println("친구톡방 생성 DB에 연결 성공유무:"+checkDao);
-					int i =0;
 					//해당하는 방에 참여자들을 추가해준다.
+					int i =0;
 					for(Map<String,Object> buddy: createBuddyTalk) {
-						pMap.getMap().put("mem_id_vc", buddy.get(lastTalk_no));
+						pMap.getMap().put("room_no_nu", buddy.get(lastTalk_no));
 						pMap.getMap().put("mem_id_vc", buddy.get("mem_id_vc"));
-						pMap.getMap().put("mem_id_vc", buddy.get(1));
+						pMap.getMap().put("chat_no_nu", buddy.get(1));
 						
 						checkDao = msgrDAO.JoinChatMember(pMap.getMap());
 						System.out.println("친구톡방에 친구들 들어갔는지 DB에 연결 성공유무:"+checkDao + i++);						
 					}
-					
-					
-					
-					
-					
-					//애들을 넣어준다.
-					
-					
-					
-					
-					
-					
-					
-					
-					//톡방 번호 , 톡방 참가자 아이디, 1
-					
-					
-					
-					
-					
-					
 					
 				}
 					break;
