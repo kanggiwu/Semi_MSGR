@@ -212,9 +212,38 @@ public class MessengerDAO {
 
 		return deleteTalkRoomCheck;
 	}
+	
+	/**
+	 * 톡방 참여 쿼리문 /확인
+	 * 
+	 * INSERT INTO MSGR_ROOM_IN_LIST(room_no_nu, mem_id_vc, join_chat_no_nu)
+	 * VALUES(#{room_no_nu}, #{mem_id_vc}, #{join_chat_no_nu})
+	 * 
+	 * @param - 사용자가 입력한 방번호, 아이디, 채팅 참여 번호를 저장한 Map
+	 * @return accept - (1) : 톡방 참여 성공 (-1) : 톡방 참여 실패
+	 */
+	public int JoinChatMember(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		int JoinChatMemberCheck = 0;
+		
+		try {
+			JoinChatMemberCheck = sqlSession.insert("MsgrMapper.JoinChatMember", pMap);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			JoinChatMemberCheck = -1;
+		}
+		
+		sqlSession.commit();
+		sqlSession.close();
+		
+		return JoinChatMemberCheck;
+	}
 
 	/**
 	 * 대화내용 전송 쿼리문 /확인
+	 * 
 	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
 	 * VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	 * 
