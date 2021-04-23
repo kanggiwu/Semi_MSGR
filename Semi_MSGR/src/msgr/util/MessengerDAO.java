@@ -136,16 +136,16 @@ public class MessengerDAO {
 	 * 
 	 * SELECT room_no_nu FROM MSGR_ROOM WHERE ROWNUM = 1 ORDER BY room_no_nu DESC
 	 * 
-	 * @return - 마지막 톡방 번호를 리스트로 리턴 
+	 * @return - 마지막 톡방 번호를 리턴 
 	 */
-	public List<Map<String, Object>> getLastRoomNum() {
+	public int getLastRoomNum() {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getLastRoomNum");
+		int	tempInt	= sqlSession.selectOne("MsgrMapper.getLastRoomNum");
 		
 		sqlSession.close();
 		
-		return tempList;
+		return tempInt;
 	}
 	/**
 	 * 오픈톡방 추가하기 메서드 /확인
@@ -449,24 +449,6 @@ public class MessengerDAO {
 
 		return makeBuddysCheck;
 	}
-//	public static void main(String[] args) {
-//	MessengerDAO				dao		= new MessengerDAO();
-//	MessengerMap				msgrMap	= MessengerMap.getInstance();
-//	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-//	
-//	msgrMap.getMap().put("chat_no_nu", 3);
-//
-//	//select문일때의 test 문장 
-//	list =  dao.getLastChatNum(msgrMap.getMap());
-//
-//	for (Map<String, Object> map : list) {
-//	
-//		System.out.println(map);
-//	}
-//
-//	System.out.println(list);
-//
-//
-//	}
+
 
 }
