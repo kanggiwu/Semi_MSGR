@@ -146,7 +146,8 @@ public class MessengerServerThread extends Thread {
 					break;
 
 				/*	(((((수신))))) 140
-				(((((송신))))) 140 # id */
+				(((((송신))))) 140 # 
+				*/
 				case Protocol.MEM_DELETE: {// 회원탈퇴 =========================================================================>완료
 					msgrServer.textArea_log.append(msg + id + "님이 회원탈퇴\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
@@ -155,14 +156,32 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 					msgrDAO.deleteMember(pMap.getMap());
 
-					String response = Integer.toString(Protocol.MEM_DELETE) + id;
+					// 회원탈퇴한 회원 정보를 송신
+					// 클라이언트 스레드에서 해당하는 정보를 받으면 창을 끄고 로그인화면을 띄워줌
+					String response = Integer.toString(Protocol.MEM_DELETE);
+					send(response);
+										
+					/*	회원탈퇴하는 경우, 친구목록에서 사라지고, 대화창에서도 사라진다. 
+					 *	회원탈퇴를 했다. 	-> 친구들 스레드에서 친구리스트에서 동일한 아이디들 삭제
+					 * 						-> 친구들한테 해당 아이디 알려줘서(buddyCasting) DTM에서 삭제
+					 * 						-> 
+					*/					 
+					
+					//친구들의 친구리스트에서 회원탈퇴한 아이디 삭제
+					removeBuddy(id);
+					
+					//친구리스트 갱신
+					//클라이언트 쪽에서 해당하는 아이디랑 같은 경우 DTM에서 삭제해준다.
+					response = null;
+					response = Protocol.BUDDY_LIST_UPDATE +id;
+					
 					buddyCasting(response);
 					msgrServer.globalList.remove(this);
 
 				}
 					break;
 					/*	(((((수신))))) 200
-					(((((송신))))) 140 | 친구리스트 */
+					(((((송신))))) 200 */
 				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
@@ -308,6 +327,17 @@ public class MessengerServerThread extends Thread {
 			e.getStackTrace();
 		}
 	}// ======================== end of run
+
+	
+	private void removeBuddy(String id) {
+		for (MessengerServerThread msgrSeverThread : msgrServer.globalList) {
+			for (String buddyId : msgrSeverThread.myBuddyList) {
+				if(buddyId == id) {
+					msgrSeverThread.myBuddyList.remove(id);
+				}
+			}
+		}
+	}
 
 	private void send(Object response) {
 
