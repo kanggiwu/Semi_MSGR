@@ -3,6 +3,7 @@ package msgr.server;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -22,6 +23,7 @@ public class MessengerServerThread extends Thread {
 	MessengerDAO			msgrDAO			= null;
 	MessengerMap			pMap			= null;
 	List<MessengerTalkRoom>	talkRoomList	= null;
+	List<String>			myBuddyList		= null;
 
 	// 깃허브 연습
 	public MessengerServerThread(MessagerServer msgrServer) {
@@ -82,8 +84,13 @@ public class MessengerServerThread extends Thread {
 
 					// 친구 목록 DB에서 받아오기
 					pMap.getMap().put("mem_id_vc", id);
-					List<Map<String, Object>> buddyList = msgrDAO.getBuddyList(pMap.getMap());
+					List<Map<String, Object>>	buddyList	= msgrDAO.getBuddyList(pMap.getMap());
 
+					//내 친구 리스트 id 저장
+					myBuddyList		= new ArrayList<String>();
+					for (Map<String, Object> map : buddyList) {
+						myBuddyList.add(String.valueOf(map.get("BUDDY_ID_VC")));
+					}
 					// 클라이언트 스레드에 메시지 전송
 					response = Integer.toString(Protocol.SIGNIN);
 					send(response);// 로그인 프로토콜 전송
@@ -140,7 +147,7 @@ public class MessengerServerThread extends Thread {
 
 				/*	(((((수신))))) 140
 				(((((송신))))) 140 # id */
-				case Protocol.MEM_DELETE: {// 회원탈퇴
+				case Protocol.MEM_DELETE: {// 회원탈퇴 =========================================================================>완료
 					msgrServer.textArea_log.append(msg + id + "님이 회원탈퇴\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 
@@ -154,9 +161,19 @@ public class MessengerServerThread extends Thread {
 
 				}
 					break;
+					/*	(((((수신))))) 200
+					(((((송신))))) 140 | 친구리스트 */
 				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
+					
+					
+					
+					
+					
+					
+					
+					
 				}
 					break;
 				case Protocol.ROOM_CREATE_OPENTALK: {// 오픈톡 생성
@@ -192,7 +209,8 @@ public class MessengerServerThread extends Thread {
 					String	response	= null;
 					String	talkTitle	= null;
 					int		room_no		= Integer.parseInt(token.nextToken());
-
+					//
+					
 					// 톡방 참가한 이후의 대화내용 가져오기
 					pMap.getMap().put("room_no_nu", room_no);
 					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
@@ -310,6 +328,17 @@ public class MessengerServerThread extends Thread {
 	}
 
 	private void buddyCasting(Object response) {// 접속한 친구들한테만 브로드캐스팅
+		//접속한 사람들 중
+		for (MessengerServerThread msgrServerThread : msgrServer.globalList) {
+			// 그 사람들의 친구리스트에서
+			for (String buddyId : msgrServerThread.myBuddyList) {
+				//내가 있는 경우
+				if(this.id == buddyId) {
+					//전송
+					send(response);
+				}
+			}
+		}
 
 	}// end of buddyCasting()
 
