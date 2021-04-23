@@ -34,7 +34,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	SignInView			signInView				= null;
 	private JTabbedPane	tabbedPane				= new JTabbedPane(JTabbedPane.LEFT);
 	BuddyListView		buddyListView			= null;
-	TalkRoomListView	roomListView			= null;
+	TalkRoomListView	talkRoomListView			= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
 	Socket				socket					= null;
@@ -105,7 +105,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		// 친구목록 패널 인스턴스화
 		buddyListView = new BuddyListView(this);
 		// 톡방목록 패널 인스턴스화
-		roomListView = new TalkRoomListView(this);
+		talkRoomListView = new TalkRoomListView(this);
 
 		/////////////////////// 메뉴 구성 시작 ///////////////////////
 		menuBar = new JMenuBar();
@@ -139,7 +139,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		/////////////////////// 탭 구성 시작 ///////////////////////
 		tabbedPane.addTab("친구목록", buddyListView);
-		tabbedPane.addTab("톡방목록", roomListView);
+		tabbedPane.addTab("톡방목록", talkRoomListView);
 		this.getContentPane().setBackground(Color.ORANGE);
 		tabbedPane.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		tabbedPane.setToolTipText("");
@@ -172,7 +172,8 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			else {
 
 				try {
-					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + aftername + Protocol.SEPERATOR + id);
+					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + aftername + Protocol.SEPERATOR
+												+ id);
 				}
 				catch (IOException ioe) {
 					System.out.println(ioe.getMessage());
@@ -192,9 +193,11 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		else if ("회원탈퇴".equals(command)) {
 			System.out.println("회원탈퇴 버튼");
+
 			try {
 				oos.writeObject(Protocol.MEM_DELETE + Protocol.SEPERATOR + id);
-			} catch (IOException memdel) {
+			}
+			catch (IOException memdel) {
 				// TODO Auto-generated catch block
 				memdel.printStackTrace();
 			}

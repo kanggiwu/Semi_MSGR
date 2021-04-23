@@ -15,7 +15,6 @@ import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
 	MessengerClientView	msgrClientView	= null;
-	MessengerChatView	msgrChatView	= null;
 	Socket				socket			= null;
 
 	public MessengerClientThread(MessengerClientView msgrClientView) {
@@ -48,18 +47,13 @@ public class MessengerClientThread extends Thread {
 					List<Map<String, Object>>	roomList	= (List) msgrClientView.ois.readObject();
 					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
 
-					for (Map<String, Object> map : roomList) {
-
-						System.out.println(map);
-					}
-
-					for (Map<String, Object> map : buddyList) {
-						System.out.println(map);
-					}
+					msgrClientView.talkRoomListView.getRoomList(roomList);
+					msgrClientView.buddyListView.getBuddyList(buddyList);
 
 				}
 					break;
 				case Protocol.SIGNOUT: {
+					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
 					msgrClientView.signInView.setVisible(true);
@@ -67,9 +61,21 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.CHANGE_NICKNAME: {
+					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
+					// 130 # mem_id_vc # nickname
+
+					// 아이디는 바뀌지 않지만 혹시 몰라 바꿔 줌.
+					msgrClientView.setId(token.nextToken());
+					msgrClientView.setNickname(token.nextToken());
+					msgrClientView.setTitle(msgrClientView.getNickname() + "(" + msgrClientView.getId() + ")님");
 				}
 					break;
 				case Protocol.MEM_DELETE: {
+					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
+					msgrClientView.setVisible(false);
+					msgrClientView.dispose();
+					msgrClientView.signInView.setVisible(true);
+					isStop = true;
 				}
 					break;
 				case Protocol.ROOM_CREATE_BUDDY: {
@@ -104,14 +110,14 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.SENDCHAT: {
-					this.msgrChatView = msgrClientView.roomListView.msgrChatView;
+					;
 					// 21.04.21. 21:27 유성열 수정
 					// 400 # nickname # 안녕하세요
 					String	nickname	= token.nextToken();
 					String	message		= token.nextToken();
 
-					System.out.println(msgrChatView);
-					msgrChatView.chatArea.append(nickname + "] " + message + "\n");
+					System.out.println(msgrClientView.talkRoomListView.msgrChatView);
+					msgrClientView.talkRoomListView.msgrChatView.chatArea.append(nickname + "] " + message + "\n");
 
 				}
 					break;
