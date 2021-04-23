@@ -53,7 +53,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		WHERE M_MEMBER.MEM_ID_VC = M_BUDDY.buddy_id_vc
 		AND M_BUDDY.MEM_ID_VC = #{mem_id_vc}
 	</select>
-
+	
+	<!-- 마지막 톡방 번호 가져오기 쿼리문 -->
+	<select id="getLastRoomNum" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT room_no_nu FROM MSGR_ROOM WHERE ROWNUM = 1 ORDER BY room_no_nu DESC
+	</select>
 
 	<!-- 오픈톡방 추가하기 쿼리문 --><!-- 확인 -->
 	<insert id="createOpenTalkRoom" parameterType="java.util.Map" >

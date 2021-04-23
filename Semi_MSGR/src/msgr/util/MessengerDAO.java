@@ -130,9 +130,25 @@ public class MessengerDAO {
 
 		return tempList;
 	}
-
+  
 	/**
-	 * 오픈톡방 추가하기 메소드 /확인
+	 * 마지막 톡방 번호 불러오기 메서드 /확인
+	 * 
+	 * SELECT room_no_nu FROM MSGR_ROOM WHERE ROWNUM = 1 ORDER BY room_no_nu DESC
+	 * 
+	 * @return - 마지막 톡방 번호를 리스트로 리턴 
+	 */
+	public List<Map<String, Object>> getLastRoomNum(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getLastRoomNum", pMap);
+		
+		sqlSession.close();
+		
+		return tempList;
+	}
+	/**
+	 * 오픈톡방 추가하기 메서드 /확인
 	 * 
 	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
 	 * VALUES (#{room_no_nu), #{room_name_vc}, 0)
@@ -160,7 +176,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구톡방 추가하기 메소드 /확인
+	 * 친구톡방 추가하기 메서드 /확인
 	 * 
 	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
 	 * VALUES (#{room_no_nu), #{room_name_vc}, 1)
@@ -188,7 +204,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 톡방 삭제 메소드 /확인 
+	 * 톡방 삭제 메서드 /확인 
 	 * 
 	 * DELETE FROM MSGR_ROOM WHERE room_no_nu = #{room_no_nu}
 	 * 
@@ -214,7 +230,7 @@ public class MessengerDAO {
 	}
 	
 	/**
-	 * 톡방 참여 쿼리문 /확인
+	 * 톡방 참여 메서드 /확인
 	 * 
 	 * INSERT INTO MSGR_ROOM_IN_LIST(room_no_nu, mem_id_vc, join_chat_no_nu)
 	 * VALUES(#{room_no_nu}, #{mem_id_vc}, #{join_chat_no_nu})
@@ -242,7 +258,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 대화내용 전송 쿼리문 /확인
+	 * 대화내용 전송 메서드 /확인
 	 * 
 	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
 	 * VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
@@ -270,7 +286,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 마지막 대화 번호 가지고 오기  쿼리문 /확인
+	 * 마지막 대화 번호 가지고 오기 메서드 /확인
 	 *
 	 * SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat ORDER BY chat_no_nu DESC)
 	 * WHERE ROWNUM = 1	 
@@ -287,7 +303,7 @@ public class MessengerDAO {
 		return tempList;
 	}
 	/**
-	 * 톡방 참가한 이후의 대화내용 가져오기 메소드 
+	 * 톡방 참가한 이후의 대화내용 가져오기 메서드 /확인 
 	 * 
 	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
 		WHERE rlist.room_no_nu = chat.room_no_nu
@@ -309,7 +325,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 회원탈퇴 메소드 /확인
+	 * 회원탈퇴 메서드 /확인
 	 * 
 	 * {
 	 * CALL 
@@ -343,7 +359,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구 삭제 메소드 /확인
+	 * 친구 삭제 메서드 /확인
 	 * 
 	 * {
 	 * CALL
@@ -376,7 +392,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 닉네임 변경 메소드 /확인 
+	 * 닉네임 변경 메서드 /확인 
 	 * 
 	 * UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} 
 	 * WHERE mem_id_vc = #{mem_id_vc}
@@ -403,7 +419,7 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 친구 추가 메소드 /확인
+	 * 친구 추가 메서드 /확인
 	 * 
 	 * {CALL
 			DECLARE
@@ -433,5 +449,24 @@ public class MessengerDAO {
 
 		return makeBuddysCheck;
 	}
+//	public static void main(String[] args) {
+//	MessengerDAO				dao		= new MessengerDAO();
+//	MessengerMap				msgrMap	= MessengerMap.getInstance();
+//	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+//	
+//	msgrMap.getMap().put("chat_no_nu", 3);
+//
+//	//select문일때의 test 문장 
+//	list =  dao.getLastChatNum(msgrMap.getMap());
+//
+//	for (Map<String, Object> map : list) {
+//	
+//		System.out.println(map);
+//	}
+//
+//	System.out.println(list);
+//
+//
+//	}
 
 }
