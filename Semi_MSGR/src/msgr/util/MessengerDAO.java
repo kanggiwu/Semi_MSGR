@@ -427,8 +427,8 @@ public class MessengerDAO {
 	 * {CALL
 			DECLARE
 			BEGIN
-				INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc});
-				INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{buddy_id_vc}, #{mem_id_vc});
+				INSERT INTO MSGR_BUDDY(mem_id_vc, buddy_id_vc) VALUES (#{mem_id_vc}, #{buddy_id_vc});
+				INSERT INTO MSGR_BUDDY(mem_id_vc, buddy_id_vc) VALUES (#{buddy_id_vc}, #{mem_id_vc});
 			END
 		}	
 	 * 
@@ -442,11 +442,10 @@ public class MessengerDAO {
 		
 		try {
 			makeBuddysCheck = sqlSession.insert("MsgrMapper.makeBuddys", pMap);
-			System.out.println("성공");
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
-			makeBuddysCheck = -1;
+			makeBuddysCheck = 1;
 		}
 		sqlSession.commit();
 		sqlSession.close();
@@ -454,16 +453,17 @@ public class MessengerDAO {
 		return makeBuddysCheck;
 	}
 
-	public static void main(String[] args) {
-	MessengerDAO				dao		= new MessengerDAO();
-	MessengerMap				msgrMap	= MessengerMap.getInstance();
-	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-	
-	msgrMap.getMap().put("mem_id_vc", "test14");
-	
-	
-	int test = dao.deleteMember(msgrMap.getMap());
-	System.out.println(test);
-	
-	}
+//	public static void main(String[] args) {
+//	MessengerDAO				dao		= new MessengerDAO();
+//	MessengerMap				msgrMap	= MessengerMap.getInstance();
+//	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+//	
+//	msgrMap.getMap().put("buddy_id_vc", "test14");
+//	msgrMap.getMap().put("mem_id_vc", "test15");
+//	
+//	
+//	int test = dao.makeBuddys(msgrMap.getMap());
+//	System.out.println(test);
+//	
+//	}
 }
