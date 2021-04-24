@@ -145,7 +145,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		/////////////////////// 탭 구성 시작 ///////////////////////
 		tabbedPane.addTab("친구목록", buddyListView);
-		tabbedPane.addTab("친구톡방", talkRoomListView);
+		tabbedPane.addTab("참여톡방", talkRoomListView);
 		tabbedPane.addTab("오픈톡방", openTalkRoomListView);
 		this.getContentPane().setBackground(Color.ORANGE);
 		tabbedPane.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
