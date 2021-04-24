@@ -68,6 +68,7 @@ public class MessengerClientThread extends Thread {
 					msgrClientView.setId(token.nextToken());
 					msgrClientView.setNickname(token.nextToken());
 					msgrClientView.setTitle(msgrClientView.getNickname() + "(" + msgrClientView.getId() + ")님");
+
 				}
 					break;
 				case Protocol.MEM_DELETE: {
@@ -79,12 +80,26 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.ROOM_CREATE_BUDDY: {
+					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
+					msgrClientView.talkRoomListView.getRoomList(tempList);
 				}
 					break;
+
+				// 201 #
 				case Protocol.ROOM_CREATE_OPENTALK: {
+					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
+
+					msgrClientView.talkRoomListView.getRoomList(tempList);
 				}
 					break;
 				case Protocol.ROOM_LIST: {
+					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
+					msgrClientView.talkRoomListView.getRoomList(tempList);
+				}
+					break;
+
+				case Protocol.ROOM_PARTICIPATE: {
+
 				}
 					break;
 				case Protocol.ROOM_IN: {
@@ -110,13 +125,11 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.SENDCHAT: {
-					;
-					// 21.04.21. 21:27 유성열 수정
+					// 21.04.24. 21:40 유성열 수정하는중....... 어케해야됨?
 					// 400 # nickname # 안녕하세요
 					String	nickname	= token.nextToken();
 					String	message		= token.nextToken();
 
-					System.out.println(msgrClientView.talkRoomListView.msgrChatView);
 					msgrClientView.talkRoomListView.msgrChatView.chatArea.append(nickname + "] " + message + "\n");
 
 				}

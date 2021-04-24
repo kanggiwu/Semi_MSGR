@@ -47,7 +47,7 @@ public class MessengerChatView extends JDialog implements ActionListener {
 		messegeField.addActionListener(this);
 		button_send.addActionListener(this);
 		button_emoticon.addActionListener(this);
-		this.setTitle("채팅방 이름");
+		this.setTitle(String.valueOf(talkRoomListView.talkRoomList.getSelectedValue()));
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setSize(400, 600);
 		this.setVisible(true);

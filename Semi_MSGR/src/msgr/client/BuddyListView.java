@@ -13,13 +13,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import msgr.map.MessengerMap;
+import msgr.server.Protocol;
 import msgr.util.MessengerDAO;
 
 public class BuddyListView extends JPanel implements MouseListener {
 	MessengerClientView			msgrClientView	= null;
-	JList<Object>				buddyList		= null;
+	JList<Object>				buddyList		= new JList<Object>();
 	DefaultListModel<Object>	dlm				= new DefaultListModel<>();
-	JScrollPane					scrollPane_list	= null;
+	JScrollPane					scrollPane_list	= new JScrollPane(buddyList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	Font						font			= new Font("맑은 고딕", Font.PLAIN, 15);
 
 	public BuddyListView() {
@@ -32,23 +34,20 @@ public class BuddyListView extends JPanel implements MouseListener {
 	}
 
 	public void getBuddyList(List<Map<String, Object>> pList) {
-		buddyList = new JList<Object>();
-		buddyList.setFont(font);
-		buddyList.addMouseListener(this);
 
 		for (Map<String, Object> map : pList) {
-			dlm.addElement(map.get("BUDDY_ID_VC"));
+			dlm.addElement(map.get("BUDDY_ID_VC") + Protocol.SEPERATOR + map.get("MEM_NICK_VC"));
 		}
 		buddyList.setModel(dlm);
-		scrollPane_list = new JScrollPane(buddyList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-									JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		this.add("Center", scrollPane_list);
 	}
 
 	public void initDisplay() {
+		buddyList.setFont(font);
+		buddyList.addMouseListener(this);
 		this.setLayout(new BorderLayout());
 		this.setSize(500, 400);
 		this.setVisible(true);
+		this.add("Center", scrollPane_list);
 	}
 
 	public void message_process(String msg, String imgChoice) {

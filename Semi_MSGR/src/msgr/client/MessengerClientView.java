@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -24,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 
+import msgr.map.MessengerMap;
 //import messenger.util.Room;
 import msgr.server.Protocol;
 
@@ -34,7 +36,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	SignInView			signInView				= null;
 	private JTabbedPane	tabbedPane				= new JTabbedPane(JTabbedPane.LEFT);
 	BuddyListView		buddyListView			= null;
-	TalkRoomListView	talkRoomListView			= null;
+	TalkRoomListView	talkRoomListView		= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
 	Socket				socket					= null;
@@ -87,7 +89,8 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			oos.writeObject(Protocol.SIGNIN + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname);
+			String request = Protocol.SIGNIN + Protocol.SEPERATOR + id + Protocol.SEPERATOR + nickname;
+			send(request);
 			MessengerClientThread msgrClientThread = new MessengerClientThread(this);
 			msgrClientThread.start();
 		}
@@ -161,56 +164,82 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		/////////////////////// 마이페이지 메뉴아이템 시작 ///////////////////////
 		if ("닉네임 변경".equals(command)) {
 
-			// break가 있어야 할 것 같은데
+			// 텍스트필드 빈칸인데 확인 누르면 계속 창 띄워주기
 			while ("".equals(aftername)) {
 				aftername = JOptionPane.showInputDialog(this, "변경할 닉네임을 입력하세요", "닉네임 변경", JOptionPane.YES_NO_OPTION);
 			}
 
+			// 취소버튼 눌렀을 때 닫기
 			if (aftername == null) {
 				System.out.println("취소버튼");
 			}
-			else {
 
-				try {
-					oos.writeObject(Protocol.CHANGE_NICKNAME + Protocol.SEPERATOR + id + Protocol.SEPERATOR + aftername + Protocol.SEPERATOR
-												+ id);
-				}
-				catch (IOException ioe) {
-					System.out.println(ioe.getMessage());
-				}
+			// 닉네임을 제대로 입력하고 확인을 눌렀을 때
+			else {
+				String request = Protocol.CHANGE_NICKNAME
+											+ Protocol.SEPERATOR
+											+ id
+											+ Protocol.SEPERATOR
+											+ aftername;
+				send(request);
 			}
 		}
 
 		else if ("로그아웃".equals(command)) {
-
-			try {
-				oos.writeObject(Protocol.SIGNOUT + Protocol.SEPERATOR + id);
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			String request = Protocol.SIGNOUT + Protocol.SEPERATOR + id;
+			send(request);
 		}
 
 		else if ("회원탈퇴".equals(command)) {
-			System.out.println("회원탈퇴 버튼");
-
-			try {
-				oos.writeObject(Protocol.MEM_DELETE + Protocol.SEPERATOR + id);
-			}
-			catch (IOException memdel) {
-				// TODO Auto-generated catch block
-				memdel.printStackTrace();
-			}
+			String request = Protocol.MEM_DELETE + Protocol.SEPERATOR + id;
+			send(request);
 		}
 		/////////////////////// 마이페이지 메뉴아이템 끝 ///////////////////////
 
 		/////////////////////// 톡방 메뉴아이템 시작 ///////////////////////
 		else if ("오픈톡".equals(command)) {
-			System.out.println("오픈톡 버튼");
+
+			int result = JOptionPane.showConfirmDialog(this, "오픈톡방을 생성하시겠습니까?", "오픈톡방 생성", JOptionPane.YES_NO_OPTION,
+										JOptionPane.INFORMATION_MESSAGE);
+
+			if (result == 0) {
+				String request = Protocol.ROOM_CREATE_OPENTALK + Protocol.SEPERATOR + nickname;
+				send(request);
+			}
 		}
 
 		else if ("친구톡".equals(command)) {
-			System.out.println("친구톡 버튼");
+			List<Object> tempList = buddyListView.buddyList.getSelectedValuesList();
+
+			for (Object index : tempList) {
+				System.out.println(index);
+			}
+
+			List<Map<String, Object>>	buddyList	= new Vector<>();
+			StringTokenizer				st			= null;
+			Map<String, Object>			map			= null;
+
+			for (int i = 0; i < tempList.size(); i++) {
+				st = new StringTokenizer(String.valueOf(tempList.get(i)), Protocol.SEPERATOR);
+				map = new HashMap<String, Object>();
+				map.put("buddy_id_vc", st.nextToken());
+				map.put("mem_nick_vc", st.nextToken());
+				buddyList.add(map);
+			}
+
+			for (Map<String, Object> index : buddyList) {
+				System.out.println(index);
+			}
+
+			String request = Protocol.ROOM_CREATE_BUDDY + Protocol.SEPERATOR;
+
+			if (tempList.size() > 0) {
+				send(request);
+				send(buddyList);
+			}
+			else {
+				JOptionPane.showMessageDialog(this, "친구를 선택해주세요.", "알림", JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
 
 		else if ("친구추가".equals(command)) {
@@ -228,12 +257,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			map.put("testKey", "testValue");
 			list.add(map);
 
-			try {
-				oos.writeObject(list);
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			send(list);
 		}
 
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
@@ -241,6 +265,17 @@ public class MessengerClientView extends JFrame implements ActionListener {
 			System.out.println("친구삭제 메뉴아이템");
 		}
 	}// end of ActionPerformed()
+
+	// 프로토콜 송신용 메서드
+	public void send(Object request) {
+
+		try {
+			oos.writeObject(request);
+		}
+		catch (IOException ioe) {
+			System.out.println(ioe.getMessage() + " 요청 실패");
+		}
+	}
 
 	public String getId() {
 		return id;
