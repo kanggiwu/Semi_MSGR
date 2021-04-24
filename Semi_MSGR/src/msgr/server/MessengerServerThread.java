@@ -80,7 +80,7 @@ public class MessengerServerThread extends Thread {
 					List<Map<String, Object>> roomList = msgrDAO.getTalkRoomList(pMap.getMap());// id를 파라미터로 넘겨준 뒤 마이바티스를 통해 해당하는 id가 참여한
 																								// 톡방리스트를 받아온다
 					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
-					setTalkRoomList(roomList);
+					setTalkRoomList(roomList); // 방이름, 방번호, 방 종류
 
 					// 친구 목록 DB에서 받아오기
 					pMap.getMap().put("mem_id_vc", id);
@@ -184,7 +184,7 @@ public class MessengerServerThread extends Thread {
 					break;
 				/*	(((((수신))))) 200 | 친구톡을 생성할 친구리스트(id,nickname)
 				(((((송신))))) 200 */
-				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성
+				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성 + 친구들 해당 톡방에 참여
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					int	checkDao	= -3;
 
@@ -252,7 +252,7 @@ public class MessengerServerThread extends Thread {
 
 					// 톡방리스트에 톡방 추가
 					MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
-					msgrTalkRoom.setMsgrTalkRoom(room_name, lastTalk_no, 1);
+					msgrTalkRoom.setMsgrTalkRoom(lastTalk_no, room_name, 1);
 					talkRoomList.add(msgrTalkRoom);
 
 				}
@@ -282,8 +282,14 @@ public class MessengerServerThread extends Thread {
 					List<Map<String, Object>>	roomList	= msgrDAO.getTalkRoomList(pMap.getMap());
 
 					String						response	= Protocol.ROOM_CREATE_OPENTALK + Protocol.SEPERATOR;
+
+					// 나 자신에게 생성된 오픈 톡방을 출력
 					send(response);
 					send(roomList);
+
+					// 접속한모든 사람들에게 생성된 오픈 톡방을 출력
+					broadCasting(response);
+					broadCasting(roomList);
 
 				}
 					break;
@@ -307,46 +313,71 @@ public class MessengerServerThread extends Thread {
 					break;
 				/*
 				 * (수신) 211 # 톡방번호 # 톡방이름
-				 * (송신) 
+				 * (송신) 211 # 톡방번호 # 톡방이름 
 				 */
-				case Protocol.ROOM_PARTICIPATE: { // 톡방 참가
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+				case Protocol.JOIN_OPENROOM: { // 오픈톡방 참가
+					msgrServer.textArea_log.append(msg + " " + id + "님이 오픈톡방 참가\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
+					String	response		= null;
+					int		room_no			= Integer.parseInt(token.nextToken());
+					String	room_name		= token.nextToken();
+					int		last_chatNum	= -1;
+					int		checkDAO		= -3;
 
-					int	checkDAO	= -3;
-					int	talk_no		= Integer.parseInt(token.nextToken());
+					// 마지막 대화 번호 가져오기
+					pMap.getMap().put("room_no_nu", room_no);
+					last_chatNum = msgrDAO.getLastChatNum(pMap.getMap());
 
-					pMap.getMap().put("room_no_nu", talk_no);
-					checkDAO = msgrDAO.getLastChatNum(pMap.getMap());
+					// 해당 방에 넣어주기
+					pMap.getMap().put("room_no_nu", room_no);
+					pMap.getMap().put("mem_id_vc", id);
+					pMap.getMap().put("join_chat_no_nu", last_chatNum);
+//					checkDAO = msgrDAO.joinChatMember(pMap.getMap());
+					System.out.println("방 입장 DAO 체크" + checkDAO);
 
-					System.out.println("마지막 대화번호 가져오기 DAO 체크" + checkDAO);
+					// 스레드 톡방 관리
+					MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
+					msgrTalkRoom.setMsgrTalkRoom(room_no, room_name, 0);
+					talkRoomList.add(msgrTalkRoom);
+
+					response = Protocol.JOIN_OPENROOM + Protocol.SEPERATOR + room_no + room_name;
+					send(response);
+
+					// 클라이언트에서 해당 참여톡방에 추가
 
 				}
 					break;
-				/*	(수신) 212 # 톡방번호
+				/*	(수신) 212 # 톡방번호 # 톡방 이름
 				 *	(송신) 212 # 톡방 이름 | 참가한 후 채팅내용
 				 */
 				case Protocol.ROOM_IN: {// 톡방 입장
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.append(msg + "," + id + "톡방에 입장\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response	= null;
-					String	talkTitle	= null;
 					int		room_no		= Integer.parseInt(token.nextToken());
-					//
+					//톡방이름은 타이틀에 띄워주기 위해 필요
+					String	room_name	= token.nextToken();
 
 					// 톡방 참가한 이후의 대화내용 가져오기
 					pMap.getMap().put("room_no_nu", room_no);
+					pMap.getMap().put("mem_id_vc", id);
+					
+					System.out.println("대화내용 잘 불러오는지 DAO 체크");
 					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
+					// 채팅 내용 잘 불러오는지 확인
+					for (Map<String, Object> map : chatList) {
+						System.out.println(map.get("room_no_nu") + ", " + map.get("chat_vc"));
 
-					// 톡방 번호가 같은 톡방의 제목을 받아옴
-					for (MessengerTalkRoom map : talkRoomList) {
-						if (map.getTalk_no() == room_no)
-							talkTitle = map.getTalkTitle();
 					}
+					// 톡방 번호가 같은 톡방의 제목을 받아옴--클라에서 보내면 될듯?
+//					for (MessengerTalkRoom map : talkRoomList) {
+//						if (map.getRoom_no() == room_no)
+//							talkTitle = map.getRoomTitle();
+//					}
 
 					response = Protocol.ROOM_IN
 												+ Protocol.SEPERATOR
-												+ talkTitle;
+												+ room_name;
 					send(response);
 					send(chatList);
 				}
@@ -498,7 +529,7 @@ public class MessengerServerThread extends Thread {
 			int		room_no		= Integer.parseInt(map.get("ROOM_NO_NU").toString());
 			int		is_private	= Integer.parseInt(map.get("IS_PRIVATE_YN").toString());
 
-			msgrTalkRoom.setMsgrTalkRoom(room_name, room_no, is_private);
+			msgrTalkRoom.setMsgrTalkRoom(room_no, room_name, is_private);
 			talkRoomList.add(msgrTalkRoom);// 톡방리스트에 만들어준 톡방을 넣어준다.
 		}
 	}
