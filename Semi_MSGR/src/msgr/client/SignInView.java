@@ -63,6 +63,7 @@ public class SignInView extends JFrame implements ActionListener {
 
 		// 비밀번호 패스워드필드
 		pwField_pw.setBounds(150, 40, 100, 20);
+		pwField_pw.addActionListener(this);
 		this.add(pwField_pw);
 
 		// 로그인 버튼
@@ -95,7 +96,7 @@ public class SignInView extends JFrame implements ActionListener {
 		Object obj = e.getSource();
 
 		// 로그인 버튼 눌렀을 경우
-		if (obj == button_signIn) {
+		if (obj == button_signIn || obj == textField_id || obj == pwField_pw) {
 
 			// 아이디 혹은 비밀번호 필드가 비었을 경우
 			if ("".equals(textField_id.getText()) || "".equals(pwField_pw.getText())) {

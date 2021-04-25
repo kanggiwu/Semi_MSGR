@@ -145,7 +145,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 
 	<!-- 친구추가 쿼리문 --><!-- 확인  -->
-	<insert id="makeBuddys" parameterType="java.util.Map">
+	<insert id="makeBuddy" parameterType="java.util.Map">
 		{CALL
 			DECLARE
 			BEGIN
@@ -154,6 +154,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			END
 		}	
 	</insert>
+
 	<!-- 전체 오픈 톡방 불러오기 쿼리문 --><!-- 확인 -->
 	<select id="getAllOpenTalkList" parameterType="java.util.Map" resultType="java.util.Map">
 		SELECT room_no_nu, room_name_vc FROM MSGR_ROOM WHERE is_private_yn = 0

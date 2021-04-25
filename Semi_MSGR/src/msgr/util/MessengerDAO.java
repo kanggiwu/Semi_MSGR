@@ -28,12 +28,12 @@ public class MessengerDAO {
 	SqlSessionFactory factory = null;
 
 	/**
-	 * alt + shift + j 
+	 * alt + shift + j
 	 * 
 	 * 로그인 메서드 /확인
 	 * 
-	 * SELECT mem_id_vc, mem_nick_vc FROM MSGR_MEMBER 
-	 * WHERE mem_id_vc = #{mem_id_vc} AND mem_pw_vc = #{mem_pw_vc}
+	 * SELECT mem_id_vc, mem_nick_vc FROM MSGR_MEMBER WHERE mem_id_vc = #{mem_id_vc}
+	 * AND mem_pw_vc = #{mem_pw_vc}
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디, 비밀번호를 저장해둔 Map
 	 * @return tempList - 아이디, 비밀번호 일치 시 아이디, 닉네임을 리스트로 리턴
@@ -66,10 +66,10 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 회원가입 메서드  /확인
+	 * 회원가입 메서드 /확인
 	 * 
-	 * INSERT INTO msgr_member (mem_id_vc, mem_pw_vc, mem_nick_vc) 
-	 * VALUES (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
+	 * INSERT INTO msgr_member (mem_id_vc, mem_pw_vc, mem_nick_vc) VALUES
+	 * (#{mem_id_vc}, #{mem_pw_vc}, #{mem_nick_vc})
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디, 비밀번호, 닉네임을 저장해둔 Map
 	 * @return accept - (1) : 회원가입 성공 (-1) : 회원가입 실패
@@ -96,10 +96,10 @@ public class MessengerDAO {
 	/**
 	 * 톡방리스트 불러오기 메서드 /확인
 	 * 
-	 * SELECT room.room_name_vc, room.room_no_nu FROM MSGR_ROOM room,MSGR_ROOM_IN_LIST rlist 
-	 * WHERE room.room_no_nu = rlist.room_no_nu 
-	 * AND rlist.mem_id_vc = #{mem_id_vc} ORDER BY room.room_no_nu ASC
-	 *  
+	 * SELECT room.room_name_vc, room.room_no_nu FROM MSGR_ROOM
+	 * room,MSGR_ROOM_IN_LIST rlist WHERE room.room_no_nu = rlist.room_no_nu AND
+	 * rlist.mem_id_vc = #{mem_id_vc} ORDER BY room.room_no_nu ASC
+	 * 
 	 * @param pMap - 사용자가 입력한 아이디를 저장해둔 Map
 	 * @return tempList - 사용자가 입력한 아이디와 일치하는 톡방 이름, 톡방 번호를 리스트로 리턴
 	 */
@@ -116,10 +116,11 @@ public class MessengerDAO {
 	/**
 	 * 친구리스트 불러오기 메서드 /확인
 	 * 
-	 * SELECT buddy_id_vc FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vd} ORDER BY mem_id_vc
+	 * SELECT buddy_id_vc FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vd} ORDER BY
+	 * mem_id_vc
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디를 저장해둔 Map
-	 * @return tempList - 사용자가 입력한 아이디의 친구들을  리스트로 리턴
+	 * @return tempList - 사용자가 입력한 아이디의 친구들을 리스트로 리턴
 	 */
 	public List<Map<String, Object>> getBuddyList(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -130,45 +131,46 @@ public class MessengerDAO {
 
 		return tempList;
 	}
-  
+
 	/**
 	 * 마지막 톡방 번호 불러오기 메서드 /확인
 	 * 
 	 * SELECT room_no_nu FROM MSGR_ROOM WHERE ROWNUM = 1 ORDER BY room_no_nu DESC
 	 * 
-	 * @return - 마지막 톡방 번호를 리턴 
+	 * @return - 마지막 톡방 번호를 리턴
 	 */
 	public int getLastRoomNum() {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int	tempInt	= sqlSession.selectOne("MsgrMapper.getLastRoomNum");
-		
+		SqlSession	sqlSession	= factory.openSession();
+		int			tempInt		= sqlSession.selectOne("MsgrMapper.getLastRoomNum");
+
 		sqlSession.close();
-		
+
 		return tempInt;
 	}
+
 	/**
 	 * 오픈톡방 추가하기 메서드 /확인
 	 * 
-	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
-	 * VALUES (#{room_no_nu), #{room_name_vc}, 0)
+	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES
+	 * (#{room_no_nu), #{room_name_vc}, 0)
 	 * 
 	 * @param pMap - 사용자가 입력한 톡방 번호, 톡방 이름을 저장한 Map
 	 * @return accept - (1) : 오픈톡방 추가 성공 (-1) : 오픈톡방 추가 실패
 	 */
 	public int createOpenTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int createOpenTalkCheck = 0;
-		
+		SqlSession	sqlSession			= factory.openSession();
+		int			createOpenTalkCheck	= 0;
+
 		try {
 			createOpenTalkCheck = sqlSession.insert("MsgrMapper.createOpenTalkRoom", pMap);
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage()); //console 창에 에러이벤트에 대한 메시지를 가져와라. 
+			System.out.println(e.getMessage()); // console 창에 에러이벤트에 대한 메시지를 가져와라.
 			createOpenTalkCheck = -1;
 		}
-		
+
 		sqlSession.commit();
 
 		sqlSession.close();
@@ -178,17 +180,17 @@ public class MessengerDAO {
 	/**
 	 * 친구톡방 추가하기 메서드 /확인
 	 * 
-	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) 
-	 * VALUES (#{room_no_nu), #{room_name_vc}, 1)
+	 * INSERT INTO MSGR_ROOM(room_no_nu, room_name_vc, is_private_yn) VALUES
+	 * (#{room_no_nu), #{room_name_vc}, 1)
 	 * 
 	 * @param pMap - 사용자가 입력한 톡방번호, 톡방이름을 저장한 Map
 	 * @return accept - (1) : 친구톡방 추가 성공 (-1) : 친구톡방 추가 실패
 	 */
 	public int createBuddyTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int							createBuddyTalkCheck = 0;
-		
+		SqlSession	sqlSession				= factory.openSession();
+		int			createBuddyTalkCheck	= 0;
+
 		try {
 			createBuddyTalkCheck = sqlSession.insert("MsgrMapper.createBuddyTalkRoom", pMap);
 		}
@@ -197,14 +199,14 @@ public class MessengerDAO {
 			createBuddyTalkCheck = -1;
 		}
 		sqlSession.commit();
-		
+
 		sqlSession.close();
 
 		return createBuddyTalkCheck;
 	}
 
 	/**
-	 * 톡방 삭제 메서드 /확인 
+	 * 톡방 삭제 메서드 /확인
 	 * 
 	 * DELETE FROM MSGR_ROOM WHERE room_no_nu = #{room_no_nu}
 	 * 
@@ -213,9 +215,9 @@ public class MessengerDAO {
 	 */
 	public int deleteTalkRoom(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int deleteTalkRoomCheck = 0;
-		
+		SqlSession	sqlSession			= factory.openSession();
+		int			deleteTalkRoomCheck	= 0;
+
 		try {
 			deleteTalkRoomCheck = sqlSession.delete("MsgrMapper.deleteTalkRoom", pMap);
 		}
@@ -228,7 +230,7 @@ public class MessengerDAO {
 
 		return deleteTalkRoomCheck;
 	}
-	
+
 	/**
 	 * 톡방 참여 메서드 /확인
 	 * 
@@ -240,9 +242,11 @@ public class MessengerDAO {
 	 */
 	public int joinChatMember(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
+
 		SqlSession					sqlSession	= factory.openSession();
 		int joinChatMemberCheck = 0;
 		
+
 		try {
 			joinChatMemberCheck = sqlSession.insert("MsgrMapper.joinChatMember", pMap);
 		}
@@ -250,17 +254,19 @@ public class MessengerDAO {
 			System.out.println(e.getMessage());
 			joinChatMemberCheck = -1;
 		}
-		
+
 		sqlSession.commit();
 		sqlSession.close();
+
 		
 		return joinChatMemberCheck;
+
 	}
 
 	/**
 	 * 대화내용 전송 메서드 /확인
 	 * 
-	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc) 
+	 * INSERT INTO MSGR_CHAT(room_no_nu, chat_no_nu, mem_id_vc, chat_vc)
 	 * VALUES(#{room_no_nu), #{chat_no_nu}, #{mem_id_vc}, #{chat_vc})
 	 * 
 	 * @param pMap - 사용자가 입력한 톡방 번호, 채팅 번호, 아이디, 대화내용을 저장한 Map
@@ -268,9 +274,9 @@ public class MessengerDAO {
 	 */
 	public int insertChat(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int insertChatCheck = 0;
-		
+		SqlSession	sqlSession		= factory.openSession();
+		int			insertChatCheck	= 0;
+
 		try {
 			insertChatCheck = sqlSession.insert("MsgrMapper.insertChat", pMap);
 		}
@@ -278,7 +284,7 @@ public class MessengerDAO {
 			System.out.println(e.getMessage());
 			insertChatCheck = -1;
 		}
-		
+
 		sqlSession.commit();
 		sqlSession.close();
 
@@ -288,33 +294,45 @@ public class MessengerDAO {
 	/**
 	 * 마지막 대화 번호 가지고 오기 메서드 /확인
 	 *
-	 *SELECT chat_no_nu 
-	 *FROM(SELECT chat_no_nu FROM msgr_chat WHERE room_no_nu = #{room_no_nu} ORDER BY chat_no_nu DESC)
-	 *WHERE ROWNUM = 1
+	 * SELECT chat_no_nu FROM(SELECT chat_no_nu FROM msgr_chat WHERE room_no_nu =
+	 * #{room_no_nu} ORDER BY chat_no_nu DESC) WHERE ROWNUM = 1
 	 * 
-	 * @return tempList - 마지막 대화 번호를 리턴  
+	 * @return tempList - 마지막 대화 번호를 리턴
 	 */
 	public int getLastChatNum(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int	tempInt	= sqlSession.selectOne("MsgrMapper.getLastChatNum", pMap);
-		
+		SqlSession	sqlSession	= factory.openSession();
+		int			tempInt		= sqlSession.selectOne("MsgrMapper.getLastChatNum", pMap);
+
 		sqlSession.close();
-		
+
 		return tempInt;
 	}
+
 	/**
-	 * 톡방 참가한 이후의 대화내용 가져오기 메서드 /확인 
+	 * 톡방 참가한 이후의 대화내용 가져오기 메서드 /확인
 	 * 
+<<<<<<< HEAD
 	 *SELECT mem.mem_nick_vc, chat.chat_vc FROM MSGR_MEMBER mem, MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
       WHERE rlist.room_no_nu = chat.room_no_nu
       AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
       AND rlist.mem_id_vc = #{mem_id_vc}
       AND chat.room_no_nu = #{room_no_nu}
       AND mem.mem_id_vc = #{mem_id_vc}
+=======
+	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist WHERE
+	 * rlist.room_no_nu = chat.room_no_nu AND chat.chat_no_nu >= (SELECT
+	 * join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND
+	 * room_no_nu = #{room_no_nu}) AND rlist.mem_id_vc = #{mem_id_vc} AND
+	 * chat.room_no_nu = #{room_no_nu}
+>>>>>>> refs/remotes/origin/geundu
 	 * 
 	 * @param pMap- 사용자가 입력한 아이디, 톡방 번호가 저장된 Map
+<<<<<<< HEAD
 	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 닉네임과 대화 내용을 리스트로 리턴  
+=======
+	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 대화 내용을 리스트로 리턴
+>>>>>>> refs/remotes/origin/geundu
 	 */
 	public List<Map<String, Object>> getChatAfterJoin(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -329,24 +347,20 @@ public class MessengerDAO {
 	/**
 	 * 회원탈퇴 메서드 /확인
 	 * 
-	 * {
-	 * CALL 
-	 * BEGIN 
-	 * UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vc}; 
-	 * DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
-	 * DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc}; DELETE FROM MSGR__MEMBER WEHRE mem_id_vc = #{mem_id_vc}; 
-	 * END
-	 * }
+	 * { CALL BEGIN UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc =
+	 * #{mem_id_vc}; DELETE FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc};
+	 * DELETE FROM MSGR_BUDDY WHERE mem_id_vc = #{mem_id_vc}; DELETE FROM
+	 * MSGR__MEMBER WEHRE mem_id_vc = #{mem_id_vc}; END }
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디를 저장한 Map
-	 * @return accept - (-1) : 회원 탈퇴 성공 (1) : 회원 탈퇴 실패 
-	 * 			
+	 * @return accept - (-1) : 회원 탈퇴 성공 (1) : 회원 탈퇴 실패
+	 * 
 	 */
 	public int deleteMember(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int deleteMemberCheck = 0;
-		
+		SqlSession	sqlSession			= factory.openSession();
+		int			deleteMemberCheck	= 0;
+
 		try {
 			deleteMemberCheck = sqlSession.delete("MsgrMapper.deleteMember", pMap);
 		}
@@ -354,7 +368,7 @@ public class MessengerDAO {
 			System.out.println(e.getMessage());
 			System.out.println("실패");
 			deleteMemberCheck = 0;
-			
+
 		}
 		sqlSession.commit();
 		sqlSession.close();
@@ -365,23 +379,20 @@ public class MessengerDAO {
 	/**
 	 * 친구 삭제 메서드 /확인
 	 * 
-	 * {
-	 * CALL
-	 * BEGIN 
-	 * DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc}; 
-	 * DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc};
-	 * END
-	 * }
+	 * { CALL BEGIN DELETE FROM MSGR_BUDDY WHERE buddy_id_vc = #{buddy_id_vc} AND
+	 * mem_id_vc = #{mem_id_vc}; DELETE FROM MSGR_BUDDY WHERE buddy_id_vc =
+	 * #{buddy_id_vc} AND mem_id_vc = #{mem_id_vc}; END }
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디와 친구 아이디를 저장한 Map
-	 * @return accept - (-1) : 친구 삭제 성공 (1) : 친구 삭제 실패 
+	 * @return accept - (-1) : 친구 삭제 성공 (1) : 친구 삭제 실패
 	 */
 	public int deleteBuddy(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		//List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.deleteBuddy", pMap);
-		int deleteBuddyCheck = 0;
-		
+		SqlSession	sqlSession			= factory.openSession();
+		// List<Map<String, Object>> tempList =
+		// sqlSession.selectList("MsgrMapper.deleteBuddy", pMap);
+		int			deleteBuddyCheck	= 0;
+
 		try {
 			deleteBuddyCheck = sqlSession.delete("MsgrMapper.deleteBuddy", pMap);
 		}
@@ -396,19 +407,19 @@ public class MessengerDAO {
 	}
 
 	/**
-	 * 닉네임 변경 메서드 /확인 
+	 * 닉네임 변경 메서드 /확인
 	 * 
-	 * UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} 
-	 * WHERE mem_id_vc = #{mem_id_vc}
+	 * UPDATE MSGR_MEMBER SET mem_nick_vc = #{mem_nick_vc} WHERE mem_id_vc =
+	 * #{mem_id_vc}
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디와 닉네임을 저장한 Map
-	 * @return accept - (1) : 닉네임 변경 성공 (-1) : 닉네임 변경 실패 
+	 * @return accept - (1) : 닉네임 변경 성공 (-1) : 닉네임 변경 실패
 	 */
 	public int changeNickname(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int changeNickNameCheck = 0;
-		
+		SqlSession	sqlSession			= factory.openSession();
+		int			changeNickNameCheck	= 0;
+
 		try {
 			changeNickNameCheck = sqlSession.update("MsgrMapper.changeNickname", pMap);
 		}
@@ -425,24 +436,24 @@ public class MessengerDAO {
 	/**
 	 * 친구 추가 메서드 /확인
 	 * 
-	 * {CALL
-			DECLARE
-			BEGIN
-				INSERT INTO MSGR_BUDDY(mem_id_vc, buddy_id_vc) VALUES (#{mem_id_vc}, #{buddy_id_vc});
-				INSERT INTO MSGR_BUDDY(mem_id_vc, buddy_id_vc) VALUES (#{buddy_id_vc}, #{mem_id_vc});
-			END
-		}	
+	 * {CALL DECLARE BEGIN INSERT INTO MSGR_BUDDY(mem_id_vc, buddy_id_vc) VALUES
+	 * (#{mem_id_vc}, #{buddy_id_vc}); INSERT INTO MSGR_BUDDY(mem_id_vc,
+	 * buddy_id_vc) VALUES (#{buddy_id_vc}, #{mem_id_vc}); END }
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디와 친구 아이디를 저장한 Map
+<<<<<<< HEAD
 	 * @return accept - (-1) : 친구 추가 전송 성공 (0) : 친구 추가 실패 
+=======
+	 * @return accept - (-1) : 친구 추가 전송 성공 (1) : 친구 추가 실패
+>>>>>>> refs/remotes/origin/geundu
 	 */
-	public int makeBuddys(Map<String, Object> pMap) {
+	public int makeBuddy(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession					sqlSession	= factory.openSession();
-		int makeBuddysCheck = 0;
-		
+		SqlSession	sqlSession		= factory.openSession();
+		int			makeBuddysCheck	= 0;
+
 		try {
-			makeBuddysCheck = sqlSession.insert("MsgrMapper.makeBuddys", pMap);
+			makeBuddysCheck = sqlSession.insert("MsgrMapper.makeBuddy", pMap);
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -512,4 +523,5 @@ public class MessengerDAO {
 		
 	}
 	
+
 }

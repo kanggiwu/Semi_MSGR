@@ -13,29 +13,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import msgr.map.MessengerMap;
+import msgr.server.Protocol;
 import msgr.util.MessengerDAO;
 
 public class BuddyListView extends JPanel implements MouseListener {
-	MessengerClientView			msgrClientView		= null;
-	JList<Object>				buddyList		= null;
+	MessengerClientView			msgrClientView	= null;
+	JList<Object>				buddyList		= new JList<Object>();
 	DefaultListModel<Object>	dlm				= new DefaultListModel<>();
-	JScrollPane					scrollPane_list	= null;
+	JScrollPane					scrollPane_list	= new JScrollPane(buddyList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	Font						font			= new Font("맑은 고딕", Font.PLAIN, 15);
 
 	public BuddyListView() {
 
-	}
-
-	public void getBuddyList() {
-
-		MessengerDAO	dao		= MessengerDAO.getInstance();
-		MessengerMap	pMap	= MessengerMap.getInstance();
-		pMap.getMap().put("mem_id_vc", msgrClientView.getId());
-		List<Map<String, Object>> tempList = dao.getBuddyList(pMap.getMap());
-
-		for (Map<String, Object> map : tempList) {
-			dlm.addElement(map.get("BUDDY_ID_VC"));
-		}
-		buddyList.setModel(dlm);
 	}
 
 	public BuddyListView(MessengerClientView msgrClientView) {
@@ -43,19 +33,21 @@ public class BuddyListView extends JPanel implements MouseListener {
 		initDisplay();
 	}
 
+	public void getBuddyList(List<Map<String, Object>> pList) {
+
+		for (Map<String, Object> map : pList) {
+			dlm.addElement(map.get("BUDDY_ID_VC") + Protocol.SEPERATOR + map.get("MEM_NICK_VC"));
+		}
+		buddyList.setModel(dlm);
+	}
+
 	public void initDisplay() {
-		Font font = new Font("맑은 고딕", Font.PLAIN, 15);
-		buddyList = new JList<Object>();
 		buddyList.setFont(font);
 		buddyList.addMouseListener(this);
-
-		getBuddyList();
-		scrollPane_list = new JScrollPane(buddyList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-									JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.setLayout(new BorderLayout());
-		this.add("Center", scrollPane_list);
 		this.setSize(500, 400);
 		this.setVisible(true);
+		this.add("Center", scrollPane_list);
 	}
 
 	public void message_process(String msg, String imgChoice) {
