@@ -19,18 +19,23 @@ import msgr.server.Protocol;
 
 public class MessengerChatView extends JDialog implements ActionListener {
 
-	private JPanel		centerPanel			= new JPanel(new BorderLayout());
-	private JPanel		southPanel			= new JPanel(new BorderLayout());
-	JTextArea			chatArea			= new JTextArea();
-	private JScrollPane	scrollPane_chat		= new JScrollPane(chatArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+	private JPanel			centerPanel				= new JPanel(new BorderLayout());
+	private JPanel			southPanel				= new JPanel(new BorderLayout());
+	JTextArea				chatArea				= new JTextArea();
+	private JScrollPane		scrollPane_chat			= new JScrollPane(chatArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	private JTextField	messegeField		= new JTextField();
-	private JButton		button_send			= new JButton("전송");
-	private JButton		button_emoticon		= new JButton("이모티콘");
-	TalkRoomListView	talkRoomListView	= null;
+	private JTextField		messegeField			= new JTextField();
+	private JButton			button_send				= new JButton("전송");
+	private JButton			button_emoticon			= new JButton("이모티콘");
+	TalkRoomListView		talkRoomListView		= null;
+	OpenTalkRoomListView	openTalkRoomListView	= null;
 
 	public MessengerChatView(TalkRoomListView talkRoomListView) {
 		this.talkRoomListView = talkRoomListView;
+	}
+
+	public MessengerChatView(OpenTalkRoomListView openTalkRoomListView) {
+		this.openTalkRoomListView = openTalkRoomListView;
 	}
 
 	public void initDisplay() {

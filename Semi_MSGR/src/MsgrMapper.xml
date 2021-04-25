@@ -145,14 +145,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 
 	<!-- 친구추가 쿼리문 --><!-- 확인  -->
-	<insert id="makeBuddys" parameterType="java.util.Map">
+	<insert id="makeBuddy" parameterType="java.util.Map">
 		{CALL
 			DECLARE
 			BEGIN
-				INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{mem_id_vc}, #{buddy_id_vc});
-				INSERT INTO MSGR_BUDDY(buddy_seq_nu, mem_id_vc, buddy_id_vc) VALUES (buddy_seq.NEXTVAL, #{buddy_id_vc}, #{mem_id_vc});
+				INSERT INTO MSGR_BUDDY(mem_id_vc, buddy_id_vc) VALUES (#{mem_id_vc}, #{buddy_id_vc});
+				INSERT INTO MSGR_BUDDY(mem_id_vc, buddy_id_vc) VALUES (#{buddy_id_vc}, #{mem_id_vc});
 			END
 		}	
 	</insert>
-
 </mapper>

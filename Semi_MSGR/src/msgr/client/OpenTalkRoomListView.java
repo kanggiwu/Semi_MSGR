@@ -13,7 +13,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class TalkRoomListView extends JPanel implements MouseListener {
+public class OpenTalkRoomListView extends JPanel implements MouseListener {
 	MessengerClientView			msgrClientView	= null;
 	List<MessengerChatView>		chatList		= new Vector<MessengerChatView>();
 	JList<Object>				talkRoomList	= new JList<Object>();
@@ -23,11 +23,11 @@ public class TalkRoomListView extends JPanel implements MouseListener {
 	MessengerChatView			msgrChatView	= null;
 	Font						font			= new Font("맑은 고딕", Font.PLAIN, 15);
 
-	public TalkRoomListView() {
+	public OpenTalkRoomListView() {
 
 	}
 
-	public TalkRoomListView(MessengerClientView msgrClient) {
+	public OpenTalkRoomListView(MessengerClientView msgrClient) {
 		this.msgrClientView = msgrClient;
 		initDisplay();
 	}
