@@ -27,7 +27,7 @@ public class MessengerChatView extends JDialog implements ActionListener {
 	private JTextField		messegeField			= new JTextField();
 	private JButton			button_send				= new JButton("전송");
 	private JButton			button_emoticon			= new JButton("이모티콘");
-	JoinTalkRoomListView		talkRoomListView		= null;
+	JoinTalkRoomListView	talkRoomListView		= null;
 	OpenTalkRoomListView	openTalkRoomListView	= null;
 
 	public MessengerChatView(JoinTalkRoomListView talkRoomListView) {
@@ -52,7 +52,7 @@ public class MessengerChatView extends JDialog implements ActionListener {
 		messegeField.addActionListener(this);
 		button_send.addActionListener(this);
 		button_emoticon.addActionListener(this);
-		this.setTitle(String.valueOf(talkRoomListView.talkRoomList.getSelectedValue()));
+//		this.setTitle(String.valueOf(talkRoomListView.talkRoomList.getSelectedValue()));
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setSize(400, 600);
 		this.setVisible(true);

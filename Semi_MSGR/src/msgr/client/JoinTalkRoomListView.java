@@ -14,21 +14,23 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import msgr.server.Protocol;
 
 public class JoinTalkRoomListView extends JPanel implements MouseListener {
-	MessengerClientView			msgrClientView	= null;
-	List<MessengerChatView>		chatList		= new Vector<MessengerChatView>();
-	List<Map<String, Object>>	joinRoom_info	= null;																		// room_no_nu,room_name_vc
-	List<Map<String, Object>>	openRoom_info	= null;																		// room_no_nu,room_name_vc
+	MessengerClientView		msgrClientView	= null;
+	List<MessengerChatView>	chatList		= new Vector<MessengerChatView>();
 
-	JList<Object>				talkRoomList	= new JList<>();
-	DefaultListModel<Object>	dlm				= new DefaultListModel<>();
-	JScrollPane					scrollPane_list	= new JScrollPane(talkRoomList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+	String[][]				data			= new String[0][2];
+	String[]				columnName		= { "톡방이름", "톡방번호" };
+	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName);
+	JTable					talkRoomTable	= new JTable(dtm);
+	JScrollPane				scrollPane_list	= new JScrollPane(talkRoomTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	MessengerChatView			msgrChatView	= null;
-	Font						font			= new Font("맑은 고딕", Font.PLAIN, 15);
+	MessengerChatView		msgrChatView	= null;
+	Font					font			= new Font("맑은 고딕", Font.PLAIN, 15);
 
 	public JoinTalkRoomListView() {
 
@@ -40,43 +42,35 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 	}
 
 	public void initDisplay() {
-		talkRoomList.setFont(font);
-		talkRoomList.addMouseListener(this);
+		talkRoomTable.setFont(font);
+		talkRoomTable.addMouseListener(this);
 		this.setLayout(new BorderLayout());
 		this.setSize(500, 400);
 		this.setVisible(true);
 		this.add("Center", scrollPane_list);
 	}
 
-	public void getRoomList() {
+	public void getRoomList(List<List<Map<String, Object>>> buddyList) {
 
-		if (dlm.size() > 0) {
-			dlm.clear();
-		}
-		
-		for (Map<String, Object> map : msgrClientView.joinOpenTalkRoom_info) {
-			dlm.addElement(map.get("ROOM_NAME_VC"));
-		}
-		
+		Vector<Object> row = null;
 
-		for (Map<String, Object> map : msgrClientView.joinBuddyTalkRoom_info) {
-			dlm.addElement(map.get("ROOM_NAME_VC"));
+		while (dtm.getRowCount() > 0) {
+			dtm.removeRow(0);
 		}
-		talkRoomList.setModel(dlm);
 
-	}
-	public void getRoomList(List<Map<String, Object>> pList) {
-		
-		if (dlm.size() > 0) {
-			dlm.clear();
+		for (List<Map<String, Object>> index : buddyList) {
+
+			for (Map<String, Object> innderIndex : index) {
+				row = new Vector<Object>();
+				row.add(0, innderIndex.get("ROOM_NAME_VC"));
+				row.add(1, innderIndex.get("ROOM_NO_NU"));
+				dtm.addRow(row);
+			}
 		}
-		
-		for (Map<String, Object> map : pList) {
-			dlm.addElement(map.get("ROOM_NAME_VC"));
-		}
-		
-		talkRoomList.setModel(dlm);
-		
+		talkRoomTable.getColumnModel().getColumn(1).setMinWidth(0);
+		talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
+
+		System.out.println(dtm.getValueAt(0, 1));
 	}
 
 	public void message_process(String msg, String imgChoice) {
@@ -85,23 +79,21 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println(talkRoomList.getSelectedValue());
 
 		if (e.getClickCount() == 2) {
-			String room_name = talkRoomList.getSelectedValue().toString();
-			try {
-				msgrClientView.oos.writeObject(Protocol.ROOM_IN+Protocol.SEPERATOR+room_name);
-			}
-			catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			String room_name = String.valueOf(dtm.getValueAt(talkRoomTable.getSelectedRow(), 0));
+			System.out.println(room_name);
+			String room_no = String.valueOf(dtm.getValueAt(talkRoomTable.getSelectedRow(), 1));
+			System.out.println(room_no);
 
-			if (!"".equals(talkRoomList.getSelectedValue())) {
-				msgrChatView = new MessengerChatView(this);
-				chatList.add(msgrChatView);
-				msgrChatView.initDisplay();
-			}
+			String request = Protocol.ROOM_IN + Protocol.SEPERATOR + room_no;
+			msgrClientView.send(request);
+
+//			if (!"".equals(talkRoomTable.getSelectedValue())) {
+//				msgrChatView = new MessengerChatView(this);
+//				chatList.add(msgrChatView);
+//				msgrChatView.initDisplay();
+//			}
 		}
 	}
 
