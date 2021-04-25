@@ -54,23 +54,26 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 
 		Vector<Object> row = null;
 
-		while (dtm.getRowCount() > 0) {
-			dtm.removeRow(0);
-		}
+		if (dtm.getRowCount() > 0) {
 
-		for (List<Map<String, Object>> index : buddyList) {
-
-			for (Map<String, Object> innderIndex : index) {
-				row = new Vector<Object>();
-				row.add(0, innderIndex.get("ROOM_NAME_VC"));
-				row.add(1, innderIndex.get("ROOM_NO_NU"));
-				dtm.addRow(row);
+			while (dtm.getRowCount() > 0) {
+				dtm.removeRow(0);
 			}
-		}
-		talkRoomTable.getColumnModel().getColumn(1).setMinWidth(0);
-		talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
 
-		System.out.println(dtm.getValueAt(0, 1));
+			for (List<Map<String, Object>> index : buddyList) {
+
+				for (Map<String, Object> innderIndex : index) {
+					row = new Vector<Object>();
+					row.add(0, innderIndex.get("ROOM_NAME_VC"));
+					row.add(1, innderIndex.get("ROOM_NO_NU"));
+					dtm.addRow(row);
+				}
+			}
+			talkRoomTable.getColumnModel().getColumn(1).setMinWidth(0);
+			talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
+
+			System.out.println(dtm.getValueAt(0, 1));
+		}
 	}
 
 	public void message_process(String msg, String imgChoice) {

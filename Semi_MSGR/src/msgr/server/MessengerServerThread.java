@@ -74,21 +74,20 @@ public class MessengerServerThread extends Thread {
 
 					// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.append(msg + "님이 로그인\n");
-					
-					//참여한 톡방 리스트 불러오기
-							//친구 톡방 불러오기
-					pMap.getMap().put("mem_id_vc",id);
-					List<Map<String,Object>> joinBuddyRoomList = msgrDAO.getJoinBuddyTalkList(pMap.getMap());
+
+					// 참여한 톡방 리스트 불러오기
+					// 친구 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> joinBuddyRoomList = msgrDAO.getJoinBuddyTalkList(pMap.getMap());
 					msgrServer.textArea_log.append("여기 지남1 \n");
-							//오픈 톡방 불러오기
-					pMap.getMap().put("mem_id_vc",id);
-					List<Map<String,Object>> joinOpenTalkList = msgrDAO.getJoinOpenTalkList(pMap.getMap());
+					// 오픈 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> joinOpenTalkList = msgrDAO.getJoinOpenTalkList(pMap.getMap());
 					msgrServer.textArea_log.append("여기 지남2 \n");
-					
-					
-					//전체 톡방 불러오기
-					pMap.getMap().put("mem_id_vc",id);
-					List<Map<String,Object>> allOpenTalkList = msgrDAO.getAllOpenTalkList(pMap.getMap());
+
+					// 전체 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> allOpenTalkList = msgrDAO.getAllOpenTalkList(pMap.getMap());
 					msgrServer.textArea_log.append("여기 지남3 \n");
 
 					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
@@ -108,7 +107,7 @@ public class MessengerServerThread extends Thread {
 						myBuddyList.add(String.valueOf(map.get("BUDDY_ID_VC")));
 					}
 					// 클라이언트 스레드에 메시지 전송
-					response = Protocol.SIGNIN+Protocol.SEPERATOR;
+					response = Protocol.SIGNIN + Protocol.SEPERATOR;
 					send(response);// 로그인 프로토콜 전송
 					send(joinBuddyRoomList);// 톡방 리스트 전송
 					send(joinOpenTalkList);// 친구 리스트 전송
@@ -381,7 +380,8 @@ public class MessengerServerThread extends Thread {
 
 					System.out.println("대화내용 잘 불러오는지 DAO 체크");
 
-					List<Map<String,Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
+					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
+
 					// 채팅 내용 잘 불러오는지 확인
 					for (Map<String, Object> map : chatList) {
 						System.out.println(map.get("mem_nick_vc") + ", " + map.get("chat_vc"));
@@ -421,13 +421,28 @@ public class MessengerServerThread extends Thread {
 
 				// 300 # 친구아이디
 				case Protocol.BUDDY_ADD: {// 친구추가
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 
-					String buddyId = token.nextToken();
+					String	response	= null;
+
+					String	buddyId		= token.nextToken();
 
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("buddy_id_vc", buddyId);
-//					int result = msgrDAO.makeBuddyProcedure(pMap.getMap());
-//					System.out.println(result);
+					int result = msgrDAO.makeBuddy(pMap.getMap());
+
+					response = Protocol.BUDDY_ADD
+												+ Protocol.SEPERATOR
+												+ result;
+					send(response);
+
+					if (result == -1) {
+
+						pMap.getMap().put("mem_id_vc", id);
+						List<Map<String, Object>> tempList = msgrDAO.getBuddyList(pMap.getMap());
+						send(tempList);
+					}
 
 					// 친구 추가 시 해당하는 친구가 있는지 확인하고 , 있을 경우, 해당 아이디가 있다는 것을 클라이언트 스레드에게 보내준다.
 					// 클라이언트 스레드에서 해당하는 친구가 있음을 출력하는 optionPane을 출력해준다.
