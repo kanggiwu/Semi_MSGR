@@ -231,7 +231,7 @@ public class MessengerServerThread extends Thread {
 					// 자기 자신 참여
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("chat_no_nu", 1);
-//					checkDao = msgrDAO.JoinChatMember(pMap.getMap());
+					checkDao = msgrDAO.joinChatMember(pMap.getMap());
 
 					// 친구들 참여
 					for (Map<String, Object> buddy : selectedBuddyList) {
@@ -240,16 +240,20 @@ public class MessengerServerThread extends Thread {
 						pMap.getMap().put("mem_id_vc", buddy.get("buddy_id_vc"));
 						pMap.getMap().put("chat_no_nu", 1);
 
-//						checkDao = msgrDAO.JoinChatMember(pMap.getMap());
+						checkDao = msgrDAO.joinChatMember(pMap.getMap());
 						msgrServer.textArea_log.append("친구톡방 참여 성공 여부 : " + checkDao + "\n");
 					}
 
 					// 나한테 전송
 					pMap.getMap().put("mem_id_vc", id);
-					List<Map<String, Object>>	roomList	= msgrDAO.getTalkRoomList(pMap.getMap());
-					String						response	= Protocol.ROOM_CREATE_BUDDY + Protocol.SEPERATOR;
+					List<Map<String, Object>>		joinBuddyRoomList	= msgrDAO.getJoinBuddyTalkList(pMap.getMap());
+					List<Map<String, Object>>		joinOpenTalkList	= msgrDAO.getJoinOpenTalkList(pMap.getMap());
+					List<List<Map<String, Object>>>	joinRoomList		= new Vector<List<Map<String, Object>>>();
+					joinRoomList.add(joinBuddyRoomList);
+					joinRoomList.add(joinOpenTalkList);
+					String response = Protocol.ROOM_CREATE_BUDDY + Protocol.SEPERATOR;
 					send(response);
-					send(roomList);
+					send(joinRoomList);
 
 					// 로그인한 친구들 톡방목록 갱신
 					for (MessengerServerThread currentUser : msgrServer.globalList) {
@@ -258,10 +262,14 @@ public class MessengerServerThread extends Thread {
 
 							if (selectedBuddy.get("buddy_id_vc").equals(currentUser.id)) {
 								pMap.getMap().put("mem_id_vc", selectedBuddy.get("buddy_id_vc"));
-								List<Map<String, Object>>	roomList_buddy	= msgrDAO.getTalkRoomList(pMap.getMap());
-								String						response_buddy	= Protocol.ROOM_LIST + Protocol.SEPERATOR;
+								List<Map<String, Object>>		b_joinBuddyRoomList	= msgrDAO.getJoinBuddyTalkList(pMap.getMap());
+								List<Map<String, Object>>		b_joinOpenTalkList	= msgrDAO.getJoinOpenTalkList(pMap.getMap());
+								List<List<Map<String, Object>>>	b_joinRoomList		= new Vector<List<Map<String, Object>>>();
+								b_joinRoomList.add(b_joinBuddyRoomList);
+								b_joinRoomList.add(b_joinOpenTalkList);
+								String response_buddy = Protocol.ROOM_LIST + Protocol.SEPERATOR;
 								currentUser.send(response_buddy);
-								currentUser.send(roomList_buddy);
+								currentUser.send(b_joinRoomList);
 							}
 						}
 					}
@@ -291,11 +299,11 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("chat_no_nu", 0);
 
-//					checkDao = msgrDAO.JoinChatMember(pMap.getMap());
+					checkDao = msgrDAO.joinChatMember(pMap.getMap());
 					msgrServer.textArea_log.append("오픈톡방 참여 성공 여부 : " + checkDao + "\n");
 
 					pMap.getMap().put("mem_id_vc", id);
-					List<Map<String, Object>>	roomList	= msgrDAO.getTalkRoomList(pMap.getMap());
+					List<Map<String, Object>>	roomList	= msgrDAO.getJoinOpenTalkList(pMap.getMap());
 
 					String						response	= Protocol.ROOM_CREATE_OPENTALK + Protocol.SEPERATOR;
 
@@ -379,19 +387,7 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 
 					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
-					
-					for (Map<String, Object> map : chatList) {
-						System.out.println(map.get("CHAT_VC"));
-					
-					}
-					// 채팅 내용 잘 불러오는지 확인
-
-					// 톡방 번호가 같은 톡방의 제목을 받아옴--클라에서 보내면 될듯?
-//					for (MessengerTalkRoom map : talkRoomList) {
-//						if (map.getRoom_no() == room_no)
-//							talkTitle = map.getRoomTitle();
-//					}
-
+	
 					response = Protocol.ROOM_IN
 												+ Protocol.SEPERATOR
 												+ room_no
