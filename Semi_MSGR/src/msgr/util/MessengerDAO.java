@@ -433,7 +433,7 @@ public class MessengerDAO {
 		}	
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디와 친구 아이디를 저장한 Map
-	 * @return accept - (-1) : 친구 추가 전송 성공 (1) : 친구 추가 실패 
+	 * @return accept - (-1) : 친구 추가 전송 성공 (0) : 친구 추가 실패 
 	 */
 	public int makeBuddys(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -445,7 +445,7 @@ public class MessengerDAO {
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
-			makeBuddysCheck = 1;
+			makeBuddysCheck = 0;
 		}
 		sqlSession.commit();
 		sqlSession.close();
@@ -453,17 +453,17 @@ public class MessengerDAO {
 		return makeBuddysCheck;
 	}
 
-//	public static void main(String[] args) {
-//	MessengerDAO				dao		= new MessengerDAO();
-//	MessengerMap				msgrMap	= MessengerMap.getInstance();
-//	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-//	
-//	msgrMap.getMap().put("buddy_id_vc", "test14");
-//	msgrMap.getMap().put("mem_id_vc", "test15");
-//	
-//	
-//	int test = dao.makeBuddys(msgrMap.getMap());
-//	System.out.println(test);
-//	
-//	}
+	public static void main(String[] args) {
+	MessengerDAO				dao		= new MessengerDAO();
+	MessengerMap				msgrMap	= MessengerMap.getInstance();
+	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
+	
+	msgrMap.getMap().put("buddy_id_vc", "test14");
+	msgrMap.getMap().put("mem_id_vc", "test15");
+	
+	
+	int test = dao.makeBuddys(msgrMap.getMap());
+	System.out.println(test);
+	
+	}
 }
