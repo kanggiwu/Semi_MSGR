@@ -215,7 +215,7 @@ public class MessengerServerThread extends Thread {
 					// 자기 자신 참여
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("chat_no_nu", 1);
-					checkDao = msgrDAO.JoinChatMember(pMap.getMap());
+//					checkDao = msgrDAO.JoinChatMember(pMap.getMap());
 
 					// 친구들 참여
 					for (Map<String, Object> buddy : selectedBuddyList) {
@@ -224,7 +224,7 @@ public class MessengerServerThread extends Thread {
 						pMap.getMap().put("mem_id_vc", buddy.get("buddy_id_vc"));
 						pMap.getMap().put("chat_no_nu", 1);
 
-						checkDao = msgrDAO.JoinChatMember(pMap.getMap());
+//						checkDao = msgrDAO.JoinChatMember(pMap.getMap());
 						msgrServer.textArea_log.append("친구톡방 참여 성공 여부 : " + checkDao + "\n");
 					}
 
@@ -275,7 +275,7 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("chat_no_nu", 0);
 
-					checkDao = msgrDAO.JoinChatMember(pMap.getMap());
+//					checkDao = msgrDAO.JoinChatMember(pMap.getMap());
 					msgrServer.textArea_log.append("오픈톡방 참여 성공 여부 : " + checkDao + "\n");
 
 					pMap.getMap().put("mem_id_vc", id);
