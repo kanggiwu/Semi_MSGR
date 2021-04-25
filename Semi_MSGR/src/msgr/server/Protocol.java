@@ -9,7 +9,7 @@ public class Protocol {
 	public static final int		ROOM_CREATE_BUDDY		= 200;	// 친구톡 생성
 	public static final int		ROOM_CREATE_OPENTALK	= 201;	// 오픈톡 생성
 	public static final int		ROOM_LIST				= 210;	// 톡방 리스트
-	public static final int 	ROOM_PARTICIPATE		= 211;	// 톡방 참가
+	public static final int		JOIN_OPENROOM			= 211;	// 오픈톡방 참가
 	public static final int		ROOM_IN					= 212;	// 톡방 입장
 	public static final int		ROOM_IN_MEM				= 213;	// 톡방 참가 인원
 	public static final int		ROOM_OUT				= 214;	// 톡방 나가기
