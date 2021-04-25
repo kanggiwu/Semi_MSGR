@@ -101,7 +101,7 @@ public class SignInView extends JFrame implements ActionListener {
 			// 아이디 혹은 비밀번호 필드가 비었을 경우
 			if ("".equals(textField_id.getText()) || "".equals(pwField_pw.getText())) {
 				JOptionPane.showMessageDialog(this, "잘못된 아이디 또는 비밀번호입니다.", "경고", JOptionPane.WARNING_MESSAGE);
-				pwField_pw.requestFocus();
+				textField_id.requestFocus();
 				return;
 			}
 
@@ -131,7 +131,7 @@ public class SignInView extends JFrame implements ActionListener {
 				// 아니면 tempList.size() == 0이어도 됨
 				else if ("".equals(nickname)) {
 					JOptionPane.showMessageDialog(this, "잘못된 아이디 또는 비밀번호입니다.", "경고", JOptionPane.WARNING_MESSAGE);
-					pwField_pw.requestFocus();
+					textField_id.requestFocus();
 					return;
 				}
 			}
