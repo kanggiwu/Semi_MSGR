@@ -33,35 +33,37 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 	// 생성자에서 로그인뷰의 정보를 받아와야 하므로 전역변수 선언
 	// 탭과 탭에 들어갈 패널들(친구목록뷰, 톡방목록뷰)
-	SignInView				signInView				= null;
-	private JTabbedPane		tabbedPane				= new JTabbedPane(JTabbedPane.LEFT);
-	BuddyListView			buddyListView			= null;
-	TalkRoomListView		talkRoomListView		= null;
-	OpenTalkRoomListView	openTalkRoomListView	= null;
+	SignInView					signInView				= null;
+	private JTabbedPane			tabbedPane				= new JTabbedPane(JTabbedPane.LEFT);
+	BuddyListView				buddyListView			= null;
+	JoinTalkRoomListView		joinTalkRoomListView	= null;
+	OpenTalkRoomListView		openTalkRoomListView	= null;
+	List<Map<String, Object>>	openTalkRoom_info		= null;
+	List<Map<String, Object>>	joinTalkRoom_info		= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
-	Socket					socket					= null;
-	ObjectOutputStream		oos						= null;
-	ObjectInputStream		ois						= null;
-	private String			ip						= "127.0.0.1";
-	private int				port					= 21430;
+	Socket						socket					= null;
+	ObjectOutputStream			oos						= null;
+	ObjectInputStream			ois						= null;
+	private String				ip						= "127.0.0.1";
+	private int					port					= 21430;
 
 	// 사용자 아이디, 닉네임
-	private String			id						= "";
-	private String			nickname				= "";
+	private String				id						= "";
+	private String				nickname				= "";
 
 	// 클라이언트 메뉴 구성
-	private JMenuBar		menuBar					= null;
-	private JMenu			menu_myPage				= null;
-	private String[]		myPageName				= { "닉네임 변경", "로그아웃", "회원탈퇴" };
-	private JMenuItem[]		menuItem_myPage			= null;
-	private JMenu			menu_talkRoom			= null;
-	private String[]		talkRoomName			= { "오픈톡", "친구톡", "친구추가" };
-	private JMenuItem[]		menuItem_talkRoom		= null;
+	private JMenuBar			menuBar					= null;
+	private JMenu				menu_myPage				= null;
+	private String[]			myPageName				= { "닉네임 변경", "로그아웃", "회원탈퇴" };
+	private JMenuItem[]			menuItem_myPage			= null;
+	private JMenu				menu_talkRoom			= null;
+	private String[]			talkRoomName			= { "오픈톡", "친구톡", "친구추가" };
+	private JMenuItem[]			menuItem_talkRoom		= null;
 
 	// 우클릭 했을 때 뜨는 팝업메뉴
-	private JPopupMenu		popupMenu				= null;
-	private JMenuItem		menuItem_deleteBuddy	= null;
+	private JPopupMenu			popupMenu				= null;
+	private JMenuItem			menuItem_deleteBuddy	= null;
 
 	// 생성자에서 SignInView에서 받은 아이디, 닉네임을 저장함
 	public MessengerClientView(SignInView signInView) {
@@ -109,7 +111,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		// 친구목록 패널 인스턴스화
 		buddyListView = new BuddyListView(this);
 		// 친구톡방목록 패널 인스턴스화
-		talkRoomListView = new TalkRoomListView(this);
+		joinTalkRoomListView = new JoinTalkRoomListView(this);
 		// 오픈톡방목록 패널 인스턴스화
 		openTalkRoomListView = new OpenTalkRoomListView(this);
 
@@ -145,7 +147,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		/////////////////////// 탭 구성 시작 ///////////////////////
 		tabbedPane.addTab("친구목록", buddyListView);
-		tabbedPane.addTab("참여톡방", talkRoomListView);
+		tabbedPane.addTab("참여톡방", joinTalkRoomListView);
 		tabbedPane.addTab("오픈톡방", openTalkRoomListView);
 		this.getContentPane().setBackground(Color.ORANGE);
 		tabbedPane.setFont(new Font("맑은 고딕", Font.PLAIN, 12));

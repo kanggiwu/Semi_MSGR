@@ -27,10 +27,10 @@ public class MessengerChatView extends JDialog implements ActionListener {
 	private JTextField		messegeField			= new JTextField();
 	private JButton			button_send				= new JButton("전송");
 	private JButton			button_emoticon			= new JButton("이모티콘");
-	TalkRoomListView		talkRoomListView		= null;
+	JoinTalkRoomListView		talkRoomListView		= null;
 	OpenTalkRoomListView	openTalkRoomListView	= null;
 
-	public MessengerChatView(TalkRoomListView talkRoomListView) {
+	public MessengerChatView(JoinTalkRoomListView talkRoomListView) {
 		this.talkRoomListView = talkRoomListView;
 	}
 

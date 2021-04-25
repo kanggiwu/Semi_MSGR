@@ -47,7 +47,9 @@ public class MessengerClientThread extends Thread {
 					List<Map<String, Object>>	roomList	= (List) msgrClientView.ois.readObject();
 					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
 
-					msgrClientView.talkRoomListView.getRoomList(roomList);
+					msgrClientView.joinTalkRoom_info = roomList;
+					msgrClientView.openTalkRoom_info = roomList;
+					msgrClientView.joinTalkRoomListView.getRoomList(roomList);
 					msgrClientView.buddyListView.getBuddyList(buddyList);
 
 				}
@@ -85,7 +87,7 @@ public class MessengerClientThread extends Thread {
 					break;
 				case Protocol.ROOM_CREATE_BUDDY: {
 					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
-					msgrClientView.talkRoomListView.getRoomList(tempList);
+					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
 					break;
 
@@ -93,12 +95,12 @@ public class MessengerClientThread extends Thread {
 				case Protocol.ROOM_CREATE_OPENTALK: {
 					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
 
-					msgrClientView.talkRoomListView.getRoomList(tempList);
+					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
 					break;
 				case Protocol.ROOM_LIST: {
 					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
-					msgrClientView.talkRoomListView.getRoomList(tempList);
+					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
 					break;
 
@@ -109,8 +111,13 @@ public class MessengerClientThread extends Thread {
 
 				case Protocol.ROOM_IN: {
 					String room_name = (String) msgrClientView.ois.readObject();
-					List<String> chatList =(List) msgrClientView.ois.readObject();
-					msgrClientView.talkRoomListView.msgrChatView.setTitle(room_name);
+					List<Map<String,Object>> chatList =(List) msgrClientView.ois.readObject();
+					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
+					
+					for (Map<String, Object> map : chatList) {
+						msgrClientView.joinTalkRoomListView.msgrChatView.chatArea.append(map.get("mem_nick_vc")+": " +map.get("chat_vc"));
+						
+					}
 					
 				}
 					break;
@@ -139,7 +146,7 @@ public class MessengerClientThread extends Thread {
 					String	nickname	= token.nextToken();
 					String	message		= token.nextToken();
 
-					msgrClientView.talkRoomListView.msgrChatView.chatArea.append(nickname + "] " + message + "\n");
+					msgrClientView.joinTalkRoomListView.msgrChatView.chatArea.append(nickname + "] " + message + "\n");
 
 				}
 					break;
