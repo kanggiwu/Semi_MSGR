@@ -108,9 +108,23 @@ public class MessengerClientThread extends Thread {
 					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
 //					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
-					break;
+					break;                                                                                    
 
 				case Protocol.JOIN_OPENROOM: {
+					int							room_no		= Integer.parseInt(token.nextToken());
+					String						room_name	= token.nextToken();
+
+					//오픈톡방 채팅방 켜기
+					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.joinTalkRoomListView);
+					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
+					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
+					//참여톡방에 추가해주기
+					Vector<Object> row = new Vector<Object>();
+					row.add(0, room_name);
+					row.add(1, room_no);
+					msgrClientView.joinTalkRoomListView.dtm.addRow(row);
+					
+					
 
 				}
 					break;

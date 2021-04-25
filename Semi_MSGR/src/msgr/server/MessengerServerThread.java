@@ -344,19 +344,24 @@ public class MessengerServerThread extends Thread {
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response		= null;
 					int		room_no			= Integer.parseInt(token.nextToken());
+					msgrServer.textArea_log.append("방번호"+room_no+"\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					String	room_name		= token.nextToken();
+					msgrServer.textArea_log.append("방이름"+room_name+"\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					int		last_chatNum	= -1;
 					int		checkDAO		= -3;
 
-					// 마지막 대화 번호 가져오기
-					pMap.getMap().put("room_no_nu", room_no);
-					last_chatNum = msgrDAO.getLastChatNum(pMap.getMap());
-
+					// 마지막 방 번호 가져오기
+					last_chatNum = msgrDAO.getLastRoomNum();
+					msgrServer.textArea_log.append("마지막 대화번호 가져오기 성공\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					
+					
 					// 해당 방에 넣어주기
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
-					pMap.getMap().put("join_chat_no_nu", last_chatNum);
-//					checkDAO = msgrDAO.joinChatMember(pMap.getMap());
+					pMap.getMap().put("join_chat_no_nu", ++last_chatNum);
+					checkDAO = msgrDAO.joinChatMember(pMap.getMap());
+					msgrServer.textArea_log.append("해당 방에 회원 넣어주기 성공\\n");// 클라이언트에서 받은 메시지 로그창에 출력
+
 					System.out.println("방 입장 DAO 체크" + checkDAO);
 
 					// 스레드 톡방 관리
@@ -364,7 +369,11 @@ public class MessengerServerThread extends Thread {
 					msgrTalkRoom.setMsgrTalkRoom(room_no, room_name, 0);
 					talkRoomList.add(msgrTalkRoom);
 
-					response = Protocol.JOIN_OPENROOM + Protocol.SEPERATOR + room_no + room_name;
+					response = Protocol.JOIN_OPENROOM 
+												+ Protocol.SEPERATOR 
+												+ room_no
+												+ Protocol.SEPERATOR 
+												+ room_name;
 					send(response);
 
 					// 클라이언트에서 해당 참여톡방에 추가
@@ -387,7 +396,7 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 
 					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
-	
+
 					response = Protocol.ROOM_IN
 												+ Protocol.SEPERATOR
 												+ room_no
