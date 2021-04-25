@@ -56,7 +56,7 @@ public class MessengerClientThread extends Thread {
 
 					msgrClientView.joinTalkRoomListView.getRoomList(joinRoomList);
 					msgrClientView.buddyListView.getBuddyList(buddyList);
-					msgrClientView.openTalkRoomListView.getRoomList();
+					msgrClientView.openTalkRoomListView.getRoomList(allOpenTalkList);
 				}
 					break;
 				case Protocol.SIGNOUT: {
