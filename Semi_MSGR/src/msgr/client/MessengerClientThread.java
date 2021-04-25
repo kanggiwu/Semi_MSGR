@@ -91,16 +91,18 @@ public class MessengerClientThread extends Thread {
 					isStop = true;
 				}
 					break;
+
+				// 200 #
 				case Protocol.ROOM_CREATE_BUDDY: {
-					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
-//					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
+					List<List<Map<String, Object>>> tempList = (List) msgrClientView.ois.readObject();
+					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
 					break;
 
 				// 201 #
 				case Protocol.ROOM_CREATE_OPENTALK: {
-					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
-//					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
+					List<List<Map<String, Object>>> tempList = (List) msgrClientView.ois.readObject();
+					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
 					break;
 				case Protocol.ROOM_LIST: {
