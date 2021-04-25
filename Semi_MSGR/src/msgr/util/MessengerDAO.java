@@ -312,27 +312,15 @@ public class MessengerDAO {
 	/**
 	 * 톡방 참가한 이후의 대화내용 가져오기 메서드 /확인
 	 * 
-<<<<<<< HEAD
 	 *SELECT mem.mem_nick_vc, chat.chat_vc FROM MSGR_MEMBER mem, MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
       WHERE rlist.room_no_nu = chat.room_no_nu
       AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
       AND rlist.mem_id_vc = #{mem_id_vc}
       AND chat.room_no_nu = #{room_no_nu}
       AND mem.mem_id_vc = #{mem_id_vc}
-=======
-	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist WHERE
-	 * rlist.room_no_nu = chat.room_no_nu AND chat.chat_no_nu >= (SELECT
-	 * join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND
-	 * room_no_nu = #{room_no_nu}) AND rlist.mem_id_vc = #{mem_id_vc} AND
-	 * chat.room_no_nu = #{room_no_nu}
->>>>>>> refs/remotes/origin/geundu
 	 * 
 	 * @param pMap- 사용자가 입력한 아이디, 톡방 번호가 저장된 Map
-<<<<<<< HEAD
 	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 닉네임과 대화 내용을 리스트로 리턴  
-=======
-	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 대화 내용을 리스트로 리턴
->>>>>>> refs/remotes/origin/geundu
 	 */
 	public List<Map<String, Object>> getChatAfterJoin(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -441,11 +429,7 @@ public class MessengerDAO {
 	 * buddy_id_vc) VALUES (#{buddy_id_vc}, #{mem_id_vc}); END }
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디와 친구 아이디를 저장한 Map
-<<<<<<< HEAD
 	 * @return accept - (-1) : 친구 추가 전송 성공 (0) : 친구 추가 실패 
-=======
-	 * @return accept - (-1) : 친구 추가 전송 성공 (1) : 친구 추가 실패
->>>>>>> refs/remotes/origin/geundu
 	 */
 	public int makeBuddy(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
