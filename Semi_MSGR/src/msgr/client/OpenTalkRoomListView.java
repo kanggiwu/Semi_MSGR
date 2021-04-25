@@ -40,14 +40,14 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 		this.setVisible(true);
 		this.add("Center", scrollPane_list);
 	}
-
-	public void getRoomList(List<Map<String, Object>> pList) {
+	// 전체 오픈톡 리스트에 넣어주기
+	public void getRoomList() {
 
 		if (dlm.size() > 0) {
 			dlm.clear();
 		}
 
-		for (Map<String, Object> map : pList) {
+		for (Map<String, Object> map : msgrClientView.allOpenTalk_info) {
 			dlm.addElement(map.get("ROOM_NAME_VC"));
 		}
 		talkRoomList.setModel(dlm);

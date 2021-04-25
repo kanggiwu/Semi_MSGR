@@ -48,18 +48,35 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 		this.add("Center", scrollPane_list);
 	}
 
-	public void getRoomList(List<Map<String, Object>> pList) {
-		joinRoom_info = pList;
+	public void getRoomList() {
 
 		if (dlm.size() > 0) {
 			dlm.clear();
 		}
+		
+		for (Map<String, Object> map : msgrClientView.joinOpenTalkRoom_info) {
+			dlm.addElement(map.get("ROOM_NAME_VC"));
+		}
+		
 
-		for (Map<String, Object> map : pList) {
+		for (Map<String, Object> map : msgrClientView.joinBuddyTalkRoom_info) {
 			dlm.addElement(map.get("ROOM_NAME_VC"));
 		}
 		talkRoomList.setModel(dlm);
 
+	}
+	public void getRoomList(List<Map<String, Object>> pList) {
+		
+		if (dlm.size() > 0) {
+			dlm.clear();
+		}
+		
+		for (Map<String, Object> map : pList) {
+			dlm.addElement(map.get("ROOM_NAME_VC"));
+		}
+		
+		talkRoomList.setModel(dlm);
+		
 	}
 
 	public void message_process(String msg, String imgChoice) {

@@ -44,13 +44,19 @@ public class MessengerClientThread extends Thread {
 				// JOptionPane.showMessageDialog(msgrClientView, "프로토콜:"+protocol);
 				switch (protocol) {
 				case Protocol.SIGNIN: {
-					List<Map<String, Object>>	roomList	= (List) msgrClientView.ois.readObject();
+					List<Map<String, Object>>	joinBuddyRoomList	= (List) msgrClientView.ois.readObject();
+					List<Map<String, Object>>	joinOpenTalkList	= (List) msgrClientView.ois.readObject();
+					List<Map<String, Object>>	allOpenTalkList	= (List) msgrClientView.ois.readObject();
 					List<Map<String, Object>>	buddyList	= (List) msgrClientView.ois.readObject();
 
-					msgrClientView.joinTalkRoom_info = roomList;
-					msgrClientView.openTalkRoom_info = roomList;
-					msgrClientView.joinTalkRoomListView.getRoomList(roomList);
+					msgrClientView.joinBuddyTalkRoom_info = joinBuddyRoomList;
+					msgrClientView.joinOpenTalkRoom_info = joinOpenTalkList;
+					msgrClientView.allOpenTalk_info = allOpenTalkList;
+					
+					msgrClientView.joinTalkRoomListView.getRoomList();
 					msgrClientView.buddyListView.getBuddyList(buddyList);
+					msgrClientView.openTalkRoomListView.getRoomList();
+					
 
 				}
 					break;

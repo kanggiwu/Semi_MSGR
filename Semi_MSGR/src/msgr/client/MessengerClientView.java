@@ -38,8 +38,9 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	BuddyListView				buddyListView			= null;
 	JoinTalkRoomListView		joinTalkRoomListView	= null;
 	OpenTalkRoomListView		openTalkRoomListView	= null;
-	List<Map<String, Object>>	openTalkRoom_info		= null;
-	List<Map<String, Object>>	joinTalkRoom_info		= null;
+	List<Map<String, Object>>	joinOpenTalkRoom_info	= null;
+	List<Map<String, Object>>	joinBuddyTalkRoom_info		= null;
+	List<Map<String, Object>>	allOpenTalk_info	= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
 	Socket						socket					= null;
