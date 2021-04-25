@@ -98,11 +98,15 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 
-				case Protocol.ROOM_PARTICIPATE: {
+				case Protocol.JOIN_OPENROOM: {
 
 				}
 					break;
 				case Protocol.ROOM_IN: {
+					String room_name = (String) msgrClientView.ois.readObject();
+					List<String> chatList =(List) msgrClientView.ois.readObject();
+					msgrClientView.talkRoomListView.msgrChatView.setTitle(room_name);
+					
 				}
 					break;
 				case Protocol.ROOM_IN_MEM: {

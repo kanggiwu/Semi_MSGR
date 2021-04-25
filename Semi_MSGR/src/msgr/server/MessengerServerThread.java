@@ -363,12 +363,12 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 					
 					System.out.println("대화내용 잘 불러오는지 DAO 체크");
-					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
-					// 채팅 내용 잘 불러오는지 확인
-					for (Map<String, Object> map : chatList) {
-						System.out.println(map.get("room_no_nu") + ", " + map.get("chat_vc"));
-
-					}
+//					List<String> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
+//					// 채팅 내용 잘 불러오는지 확인
+//					for (Map<String, Object> map : chatList) {
+//						System.out.println(map.get("room_no_nu") + ", " + map.get("chat_vc"));
+//
+//					}
 					// 톡방 번호가 같은 톡방의 제목을 받아옴--클라에서 보내면 될듯?
 //					for (MessengerTalkRoom map : talkRoomList) {
 //						if (map.getRoom_no() == room_no)
@@ -379,7 +379,7 @@ public class MessengerServerThread extends Thread {
 												+ Protocol.SEPERATOR
 												+ room_name;
 					send(response);
-					send(chatList);
+//					send(chatList);
 				}
 
 					break;
