@@ -247,21 +247,22 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		}
 
 		else if ("친구추가".equals(command)) {
-			System.out.println("친구추가 버튼");
 
-			try {
-				oos.writeObject(Protocol.BUDDY_ADD + Protocol.SEPERATOR + id);
-			}
-			catch (IOException e2) {
-				e2.printStackTrace();
+			String buddyId = "";
+
+			while ("".equals(buddyId)) {
+				buddyId = JOptionPane.showInputDialog(this, "친구의 아이디를 입력해주세요.", "친구 추가", JOptionPane.PLAIN_MESSAGE);
 			}
 
-			List<Map<String, Object>>	list	= new Vector<>();
-			Map<String, Object>			map		= new HashMap<String, Object>();
-			map.put("testKey", "testValue");
-			list.add(map);
+			// 취소버튼 눌렀을 때 닫기
+			if (buddyId == null) {
+				System.out.println("취소버튼");
+			}
 
-			send(list);
+			else {
+				String request = Protocol.BUDDY_ADD + Protocol.SEPERATOR + buddyId;
+				send(request);
+			}
 		}
 
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
