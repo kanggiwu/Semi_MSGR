@@ -25,7 +25,11 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 
 	String[][]				data			= new String[0][2];
 	String[]				columnName		= { "톡방이름", "톡방번호" };
-	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName);
+	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName) {	// 테이블 내에서 수정 금지
+												public boolean isCellEditable(int row, int col) {
+													return false;
+												}
+											};
 	JTable					talkRoomTable	= new JTable(dtm);
 	JScrollPane				scrollPane_list	= new JScrollPane(talkRoomTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

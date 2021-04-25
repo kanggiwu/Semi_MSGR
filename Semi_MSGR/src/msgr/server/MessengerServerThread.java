@@ -74,21 +74,20 @@ public class MessengerServerThread extends Thread {
 
 					// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.append(msg + "님이 로그인\n");
-					
-					//참여한 톡방 리스트 불러오기
-							//친구 톡방 불러오기
-					pMap.getMap().put("mem_id_vc",id);
-					List<Map<String,Object>> joinBuddyRoomList = msgrDAO.getJoinBuddyTalkList(pMap.getMap());
+
+					// 참여한 톡방 리스트 불러오기
+					// 친구 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> joinBuddyRoomList = msgrDAO.getJoinBuddyTalkList(pMap.getMap());
 					msgrServer.textArea_log.append("여기 지남1 \n");
-							//오픈 톡방 불러오기
-					pMap.getMap().put("mem_id_vc",id);
-					List<Map<String,Object>> joinOpenTalkList = msgrDAO.getJoinOpenTalkList(pMap.getMap());
+					// 오픈 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> joinOpenTalkList = msgrDAO.getJoinOpenTalkList(pMap.getMap());
 					msgrServer.textArea_log.append("여기 지남2 \n");
-					
-					
-					//전체 톡방 불러오기
-					pMap.getMap().put("mem_id_vc",id);
-					List<Map<String,Object>> allOpenTalkList = msgrDAO.getAllOpenTalkList(pMap.getMap());
+
+					// 전체 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> allOpenTalkList = msgrDAO.getAllOpenTalkList(pMap.getMap());
 					msgrServer.textArea_log.append("여기 지남3 \n");
 
 					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
@@ -108,7 +107,7 @@ public class MessengerServerThread extends Thread {
 						myBuddyList.add(String.valueOf(map.get("BUDDY_ID_VC")));
 					}
 					// 클라이언트 스레드에 메시지 전송
-					response = Protocol.SIGNIN+Protocol.SEPERATOR;
+					response = Protocol.SIGNIN + Protocol.SEPERATOR;
 					send(response);// 로그인 프로토콜 전송
 					send(joinBuddyRoomList);// 톡방 리스트 전송
 					send(joinOpenTalkList);// 친구 리스트 전송
@@ -365,7 +364,7 @@ public class MessengerServerThread extends Thread {
 				}
 					break;
 				/*	(수신) 212 # 톡방번호 # 톡방 이름
-				 *	(송신) 212 # 톡방 이름 | 참가한 후 채팅내용
+				 *	(송신) 212 # 톡방번호 # 톡방 이름 | 참가한 후 채팅내용
 				 */
 				case Protocol.ROOM_IN: {// 톡방 입장
 					msgrServer.textArea_log.append(msg + "," + id + "톡방에 입장\n");// 클라이언트에서 받은 메시지 로그창에 출력
@@ -379,13 +378,14 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
 
-					System.out.println("대화내용 잘 불러오는지 DAO 체크");
-
-					List<Map<String,Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
-					// 채팅 내용 잘 불러오는지 확인
+					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
+					
 					for (Map<String, Object> map : chatList) {
-						System.out.println(map.get("mem_nick_vc") + ", " + map.get("chat_vc"));
+						System.out.println(map.get("CHAT_VC"));
+					
 					}
+					// 채팅 내용 잘 불러오는지 확인
+
 					// 톡방 번호가 같은 톡방의 제목을 받아옴--클라에서 보내면 될듯?
 //					for (MessengerTalkRoom map : talkRoomList) {
 //						if (map.getRoom_no() == room_no)
@@ -394,9 +394,11 @@ public class MessengerServerThread extends Thread {
 
 					response = Protocol.ROOM_IN
 												+ Protocol.SEPERATOR
+												+ room_no
+												+ Protocol.SEPERATOR
 												+ room_name;
 					send(response);
-//					send(chatList);
+					send(chatList);
 				}
 
 					break;

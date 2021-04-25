@@ -25,7 +25,11 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 
 	String[][]				data			= new String[0][2];
 	String[]				columnName		= { "톡방이름", "톡방번호" };
-	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName);
+	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName) {// 테이블 내에서 수정 금지
+												public boolean isCellEditable(int row, int col) {
+													return false;
+												}
+											};
 	JTable					talkRoomTable	= new JTable(dtm);
 	JScrollPane				scrollPane_list	= new JScrollPane(talkRoomTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -48,6 +52,7 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 		this.setSize(500, 400);
 		this.setVisible(true);
 		this.add("Center", scrollPane_list);
+
 	}
 
 	public void getRoomList(List<List<Map<String, Object>>> buddyList) {
@@ -86,7 +91,7 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 			String room_no = String.valueOf(dtm.getValueAt(talkRoomTable.getSelectedRow(), 1));
 			System.out.println(room_no);
 
-			String request = Protocol.ROOM_IN + Protocol.SEPERATOR + room_no;
+			String request = Protocol.ROOM_IN + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR+ room_name;
 			msgrClientView.send(request);
 
 //			if (!"".equals(talkRoomTable.getSelectedValue())) {

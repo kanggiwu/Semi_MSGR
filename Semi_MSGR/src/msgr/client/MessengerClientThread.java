@@ -114,13 +114,19 @@ public class MessengerClientThread extends Thread {
 					break;
 
 				case Protocol.ROOM_IN: {
-					String						room_name	= (String) msgrClientView.ois.readObject();
+					int							room_no		= Integer.parseInt(token.nextToken());
+					String						room_name	= token.nextToken();
 					List<Map<String, Object>>	chatList	= (List) msgrClientView.ois.readObject();
+					
+					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.joinTalkRoomListView);
 					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
+					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
+					
+					
 
 					for (Map<String, Object> map : chatList) {
 						msgrClientView.joinTalkRoomListView.msgrChatView.chatArea
-													.append(map.get("mem_nick_vc") + ": " + map.get("chat_vc"));
+													.append(map.get("MEM_NICK_VC") + ": " + map.get("CHAT_VC")+"\n");
 
 					}
 

@@ -27,11 +27,11 @@ public class MessengerChatView extends JDialog implements ActionListener {
 	private JTextField		messegeField			= new JTextField();
 	private JButton			button_send				= new JButton("전송");
 	private JButton			button_emoticon			= new JButton("이모티콘");
-	JoinTalkRoomListView	talkRoomListView		= null;
+	JoinTalkRoomListView	joinTalkRoomListView	= null;
 	OpenTalkRoomListView	openTalkRoomListView	= null;
 
 	public MessengerChatView(JoinTalkRoomListView talkRoomListView) {
-		this.talkRoomListView = talkRoomListView;
+		this.joinTalkRoomListView = talkRoomListView;
 	}
 
 	public MessengerChatView(OpenTalkRoomListView openTalkRoomListView) {
@@ -66,8 +66,8 @@ public class MessengerChatView extends JDialog implements ActionListener {
 
 			// 400 # nickname # 메시지
 			try {
-				talkRoomListView.msgrClientView.oos.writeObject(
-											Protocol.SENDCHAT + Protocol.SEPERATOR + talkRoomListView.msgrClientView.getNickname()
+				joinTalkRoomListView.msgrClientView.oos.writeObject(
+											Protocol.SENDCHAT + Protocol.SEPERATOR + joinTalkRoomListView.msgrClientView.getNickname()
 																		+ Protocol.SEPERATOR + messegeField.getText());
 			}
 			catch (IOException ioe) {
