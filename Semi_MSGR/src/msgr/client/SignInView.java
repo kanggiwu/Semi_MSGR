@@ -122,6 +122,7 @@ public class SignInView extends JFrame implements ActionListener {
 					this.setVisible(false);
 					textField_id.setText("");
 					pwField_pw.setText("");
+					textField_id.requestFocus();
 
 					// 로그인 성공하면 MessengerClient 인스턴스화하고 서버와 연결
 					msgrClient = new MessengerClientView(this);
