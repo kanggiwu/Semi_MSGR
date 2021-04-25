@@ -77,6 +77,8 @@ public class MessengerClientThread extends Thread {
 					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
+					msgrClientView.signInView.setId("");
+					msgrClientView.signInView.setNickname("");
 					msgrClientView.signInView.setVisible(true);
 					isStop = true;
 				}
@@ -104,6 +106,7 @@ public class MessengerClientThread extends Thread {
 
 				}
 					break;
+
 				case Protocol.ROOM_IN: {
 					String room_name = (String) msgrClientView.ois.readObject();
 					List<String> chatList =(List) msgrClientView.ois.readObject();
