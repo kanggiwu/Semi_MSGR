@@ -355,15 +355,16 @@ public class MessengerServerThread extends Thread {
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response	= null;
 					int		room_no		= Integer.parseInt(token.nextToken());
-					//톡방이름은 타이틀에 띄워주기 위해 필요
+					// 톡방이름은 타이틀에 띄워주기 위해 필요
 					String	room_name	= token.nextToken();
 
 					// 톡방 참가한 이후의 대화내용 가져오기
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
-					
+
 					System.out.println("대화내용 잘 불러오는지 DAO 체크");
 					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
+
 					// 채팅 내용 잘 불러오는지 확인
 					for (Map<String, Object> map : chatList) {
 						System.out.println(map.get("room_no_nu") + ", " + map.get("chat_vc"));
@@ -438,8 +439,6 @@ public class MessengerServerThread extends Thread {
 					String	chat		= token.nextToken();
 
 					String	response	= Protocol.SENDCHAT + Protocol.SEPERATOR + nickname + Protocol.SEPERATOR + chat;
-
-					// 테스트용) 모든 스레드에게 브로드캐스팅 하는 걸로
 
 					send(response);
 					buddyCasting(response);
