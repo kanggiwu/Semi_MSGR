@@ -238,23 +238,23 @@ public class MessengerDAO {
 	 * @param - 사용자가 입력한 방번호, 아이디, 채팅 참여 번호를 저장한 Map
 	 * @return accept - (1) : 톡방 참여 성공 (-1) : 톡방 참여 실패
 	 */
-	public int JoinChatMember(Map<String, Object> pMap) {
+	public int joinChatMember(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
-		int JoinChatMemberCheck = 0;
+		int joinChatMemberCheck = 0;
 		
 		try {
-			JoinChatMemberCheck = sqlSession.insert("MsgrMapper.JoinChatMember", pMap);
+			joinChatMemberCheck = sqlSession.insert("MsgrMapper.joinChatMember", pMap);
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
-			JoinChatMemberCheck = -1;
+			joinChatMemberCheck = -1;
 		}
 		
 		sqlSession.commit();
 		sqlSession.close();
 		
-		return JoinChatMemberCheck;
+		return joinChatMemberCheck;
 	}
 
 	/**
@@ -306,14 +306,15 @@ public class MessengerDAO {
 	/**
 	 * 톡방 참가한 이후의 대화내용 가져오기 메서드 /확인 
 	 * 
-	 * SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
-	 * WHERE rlist.room_no_nu = chat.room_no_nu
-	 * AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
-	 * AND rlist.mem_id_vc = #{mem_id_vc}
-	 * AND chat.room_no_nu = #{room_no_nu}
+	 *SELECT mem.mem_nick_vc, chat.chat_vc FROM MSGR_MEMBER mem, MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
+      WHERE rlist.room_no_nu = chat.room_no_nu
+      AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
+      AND rlist.mem_id_vc = #{mem_id_vc}
+      AND chat.room_no_nu = #{room_no_nu}
+      AND mem.mem_id_vc = #{mem_id_vc}
 	 * 
 	 * @param pMap- 사용자가 입력한 아이디, 톡방 번호가 저장된 Map
-	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 대화 내용을 리스트로 리턴  
+	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 닉네임과 대화 내용을 리스트로 리턴  
 	 */
 	public List<Map<String, Object>> getChatAfterJoin(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -452,18 +453,63 @@ public class MessengerDAO {
 
 		return makeBuddysCheck;
 	}
+	
+	/**
+	 * 전체 오픈 톡방 불러오기 메서드 /확인
+	 * 
+	 * SELECT room_no_nu, room_name_vc FROM MSGR_ROOM WHERE is_private_yn = 0
+	 * 
+	 * @param pMap
+	 * @return
+	 */
+	public List<Map<String, Object>> getAllOpenTalkList(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getAllOpenTalkList", pMap);
 
-	public static void main(String[] args) {
-	MessengerDAO				dao		= new MessengerDAO();
-	MessengerMap				msgrMap	= MessengerMap.getInstance();
-	List<Map<String, Object>>	list	= new ArrayList<Map<String, Object>>();
-	
-	msgrMap.getMap().put("buddy_id_vc", "test14");
-	msgrMap.getMap().put("mem_id_vc", "test15");
-	
-	
-	int test = dao.makeBuddys(msgrMap.getMap());
-	System.out.println(test);
-	
+		sqlSession.close();
+
+		return tempList;
 	}
+	
+	/**
+	 * 참여한 오픈 톡방 불러오기 메서드 /확인
+	 * 
+	 * SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist 
+	 * WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND is_private_yn =0
+	 * 
+	 * @param pMap
+	 * @return
+	 */
+	public List<Map<String, Object>> getJoinOpenTalkList(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getJoinOpenTalkList", pMap);
+
+		sqlSession.close();
+
+		return tempList;	
+
+	}
+		
+	/**
+	 * 참여한 친구 톡방 불러오기 메서드 /확인
+	 * 
+	 * SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist 
+     * WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND is_private_yn =1	
+	 * 
+	 * @param pMap
+	 * @return
+	 */
+	public List<Map<String, Object>> getJoinBuddyTalkList(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getJoinBuddyTalkList", pMap);
+		
+		sqlSession.close();
+		
+		return tempList;	
+		
+	}
+	
 }

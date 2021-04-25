@@ -77,7 +77,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</delete>
 	
 	<!-- 톡방 참여 쿼리문 --><!-- 확인 -->
-	<insert id ="JoinChatMember" parameterType="java.util.Map">
+	<insert id ="joinChatMember" parameterType="java.util.Map">
 		INSERT INTO MSGR_ROOM_IN_LIST(room_no_nu, mem_id_vc, join_chat_no_nu)
 		VALUES(#{room_no_nu}, #{mem_id_vc}, #{join_chat_no_nu})
 	</insert>
@@ -97,11 +97,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 --><!-- 확인 -->
 	<select id="getChatAfterJoin" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT chat.chat_vc FROM MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
-		WHERE rlist.room_no_nu = chat.room_no_nu
-		AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
-		AND rlist.mem_id_vc = #{mem_id_vc}
-		AND chat.room_no_nu = #{room_no_nu}
+		SELECT mem.mem_nick_vc, chat.chat_vc FROM MSGR_MEMBER mem, MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
+        WHERE rlist.room_no_nu = chat.room_no_nu
+        AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
+        AND rlist.mem_id_vc = #{mem_id_vc}
+        AND chat.room_no_nu = #{room_no_nu}
+        AND mem.mem_id_vc = #{mem_id_vc}
 	</select>
 
 	
@@ -113,8 +114,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			 	다중쿼리문 
 			END
 		 } 
-		 									-->
-	
+		 									-->	
 	<!-- 회원탈퇴 쿼리문 --><!-- 확인  -->
 	<delete id="deleteMember" parameterType="java.util.Map">
 		{CALL
@@ -154,5 +154,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			END
 		}	
 	</insert>
-
+	<!-- 전체 오픈 톡방 불러오기 쿼리문 --><!-- 확인 -->
+	<select id="getAllOpenTalkList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT room_no_nu, room_name_vc FROM MSGR_ROOM WHERE is_private_yn = 0
+	</select>
+	
+	<!-- 참여한 오픈 톡방 불러오기 쿼리문  --><!-- 확인 -->
+	<select id="getJoinOpenTalkList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist 
+		WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND is_private_yn =0
+	</select>	
+	
+	<!-- 참여한 친구 톡방 불러오기 쿼리문 --><!-- 확인 -->	
+	<select id="getJoinBuddyTalkList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist 
+		WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND is_private_yn =1	
+	</select>
+	
 </mapper>
