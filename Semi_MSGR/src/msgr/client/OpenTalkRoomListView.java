@@ -96,7 +96,7 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 				}
 			}
 
-			if (isDuplicate) {
+			if (!isDuplicate) {
 				String request = Protocol.JOIN_OPENROOM + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR + room_name;
 				msgrClientView.send(request);
 
