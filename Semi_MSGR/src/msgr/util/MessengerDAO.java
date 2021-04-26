@@ -243,9 +243,8 @@ public class MessengerDAO {
 	public int joinChatMember(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 
-		SqlSession					sqlSession	= factory.openSession();
-		int joinChatMemberCheck = 0;
-		
+		SqlSession	sqlSession			= factory.openSession();
+		int			joinChatMemberCheck	= 0;
 
 		try {
 			joinChatMemberCheck = sqlSession.insert("MsgrMapper.joinChatMember", pMap);
@@ -258,7 +257,6 @@ public class MessengerDAO {
 		sqlSession.commit();
 		sqlSession.close();
 
-		
 		return joinChatMemberCheck;
 
 	}
@@ -312,15 +310,16 @@ public class MessengerDAO {
 	/**
 	 * 톡방 참가한 이후의 대화내용 가져오기 메서드 /확인
 	 * 
-	 *SELECT mem.mem_nick_vc, chat.chat_vc FROM MSGR_MEMBER mem, MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
-        WHERE rlist.room_no_nu = chat.room_no_nu
-        AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
-        AND rlist.mem_id_vc = #{mem_id_vc}
-        AND chat.room_no_nu = #{room_no_nu}
-        AND mem.mem_id_vc = chat.mem_id_vc
+	 * SELECT mem.mem_nick_vc, chat.chat_vc FROM MSGR_MEMBER mem, MSGR_CHAT chat,
+	 * MSGR_ROOM_IN_LIST rlist WHERE rlist.room_no_nu = chat.room_no_nu AND
+	 * chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE
+	 * mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu}) AND rlist.mem_id_vc
+	 * = #{mem_id_vc} AND chat.room_no_nu = #{room_no_nu} AND mem.mem_id_vc =
+	 * chat.mem_id_vc
 	 * 
 	 * @param pMap- 사용자가 입력한 아이디, 톡방 번호가 저장된 Map
-	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 닉네임과 대화 내용을 리스트로 리턴  
+	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 닉네임과 대화 내용을 리스트로
+	 *         리턴
 	 */
 	public List<Map<String, Object>> getChatAfterJoin(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -429,7 +428,7 @@ public class MessengerDAO {
 	 * buddy_id_vc) VALUES (#{buddy_id_vc}, #{mem_id_vc}); END }
 	 * 
 	 * @param pMap - 사용자가 입력한 아이디와 친구 아이디를 저장한 Map
-	 * @return accept - (-1) : 친구 추가 전송 성공 (0) : 친구 추가 실패 
+	 * @return accept - (-1) : 친구 추가 전송 성공 (0) : 친구 추가 실패
 	 */
 	public int makeBuddy(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
@@ -448,7 +447,7 @@ public class MessengerDAO {
 
 		return makeBuddysCheck;
 	}
-	
+
 	/**
 	 * 전체 오픈 톡방 불러오기 메서드 /확인
 	 * 
@@ -466,12 +465,13 @@ public class MessengerDAO {
 
 		return tempList;
 	}
-	
+
 	/**
 	 * 참여한 오픈 톡방 불러오기 메서드 /확인
 	 * 
-	 * SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist 
-	 * WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND is_private_yn =0
+	 * SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist
+	 * WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND
+	 * is_private_yn =0
 	 * 
 	 * @param pMap
 	 * @return
@@ -483,15 +483,16 @@ public class MessengerDAO {
 
 		sqlSession.close();
 
-		return tempList;	
+		return tempList;
 
 	}
-		
+
 	/**
 	 * 참여한 친구 톡방 불러오기 메서드 /확인
 	 * 
-	 * SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist 
-     * WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND is_private_yn =1	
+	 * SELECT r.room_no_nu, r.room_name_vc FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist
+	 * WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND
+	 * is_private_yn =1
 	 * 
 	 * @param pMap
 	 * @return
@@ -500,11 +501,19 @@ public class MessengerDAO {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
 		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getJoinBuddyTalkList", pMap);
-		
+
 		sqlSession.close();
-		
-		return tempList;	
-		
+
+		return tempList;
+
 	}
 
+	public List<Map<String, Object>> getTalkRoomUserList(Map<String, Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getTalkRoomUserList", pMap);
+		sqlSession.close();
+
+		return tempList;
+	}
 }

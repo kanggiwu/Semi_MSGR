@@ -30,6 +30,18 @@ public class MessengerTalkRoom {
 	public String getRoomTitle() {
 		return roomTitle;
 	}
+	public List<MessengerServerThread> getRoomInList() {
+		return roomInList;
+	}
+	public void setRoomInList(List<MessengerServerThread> roomInList) {
+		this.roomInList = roomInList;
+	}
+	public int getCurrentClientNum() {
+		return currentClientNum;
+	}
+	public void setCurrentClientNum(int currentClientNum) {
+		this.currentClientNum = currentClientNum;
+	}
 	
 	
 	

@@ -281,7 +281,10 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
 		if ("친구삭제".equals(command)) {
-			System.out.println("친구삭제 메뉴아이템");
+
+			if (buddyListView.buddyList.getSelectedValue() != null) {
+				
+			}
 		}
 
 		if ("톡방삭제".equals(command)) {
