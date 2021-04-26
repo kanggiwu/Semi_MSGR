@@ -64,9 +64,11 @@ public class MessengerClientThread extends Thread {
 					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
+					msgrClientView.joinTalkRoomListView.msgrChatView.setVisible(false);
 					msgrClientView.signInView.setId("");
 					msgrClientView.signInView.setNickname("");
 					msgrClientView.signInView.setVisible(true);
+					
 					isStop = true;
 				}
 					break;
