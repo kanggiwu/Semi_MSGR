@@ -109,23 +109,21 @@ public class MessengerClientThread extends Thread {
 					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
 //					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
-					break;                                                                                    
+					break;
 
 				case Protocol.JOIN_OPENROOM: {
-					int							room_no		= Integer.parseInt(token.nextToken());
-					String						room_name	= token.nextToken();
+					int		room_no		= Integer.parseInt(token.nextToken());
+					String	room_name	= token.nextToken();
 
-					//오픈톡방 채팅방 켜기
+					// 오픈톡방 채팅방 켜기
 					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.joinTalkRoomListView);
 					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
 					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
-					//참여톡방에 추가해주기
+					// 참여톡방에 추가해주기
 					Vector<Object> row = new Vector<Object>();
 					row.add(0, room_name);
 					row.add(1, room_no);
 					msgrClientView.joinTalkRoomListView.dtm.addRow(row);
-					
-					
 
 				}
 					break;
@@ -134,16 +132,14 @@ public class MessengerClientThread extends Thread {
 					int							room_no		= Integer.parseInt(token.nextToken());
 					String						room_name	= token.nextToken();
 					List<Map<String, Object>>	chatList	= (List) msgrClientView.ois.readObject();
-					
+
 					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.joinTalkRoomListView);
 					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
 					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
-					
-					
 
 					for (Map<String, Object> map : chatList) {
 						msgrClientView.joinTalkRoomListView.msgrChatView.chatArea
-													.append(map.get("MEM_NICK_VC") + ": " + map.get("CHAT_VC")+"\n");
+													.append(map.get("MEM_NICK_VC") + ": " + map.get("CHAT_VC") + "\n");
 
 					}
 
@@ -181,11 +177,14 @@ public class MessengerClientThread extends Thread {
 					break;
 				case Protocol.SENDCHAT: {
 					// 21.04.24. 21:40 유성열 수정하는중....... 어케해야됨?
-					// 400 # nickname # 안녕하세요
+					// 400 # 방번호 # nickname # 안녕하세요
+					int		room_no		= Integer.parseInt(token.nextToken());
 					String	nickname	= token.nextToken();
 					String	message		= token.nextToken();
 
-					msgrClientView.joinTalkRoomListView.msgrChatView.chatArea.append(nickname + "] " + message + "\n");
+					if (room_no == msgrClientView.joinTalkRoomListView.msgrChatView.room_no) {
+						msgrClientView.joinTalkRoomListView.msgrChatView.chatArea.append(nickname + "#" + message + "\n");
+					}
 
 				}
 					break;

@@ -171,5 +171,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT r.room_no_nu, r.room_name_vc,r.is_private_yn FROM MSGR_ROOM r, MSGR_ROOM_IN_LIST rlist 
 		WHERE mem_id_vc = #{mem_id_vc} AND r.room_no_nu = rlist.room_no_nu AND is_private_yn =1	
 	</select>
-	
+	<select id="getTalkRoomUserList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT mem_id_vc FROM MSGR_ROOM_IN_LIST WHERE room_no_nu = #{room_no_nu}
+	</select>
 </mapper>

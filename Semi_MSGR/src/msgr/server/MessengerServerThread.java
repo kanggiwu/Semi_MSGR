@@ -22,7 +22,7 @@ public class MessengerServerThread extends Thread {
 	String					nickname		= "";
 	MessengerDAO			msgrDAO			= null;
 	MessengerMap			pMap			= null;
-	List<MessengerTalkRoom>	talkRoomList	= new Vector<>();
+	List<MessengerTalkRoom>	talkRoomList	= null;
 	List<String>			myBuddyList		= null;
 
 	// 깃허브 연습
@@ -342,19 +342,18 @@ public class MessengerServerThread extends Thread {
 				case Protocol.JOIN_OPENROOM: { // 오픈톡방 참가
 					msgrServer.textArea_log.append(msg + " " + id + "님이 오픈톡방 참가\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-					String	response		= null;
-					int		room_no			= Integer.parseInt(token.nextToken());
-					msgrServer.textArea_log.append("방번호"+room_no+"\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					String	room_name		= token.nextToken();
-					msgrServer.textArea_log.append("방이름"+room_name+"\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					int		last_chatNum	= -1;
-					int		checkDAO		= -3;
+					String	response	= null;
+					int		room_no		= Integer.parseInt(token.nextToken());
+					msgrServer.textArea_log.append("방번호" + room_no + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					String room_name = token.nextToken();
+					msgrServer.textArea_log.append("방이름" + room_name + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					int	last_chatNum	= -1;
+					int	checkDAO		= -3;
 
 					// 마지막 방 번호 가져오기
 					last_chatNum = msgrDAO.getLastRoomNum();
 					msgrServer.textArea_log.append("마지막 대화번호 가져오기 성공\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					
-					
+
 					// 해당 방에 넣어주기
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
@@ -369,10 +368,10 @@ public class MessengerServerThread extends Thread {
 					msgrTalkRoom.setMsgrTalkRoom(room_no, room_name, 0);
 					talkRoomList.add(msgrTalkRoom);
 
-					response = Protocol.JOIN_OPENROOM 
-												+ Protocol.SEPERATOR 
+					response = Protocol.JOIN_OPENROOM
+												+ Protocol.SEPERATOR
 												+ room_no
-												+ Protocol.SEPERATOR 
+												+ Protocol.SEPERATOR
 												+ room_name;
 					send(response);
 
@@ -470,19 +469,21 @@ public class MessengerServerThread extends Thread {
 
 				}
 					break;
-				// 400 # nickname # 메시지
+				// 400 # 방번호 # nickname # 메시지
 				case Protocol.SENDCHAT: {// 메시지 전송
+					int		room_no		= Integer.parseInt(token.nextToken());
 					String	nickname	= token.nextToken();
-//					String	talkRoomFlag	= token.nextToken();
 					String	chat		= token.nextToken();
 
-					String	response	= Protocol.SENDCHAT + Protocol.SEPERATOR + nickname + Protocol.SEPERATOR + chat;
+					String	response	= Protocol.SENDCHAT + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR + nickname
+												+ Protocol.SEPERATOR + chat;
 
-					send(response);
-					buddyCasting(response);
+					pMap.getMap().put("room_no_nu", room_no);
+
+					List<Map<String, Object>> tempList = msgrDAO.getTalkRoomUserList(pMap.getMap());
 
 					// 방에 참여한 사람들에게만 메시지 전송
-					// broadCasting
+					broadCasting(tempList, response);
 				}
 					break;
 				case Protocol.EMOTICON: {// 이모티콘 전송
@@ -532,12 +533,26 @@ public class MessengerServerThread extends Thread {
 		}
 	}
 
-	// 접속한 모든 사람들에게 브로드캐스팅
 	private void broadCasting(Object response) {
 
-		// 오픈톡방 리스트 출력
-		for (MessengerServerThread msgrServerThread : msgrServer.globalList) {
-			msgrServerThread.send(response);
+		for (MessengerServerThread currentUser : msgrServer.globalList) {
+			currentUser.send(response);
+		}
+	}
+
+	// 접속한 유저들 중에 해당 채팅방에 입장 중이면 채팅 전송
+	private void broadCasting(List<Map<String, Object>> tempList, String response) {
+
+		for (MessengerServerThread currentUser : msgrServer.globalList) {
+			// 테스트1, 2, 3
+
+			for (Map<String, Object> userIndex : tempList) {
+
+				if (currentUser.id.equals(userIndex.get("MEM_ID_VC"))) {
+					currentUser.send(response);
+					break;
+				}
+			}
 		}
 	}
 

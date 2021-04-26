@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.TableView;
 
 import msgr.server.Protocol;
 
@@ -27,11 +28,16 @@ public class MessengerChatView extends JDialog implements ActionListener {
 	private JTextField		messegeField			= new JTextField();
 	private JButton			button_send				= new JButton("전송");
 	private JButton			button_emoticon			= new JButton("이모티콘");
+
+	int						room_no					= 0;
+
 	JoinTalkRoomListView	joinTalkRoomListView	= null;
 	OpenTalkRoomListView	openTalkRoomListView	= null;
 
 	public MessengerChatView(JoinTalkRoomListView talkRoomListView) {
 		this.joinTalkRoomListView = talkRoomListView;
+		this.room_no = Integer.parseInt(
+									String.valueOf(talkRoomListView.dtm.getValueAt(talkRoomListView.talkRoomTable.getSelectedRow(), 1)));
 	}
 
 	public MessengerChatView(OpenTalkRoomListView openTalkRoomListView) {
@@ -64,15 +70,18 @@ public class MessengerChatView extends JDialog implements ActionListener {
 
 		if (messegeField == obj || button_send == obj) {
 
-			// 400 # nickname # 메시지
-			try {
-				joinTalkRoomListView.msgrClientView.oos.writeObject(
-											Protocol.SENDCHAT + Protocol.SEPERATOR + joinTalkRoomListView.msgrClientView.getNickname()
-																		+ Protocol.SEPERATOR + messegeField.getText());
-			}
-			catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
+			// 400 # 방번호 # nickname # 메시지
+
+			String	room_no	= String.valueOf(joinTalkRoomListView.dtm.getValueAt(joinTalkRoomListView.talkRoomTable.getSelectedRow(), 1));
+
+			String	request	= Protocol.SENDCHAT + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR
+										+ joinTalkRoomListView.msgrClientView.getNickname()
+										+ Protocol.SEPERATOR + messegeField.getText();
+
+			System.out.println(request);
+
+			joinTalkRoomListView.msgrClientView.send(request);
+
 			messegeField.setText("");
 			messegeField.requestFocus();
 		}
