@@ -16,8 +16,8 @@ public class MessagerServer extends JFrame implements Runnable {
 	ServerSocket				server				= null;
 	Socket						client				= null;
 	JTextArea					textArea_log		= new JTextArea();
-	JScrollPane					scrollPane			= new JScrollPane(textArea_log, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	JScrollPane					scrollPane			= new JScrollPane(textArea_log, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+											JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	MessengerServerThread		msgrServerThread	= null;
 	List<MessengerServerThread>	globalList			= null;																		// 현재 접속중인
 	List<MessengerTalkRoom>		talkRoomList		= null;																		// 방에 참여한

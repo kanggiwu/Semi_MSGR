@@ -42,6 +42,8 @@ public class MessengerChatView extends JDialog implements ActionListener {
 
 	public MessengerChatView(OpenTalkRoomListView openTalkRoomListView) {
 		this.openTalkRoomListView = openTalkRoomListView;
+		this.room_no = Integer.parseInt(
+									String.valueOf(openTalkRoomListView.dtm.getValueAt(openTalkRoomListView.talkRoomTable.getSelectedRow(), 1)));
 	}
 
 	public void initDisplay() {

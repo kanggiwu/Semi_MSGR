@@ -289,6 +289,14 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		if ("톡방삭제".equals(command)) {
 			System.out.println("톡방삭제 메뉴아이템");
+				if(joinTalkRoomListView.dtm.getRowCount()!=1) {
+					JOptionPane.showMessageDialog(this, "톡방 하나 선택해주세요", "톡방삭제", JOptionPane.ERROR_MESSAGE);
+				}
+				int row = joinTalkRoomListView.talkRoomTable.getSelectedRow();
+				int room_no = Integer.parseInt(joinTalkRoomListView.dtm.getValueAt(row, 1).toString());
+				String request = Protocol.ROOM_DELETE +  Protocol.SEPERATOR + room_no ;
+				send(request);
+		
 		}
 	}// end of ActionPerformed()
 

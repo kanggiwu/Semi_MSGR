@@ -79,26 +79,21 @@ public class MessengerServerThread extends Thread {
 					// 친구 톡방 불러오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> joinBuddyRoomList = msgrDAO.getJoinBuddyTalkList(pMap.getMap());
-					msgrServer.textArea_log.append("여기 지남1 \n");
 					// 오픈 톡방 불러오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> joinOpenTalkList = msgrDAO.getJoinOpenTalkList(pMap.getMap());
-					msgrServer.textArea_log.append("여기 지남2 \n");
 
 					// 전체 톡방 불러오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> allOpenTalkList = msgrDAO.getAllOpenTalkList(pMap.getMap());
-					msgrServer.textArea_log.append("여기 지남3 \n");
 
 					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
 					setTalkRoomList(joinBuddyRoomList); // 방이름, 방번호, 방 종류
 					setTalkRoomList(joinOpenTalkList); // 방이름, 방번호, 방 종류
-					msgrServer.textArea_log.append("여기 지남4 \n");
 
 					// 친구 목록 DB에서 받아오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> buddyList = msgrDAO.getBuddyList(pMap.getMap());
-					msgrServer.textArea_log.append("여기 지남5 \n");
 
 					// 내 친구 리스트 id 저장
 					myBuddyList = new ArrayList<String>();
@@ -410,22 +405,21 @@ public class MessengerServerThread extends Thread {
 				}
 
 					break;
-
+					//220 # 방번호
 				case Protocol.ROOM_DELETE: {// 톡방 나가기
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					
+					int room_no = Integer.parseInt(token.nextToken());
 					
+					pMap.getMap().put("room_no_nu",room_no);
+					pMap.getMap().put("mem_id_vc",id);
 					
+					int cheakDao = msgrDAO.deleteTalkRoom(pMap.getMap());
 					
-					
-					
-					
-					
-					
-					
-					
-					
+					System.out.println("톡방삭제 테스트"+cheakDao);
+					String response = Protocol.ROOM_DELETE+Protocol.SEPERATOR + room_no;
+					send(response);
 
 				}
 					break;

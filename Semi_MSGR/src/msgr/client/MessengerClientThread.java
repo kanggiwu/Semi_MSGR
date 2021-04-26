@@ -116,7 +116,7 @@ public class MessengerClientThread extends Thread {
 					String	room_name	= token.nextToken();
 
 					// 오픈톡방 채팅방 켜기
-					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.joinTalkRoomListView);
+					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.openTalkRoomListView);
 					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
 					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
 					// 참여톡방에 추가해주기
@@ -146,6 +146,15 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.ROOM_DELETE: {
+					int room_no = (int)msgrClientView.ois.readObject();
+					for(int i = 0; i<msgrClientView.joinTalkRoomListView.dtm.getRowCount();i++) {
+						if(room_no == Integer.parseInt(msgrClientView.joinTalkRoomListView.dtm.getValueAt(i, 1).toString())) {
+							msgrClientView.joinTalkRoomListView.dtm.removeRow(i);
+						}
+					}
+					
+					
+					
 				}
 					break;
 				case Protocol.BUDDY_ADD: {
