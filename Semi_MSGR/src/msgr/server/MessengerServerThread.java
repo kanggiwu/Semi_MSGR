@@ -461,11 +461,31 @@ public class MessengerServerThread extends Thread {
 
 				}
 					break;
+					// 320 # test13 # nick13
 				case Protocol.BUDDY_DELETE: {// 친구 삭제
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
 																												// 아래로
-																												// 스크롤
+					String	response	= null;
+
+					String	buddyId			= token.nextToken();
+					token.nextToken();
+					
+					pMap.getMap().put("buddy_id_vc", buddyId);
+					int result = msgrDAO.deleteBuddy(pMap.getMap());
+					System.out.println("친구삭제 쿼리 삭제 " + result);
+					response = Protocol.BUDDY_DELETE
+												+ Protocol.SEPERATOR
+												+ result;
+					send(response);
+
+					if (result == -1) {
+
+						pMap.getMap().put("mem_id_vc", id);
+						List<Map<String, Object>> tempList = msgrDAO.getBuddyList(pMap.getMap());
+						send(tempList);
+					}
+					// 스크롤
 
 				}
 					break;

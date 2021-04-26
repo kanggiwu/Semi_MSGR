@@ -271,9 +271,14 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
 		if ("친구삭제".equals(command)) {
-
+			String buddyId = "";
+			
 			if (buddyListView.buddyList.getSelectedValue() != null) {
-				
+				buddyId = String.valueOf(buddyListView.buddyList.getSelectedValue());
+				String request = Protocol.BUDDY_DELETE + Protocol.SEPERATOR + buddyId;
+				send(request);
+			}else {
+				JOptionPane.showMessageDialog(this, "삭제할 친구를 선택해주세요", "친구삭제", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}// end of ActionPerformed()

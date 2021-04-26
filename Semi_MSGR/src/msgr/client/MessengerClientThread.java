@@ -173,6 +173,15 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {
+					int buddy_delete = 0;
+					buddy_delete = Integer.parseInt(token.nextToken());
+
+					if (buddy_delete == -1) {
+						List<Map<String, Object>> buddyList = (List) msgrClientView.ois.readObject();
+						msgrClientView.buddyListView.getBuddyList(buddyList);
+						JOptionPane.showMessageDialog(msgrClientView, "친구가 삭제되었습니다.", "친구 삭제", JOptionPane.INFORMATION_MESSAGE);
+					}
+					
 				}
 					break;
 				case Protocol.SENDCHAT: {
