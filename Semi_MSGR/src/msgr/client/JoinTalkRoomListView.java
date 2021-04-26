@@ -2,16 +2,14 @@ package msgr.client;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,7 +23,7 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 
 	String[][]				data			= new String[0][2];
 	String[]				columnName		= { "톡방이름", "톡방번호" };
-	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName) {// 테이블 내에서 수정 금지
+	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName) {									// 테이블 내에서 수정 금지
 												public boolean isCellEditable(int row, int col) {
 													return false;
 												}
@@ -89,15 +87,15 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 			String room_no = String.valueOf(dtm.getValueAt(talkRoomTable.getSelectedRow(), 1));
 			System.out.println(room_no);
 
-			String request = Protocol.ROOM_IN + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR+ room_name;
+			String request = Protocol.ROOM_IN + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR + room_name;
 			msgrClientView.send(request);
+			}
 
 //			if (!"".equals(talkRoomTable.getSelectedValue())) {
 //				msgrChatView = new MessengerChatView(this);
 //				chatList.add(msgrChatView);
 //				msgrChatView.initDisplay();
 //			}
-		}
 	}
 
 	@Override
@@ -113,15 +111,19 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+	public void mousePressed(MouseEvent e) {
 
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+	public void mouseReleased(MouseEvent e) {
+		Object obj = e.getSource();
+		if (obj == talkRoomTable) {
 
+			if (e.isPopupTrigger()) {
+				msgrClientView.getPopupMenu_joinRoom().show(this, e.getX(), e.getY());
+			}
+
+		}
 	}
-
 }

@@ -39,8 +39,8 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	JoinTalkRoomListView		joinTalkRoomListView	= null;
 	OpenTalkRoomListView		openTalkRoomListView	= null;
 	List<Map<String, Object>>	joinOpenTalkRoom_info	= null;
-	List<Map<String, Object>>	joinBuddyTalkRoom_info		= null;
-	List<Map<String, Object>>	allOpenTalk_info	= null;
+	List<Map<String, Object>>	joinBuddyTalkRoom_info	= null;
+	List<Map<String, Object>>	allOpenTalk_info		= null;
 
 	// 서버와 연결할 소켓, 스트림, 아이피, 포트
 	Socket						socket					= null;
@@ -63,8 +63,11 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	private JMenuItem[]			menuItem_talkRoom		= null;
 
 	// 우클릭 했을 때 뜨는 팝업메뉴
-	private JPopupMenu			popupMenu				= null;
+	private JPopupMenu			popupMenu_buddy			= null;
 	private JMenuItem			menuItem_deleteBuddy	= null;
+
+	private JPopupMenu			popupMenu_joinRoom		= null;
+	private JMenuItem			menuItem_deleteRoom		= null;
 
 	// 생성자에서 SignInView에서 받은 아이디, 닉네임을 저장함
 	public MessengerClientView(SignInView signInView) {
@@ -139,12 +142,19 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		menuBar.add(menu_talkRoom);
 		/////////////////////// 메뉴 구성 끝 ///////////////////////
 
-		/////////////////////// 팝업메뉴 구성 시작 ///////////////////////
+		/////////////////////// 친구목록 팝업메뉴 구성 시작 ///////////////////////
 		menuItem_deleteBuddy = new JMenuItem("친구삭제");
 		menuItem_deleteBuddy.addActionListener(this);
-		popupMenu = new JPopupMenu();
-		popupMenu.add(menuItem_deleteBuddy);
-		/////////////////////// 팝업메뉴 구성 끝 ///////////////////////
+		popupMenu_buddy = new JPopupMenu();
+		popupMenu_buddy.add(menuItem_deleteBuddy);
+		/////////////////////// 친구목록 팝업메뉴 구성 끝 ///////////////////////
+
+		/////////////////////// 참여톡방 목록 팝업메뉴 구성 시작////////////////////
+		menuItem_deleteRoom = new JMenuItem("톡방삭제");
+		menuItem_deleteRoom.addActionListener(this);
+		popupMenu_joinRoom = new JPopupMenu();
+		popupMenu_joinRoom.add(menuItem_deleteRoom);
+		/////////////////////// 참여톡방 목록 팝업메뉴 구성 끝 ///////////////////////
 
 		/////////////////////// 탭 구성 시작 ///////////////////////
 		tabbedPane.addTab("친구목록", buddyListView);
@@ -273,6 +283,10 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		if ("친구삭제".equals(command)) {
 			System.out.println("친구삭제 메뉴아이템");
 		}
+
+		if ("톡방삭제".equals(command)) {
+			System.out.println("톡방삭제 메뉴아이템");
+		}
 	}// end of ActionPerformed()
 
 	// 프로토콜 송신용 메서드
@@ -302,7 +316,12 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		this.nickname = nickname;
 	}
 
-	public JPopupMenu getPopupMenu() {
-		return popupMenu;
+	public JPopupMenu getPopupMenu_buddy() {
+		return popupMenu_buddy;
 	}
+
+	public JPopupMenu getPopupMenu_joinRoom() {
+		return popupMenu_joinRoom;
+	}
+
 }

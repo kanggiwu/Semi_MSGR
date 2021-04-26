@@ -200,50 +200,54 @@ public class MessengerServerThread extends Thread {
 					break;
 				/*	(((((수신))))) 200 | 친구톡을 생성할 친구리스트(id,nickname)
 				(((((송신))))) 200 */
-				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성 + 친구들 해당 톡방에 참여
+				case Protocol.ROOM_CREATE_BUDDY: {// 친구톡 생성 + 친구들 해당 톡방에 참여=================>완료
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					int	checkDao	= -3;
 
 					// 마지막 톡방 번호를 받아오고
 					int	lastTalk_no	= -1;
 					lastTalk_no = msgrDAO.getLastRoomNum();
-
+					//방이름 생성한 사람 먼저
 					String						room_name			= nickname + "님";
+					//선택한 친구 정보 받아오고
 					List<Map<String, Object>>	selectedBuddyList	= (List) ois.readObject();
-
+					
+					//어떤 친구들 받아왔는지 콘솔창에 출력
 					for (Map<String, Object> index : selectedBuddyList) {
 						System.out.println(index.get("mem_nick_vc"));
 					}
-
+					
+					//받아온 친구들 닉네임 방제목에 붙이기
 					for (Map<String, Object> buddy : selectedBuddyList) {
 						room_name += ", " + buddy.get("mem_nick_vc")
 													+ "님";
 					}
 					room_name += "의 방";
 					msgrServer.textArea_log.append("방이름 : " + room_name + "\n");
+					
 					// 방을 만들고
 					pMap.getMap().put("room_no_nu", ++lastTalk_no);
 					pMap.getMap().put("room_name_vc", room_name);
 					checkDao = msgrDAO.createBuddyTalkRoom(pMap.getMap());
 					msgrServer.textArea_log.append("친구톡방 생성 성공 여부 : " + checkDao + "\n");
 					// 해당하는 방에 참여자들을 추가해준다.
-
+					
 					// 자기 자신 참여
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("chat_no_nu", 1);
 					checkDao = msgrDAO.joinChatMember(pMap.getMap());
-
+					
 					// 친구들 참여
 					for (Map<String, Object> buddy : selectedBuddyList) {
 						// 마지막 톡방번호는 이미 209번에서 put 돼서 필요없음
 //						pMap.getMap().put("room_no_nu", lastTalk_no);
 						pMap.getMap().put("mem_id_vc", buddy.get("buddy_id_vc"));
 						pMap.getMap().put("chat_no_nu", 1);
-
+						
 						checkDao = msgrDAO.joinChatMember(pMap.getMap());
 						msgrServer.textArea_log.append("친구톡방 참여 성공 여부 : " + checkDao + "\n");
 					}
-
+					
 					// 나한테 전송
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>>		joinBuddyRoomList	= msgrDAO.getJoinBuddyTalkList(pMap.getMap());
@@ -254,10 +258,10 @@ public class MessengerServerThread extends Thread {
 					String response = Protocol.ROOM_CREATE_BUDDY + Protocol.SEPERATOR;
 					send(response);
 					send(joinRoomList);
-
+					
 					// 로그인한 친구들 톡방목록 갱신
 					for (MessengerServerThread currentUser : msgrServer.globalList) {
-
+						
 						for (Map<String, Object> selectedBuddy : selectedBuddyList) {
 
 							if (selectedBuddy.get("buddy_id_vc").equals(currentUser.id)) {
@@ -273,15 +277,15 @@ public class MessengerServerThread extends Thread {
 							}
 						}
 					}
-
+					
 					// 톡방리스트에 톡방 추가
 					MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
 					msgrTalkRoom.setMsgrTalkRoom(lastTalk_no, room_name, 1);
 					talkRoomList.add(msgrTalkRoom);
-
+					
 				}
 					break;
-
+					
 				// 201 # 닉네임(쓰진 않는듯)
 				case Protocol.ROOM_CREATE_OPENTALK: {// 오픈톡 생성
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
@@ -339,7 +343,7 @@ public class MessengerServerThread extends Thread {
 				 * (수신) 211 # 톡방번호 # 톡방이름
 				 * (송신) 211 # 톡방번호 # 톡방이름 
 				 */
-				case Protocol.JOIN_OPENROOM: { // 오픈톡방 참가
+				case Protocol.JOIN_OPENROOM: { // 오픈톡방 참가 ===========================>완료
 					msgrServer.textArea_log.append(msg + " " + id + "님이 오픈톡방 참가\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response		= null;
@@ -383,7 +387,7 @@ public class MessengerServerThread extends Thread {
 				/*	(수신) 212 # 톡방번호 # 톡방 이름
 				 *	(송신) 212 # 톡방번호 # 톡방 이름 | 참가한 후 채팅내용
 				 */
-				case Protocol.ROOM_IN: {// 톡방 입장
+				case Protocol.ROOM_IN: {// 톡방 입장(이전 대화내용 출력)===========================>완료
 					msgrServer.textArea_log.append(msg + "," + id + "톡방에 입장\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response	= null;
@@ -407,21 +411,22 @@ public class MessengerServerThread extends Thread {
 				}
 
 					break;
-				case Protocol.ROOM_IN_MEM: {// 톡방 참가 인원
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 
-				}
-					break;
-				case Protocol.ROOM_OUT: {// 톡방 닫기
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-
-				}
-					break;
 				case Protocol.ROOM_DELETE: {// 톡방 나가기
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
 
 				}
 					break;

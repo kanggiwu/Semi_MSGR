@@ -86,11 +86,10 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 			System.out.println(room_no);
 			boolean isDuplicate = false;
 
+			
 			for (int i = 0; i < msgrClientView.joinTalkRoomListView.dtm.getRowCount(); i++) {
-
-				if (room_no.equals(msgrClientView.joinTalkRoomListView.dtm.getValueAt(i, 1))) {
+				if (room_no.equals(msgrClientView.joinTalkRoomListView.dtm.getValueAt(i, 1).toString())) {
 					JOptionPane.showMessageDialog(msgrClientView, "이미 참여한 오픈톡방입니다.", "경고", JOptionPane.ERROR_MESSAGE);
-					System.out.println("if문 들어오는지 확인");
 					isDuplicate = true;
 					break;
 				}

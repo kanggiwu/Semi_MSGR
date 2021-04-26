@@ -92,7 +92,7 @@ public class BuddyListView extends JPanel implements MouseListener {
 		if (obj == buddyList) {
 
 			if (e.isPopupTrigger()) {
-				msgrClientView.getPopupMenu().show(this, e.getX(), e.getY());
+				msgrClientView.getPopupMenu_buddy().show(this, e.getX(), e.getY());
 			}
 		}
 	}

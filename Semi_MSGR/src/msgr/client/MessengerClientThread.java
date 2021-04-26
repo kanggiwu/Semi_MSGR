@@ -149,12 +149,6 @@ public class MessengerClientThread extends Thread {
 
 				}
 					break;
-				case Protocol.ROOM_IN_MEM: {
-				}
-					break;
-				case Protocol.ROOM_OUT: {
-				}
-					break;
 				case Protocol.ROOM_DELETE: {
 				}
 					break;
