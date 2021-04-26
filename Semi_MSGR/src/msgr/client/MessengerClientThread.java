@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
+import msgr.map.MessengerMap;
 import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
@@ -108,21 +109,41 @@ public class MessengerClientThread extends Thread {
 					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
 //					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
-					break;
+					break;                                                                                    
 
 				case Protocol.JOIN_OPENROOM: {
+					int							room_no		= Integer.parseInt(token.nextToken());
+					String						room_name	= token.nextToken();
+
+					//오픈톡방 채팅방 켜기
+					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.joinTalkRoomListView);
+					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
+					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
+					//참여톡방에 추가해주기
+					Vector<Object> row = new Vector<Object>();
+					row.add(0, room_name);
+					row.add(1, room_no);
+					msgrClientView.joinTalkRoomListView.dtm.addRow(row);
+					
+					
 
 				}
 					break;
 
 				case Protocol.ROOM_IN: {
-					String						room_name	= (String) msgrClientView.ois.readObject();
+					int							room_no		= Integer.parseInt(token.nextToken());
+					String						room_name	= token.nextToken();
 					List<Map<String, Object>>	chatList	= (List) msgrClientView.ois.readObject();
+					
+					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.joinTalkRoomListView);
 					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
+					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
+					
+					
 
 					for (Map<String, Object> map : chatList) {
 						msgrClientView.joinTalkRoomListView.msgrChatView.chatArea
-													.append(map.get("mem_nick_vc") + ": " + map.get("chat_vc"));
+													.append(map.get("MEM_NICK_VC") + ": " + map.get("CHAT_VC")+"\n");
 
 					}
 
@@ -138,6 +159,17 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_ADD: {
+					int buddy_add = 0;
+					buddy_add = Integer.parseInt(token.nextToken());
+
+					if (buddy_add == -1) {
+						List<Map<String, Object>> buddyList = (List) msgrClientView.ois.readObject();
+						msgrClientView.buddyListView.getBuddyList(buddyList);
+						JOptionPane.showMessageDialog(msgrClientView, "친구가 추가되었습니다.", "친구 추가", JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(msgrClientView, "친구 아이디를 다시 입력해주세요.", "친구 추가", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 					break;
 				case Protocol.BUDDY_LIST: {

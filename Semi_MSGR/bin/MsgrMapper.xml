@@ -102,7 +102,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
         AND rlist.mem_id_vc = #{mem_id_vc}
         AND chat.room_no_nu = #{room_no_nu}
-        AND mem.mem_id_vc = #{mem_id_vc}
+        AND mem.mem_id_vc = chat.mem_id_vc
 	</select>
 
 	

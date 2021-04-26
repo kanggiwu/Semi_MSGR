@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,7 +26,11 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 
 	String[][]				data			= new String[0][2];
 	String[]				columnName		= { "톡방이름", "톡방번호" };
-	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName);
+	DefaultTableModel		dtm				= new DefaultTableModel(data, columnName) {									// 테이블 내에서 수정 금지
+												public boolean isCellEditable(int row, int col) {
+													return false;
+												}
+											};
 	JTable					talkRoomTable	= new JTable(dtm);
 	JScrollPane				scrollPane_list	= new JScrollPane(talkRoomTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 								JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -74,13 +79,28 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 
 		if (e.getClickCount() == 2) {
+
 			String room_name = String.valueOf(dtm.getValueAt(talkRoomTable.getSelectedRow(), 0));
 			System.out.println(room_name);
 			String room_no = String.valueOf(dtm.getValueAt(talkRoomTable.getSelectedRow(), 1));
 			System.out.println(room_no);
+			boolean isDuplicate = false;
 
-			String request = Protocol.ROOM_IN + Protocol.SEPERATOR + room_no;
-			msgrClientView.send(request);
+			for (int i = 0; i < msgrClientView.joinTalkRoomListView.dtm.getRowCount(); i++) {
+
+				if (room_no.equals(msgrClientView.joinTalkRoomListView.dtm.getValueAt(i, 1))) {
+					JOptionPane.showMessageDialog(msgrClientView, "이미 참여한 오픈톡방입니다.", "경고", JOptionPane.ERROR_MESSAGE);
+					System.out.println("if문 들어오는지 확인");
+					isDuplicate = true;
+					break;
+				}
+			}
+
+			if (!isDuplicate) {
+				String request = Protocol.JOIN_OPENROOM + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR + room_name;
+				msgrClientView.send(request);
+
+			}
 
 //			if (!"".equals(talkRoomTable.getSelectedValue())) {
 //				msgrChatView = new MessengerChatView(this);

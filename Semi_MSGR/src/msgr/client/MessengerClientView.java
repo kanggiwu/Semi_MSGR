@@ -264,6 +264,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 
 			else {
 				String request = Protocol.BUDDY_ADD + Protocol.SEPERATOR + buddyId;
+				System.out.println(request);
 				send(request);
 			}
 		}

@@ -35,6 +35,8 @@ public class BuddyListView extends JPanel implements MouseListener {
 
 	public void getBuddyList(List<Map<String, Object>> pList) {
 
+		dlm.clear();
+
 		for (Map<String, Object> map : pList) {
 			dlm.addElement(map.get("BUDDY_ID_VC") + Protocol.SEPERATOR + map.get("MEM_NICK_VC"));
 		}

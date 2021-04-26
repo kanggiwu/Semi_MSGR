@@ -344,19 +344,24 @@ public class MessengerServerThread extends Thread {
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response		= null;
 					int		room_no			= Integer.parseInt(token.nextToken());
+					msgrServer.textArea_log.append("방번호"+room_no+"\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					String	room_name		= token.nextToken();
+					msgrServer.textArea_log.append("방이름"+room_name+"\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					int		last_chatNum	= -1;
 					int		checkDAO		= -3;
 
-					// 마지막 대화 번호 가져오기
-					pMap.getMap().put("room_no_nu", room_no);
-					last_chatNum = msgrDAO.getLastChatNum(pMap.getMap());
-
+					// 마지막 방 번호 가져오기
+					last_chatNum = msgrDAO.getLastRoomNum();
+					msgrServer.textArea_log.append("마지막 대화번호 가져오기 성공\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					
+					
 					// 해당 방에 넣어주기
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
-					pMap.getMap().put("join_chat_no_nu", last_chatNum);
-//					checkDAO = msgrDAO.joinChatMember(pMap.getMap());
+					pMap.getMap().put("join_chat_no_nu", ++last_chatNum);
+					checkDAO = msgrDAO.joinChatMember(pMap.getMap());
+					msgrServer.textArea_log.append("해당 방에 회원 넣어주기 성공\\n");// 클라이언트에서 받은 메시지 로그창에 출력
+
 					System.out.println("방 입장 DAO 체크" + checkDAO);
 
 					// 스레드 톡방 관리
@@ -364,7 +369,11 @@ public class MessengerServerThread extends Thread {
 					msgrTalkRoom.setMsgrTalkRoom(room_no, room_name, 0);
 					talkRoomList.add(msgrTalkRoom);
 
-					response = Protocol.JOIN_OPENROOM + Protocol.SEPERATOR + room_no + room_name;
+					response = Protocol.JOIN_OPENROOM 
+												+ Protocol.SEPERATOR 
+												+ room_no
+												+ Protocol.SEPERATOR 
+												+ room_name;
 					send(response);
 
 					// 클라이언트에서 해당 참여톡방에 추가
@@ -372,7 +381,7 @@ public class MessengerServerThread extends Thread {
 				}
 					break;
 				/*	(수신) 212 # 톡방번호 # 톡방 이름
-				 *	(송신) 212 # 톡방 이름 | 참가한 후 채팅내용
+				 *	(송신) 212 # 톡방번호 # 톡방 이름 | 참가한 후 채팅내용
 				 */
 				case Protocol.ROOM_IN: {// 톡방 입장
 					msgrServer.textArea_log.append(msg + "," + id + "톡방에 입장\n");// 클라이언트에서 받은 메시지 로그창에 출력
@@ -386,25 +395,15 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
 
-					System.out.println("대화내용 잘 불러오는지 DAO 체크");
-
 					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
-
-					// 채팅 내용 잘 불러오는지 확인
-					for (Map<String, Object> map : chatList) {
-						System.out.println(map.get("mem_nick_vc") + ", " + map.get("chat_vc"));
-					}
-					// 톡방 번호가 같은 톡방의 제목을 받아옴--클라에서 보내면 될듯?
-//					for (MessengerTalkRoom map : talkRoomList) {
-//						if (map.getRoom_no() == room_no)
-//							talkTitle = map.getRoomTitle();
-//					}
 
 					response = Protocol.ROOM_IN
 												+ Protocol.SEPERATOR
+												+ room_no
+												+ Protocol.SEPERATOR
 												+ room_name;
 					send(response);
-//					send(chatList);
+					send(chatList);
 				}
 
 					break;
@@ -429,13 +428,28 @@ public class MessengerServerThread extends Thread {
 
 				// 300 # 친구아이디
 				case Protocol.BUDDY_ADD: {// 친구추가
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 
-					String buddyId = token.nextToken();
+					String	response	= null;
+
+					String	buddyId		= token.nextToken();
 
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("buddy_id_vc", buddyId);
-//					int result = msgrDAO.makeBuddyProcedure(pMap.getMap());
-//					System.out.println(result);
+					int result = msgrDAO.makeBuddy(pMap.getMap());
+
+					response = Protocol.BUDDY_ADD
+												+ Protocol.SEPERATOR
+												+ result;
+					send(response);
+
+					if (result == -1) {
+
+						pMap.getMap().put("mem_id_vc", id);
+						List<Map<String, Object>> tempList = msgrDAO.getBuddyList(pMap.getMap());
+						send(tempList);
+					}
 
 					// 친구 추가 시 해당하는 친구가 있는지 확인하고 , 있을 경우, 해당 아이디가 있다는 것을 클라이언트 스레드에게 보내준다.
 					// 클라이언트 스레드에서 해당하는 친구가 있음을 출력하는 optionPane을 출력해준다.
