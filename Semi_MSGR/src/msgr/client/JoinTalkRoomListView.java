@@ -58,6 +58,8 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 	public void getRoomList(List<List<Map<String, Object>>> buddyList) {
 
 		Vector<Object> row = null;
+		talkRoomTable.getColumnModel().getColumn(1).setMinWidth(0);
+		talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
 
 		while (dtm.getRowCount() > 0) {
 			dtm.removeRow(0);
@@ -72,10 +74,6 @@ public class JoinTalkRoomListView extends JPanel implements MouseListener {
 				dtm.addRow(row);
 			}
 		}
-		talkRoomTable.getColumnModel().getColumn(1).setMinWidth(0);
-		talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
-
-		System.out.println(dtm.getValueAt(0, 1));
 	}
 
 	public void message_process(String msg, String imgChoice) {

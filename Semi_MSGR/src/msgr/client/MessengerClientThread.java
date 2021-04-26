@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
+import msgr.map.MessengerMap;
 import msgr.server.Protocol;
 
 public class MessengerClientThread extends Thread {
@@ -158,6 +159,17 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_ADD: {
+					int buddy_add = 0;
+					buddy_add = Integer.parseInt(token.nextToken());
+
+					if (buddy_add == -1) {
+						List<Map<String, Object>> buddyList = (List) msgrClientView.ois.readObject();
+						msgrClientView.buddyListView.getBuddyList(buddyList);
+						JOptionPane.showMessageDialog(msgrClientView, "친구가 추가되었습니다.", "친구 추가", JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(msgrClientView, "친구 아이디를 다시 입력해주세요.", "친구 추가", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 					break;
 				case Protocol.BUDDY_LIST: {

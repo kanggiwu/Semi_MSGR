@@ -428,13 +428,28 @@ public class MessengerServerThread extends Thread {
 
 				// 300 # 친구아이디
 				case Protocol.BUDDY_ADD: {// 친구추가
+					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 
-					String buddyId = token.nextToken();
+					String	response	= null;
+
+					String	buddyId		= token.nextToken();
 
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("buddy_id_vc", buddyId);
-//					int result = msgrDAO.makeBuddyProcedure(pMap.getMap());
-//					System.out.println(result);
+					int result = msgrDAO.makeBuddy(pMap.getMap());
+
+					response = Protocol.BUDDY_ADD
+												+ Protocol.SEPERATOR
+												+ result;
+					send(response);
+
+					if (result == -1) {
+
+						pMap.getMap().put("mem_id_vc", id);
+						List<Map<String, Object>> tempList = msgrDAO.getBuddyList(pMap.getMap());
+						send(tempList);
+					}
 
 					// 친구 추가 시 해당하는 친구가 있는지 확인하고 , 있을 경우, 해당 아이디가 있다는 것을 클라이언트 스레드에게 보내준다.
 					// 클라이언트 스레드에서 해당하는 친구가 있음을 출력하는 optionPane을 출력해준다.
