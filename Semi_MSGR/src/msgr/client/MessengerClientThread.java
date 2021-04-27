@@ -64,9 +64,11 @@ public class MessengerClientThread extends Thread {
 					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
+					msgrClientView.joinTalkRoomListView.msgrChatView.setVisible(false);
 					msgrClientView.signInView.setId("");
 					msgrClientView.signInView.setNickname("");
 					msgrClientView.signInView.setVisible(true);
+					
 					isStop = true;
 				}
 					break;
@@ -178,6 +180,15 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {
+					int buddy_delete = 0;
+					buddy_delete = Integer.parseInt(token.nextToken());
+
+					if (buddy_delete == -1) {
+						List<Map<String, Object>> buddyList = (List) msgrClientView.ois.readObject();
+						msgrClientView.buddyListView.getBuddyList(buddyList);
+						JOptionPane.showMessageDialog(msgrClientView, "친구가 삭제되었습니다.", "친구 삭제", JOptionPane.INFORMATION_MESSAGE);
+					}
+					
 				}
 					break;
 				case Protocol.SENDCHAT: {
