@@ -146,15 +146,17 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.ROOM_DELETE: {
-					int room_no = (int)msgrClientView.ois.readObject();
-					for(int i = 0; i<msgrClientView.joinTalkRoomListView.dtm.getRowCount();i++) {
-						if(room_no == Integer.parseInt(msgrClientView.joinTalkRoomListView.dtm.getValueAt(i, 1).toString())) {
-							msgrClientView.joinTalkRoomListView.dtm.removeRow(i);
-						}
+
+					int cheakDao = Integer.parseInt(String.valueOf(token.nextToken()));
+
+					if (cheakDao == -1) {
+						JOptionPane.showMessageDialog(msgrClientView.joinTalkRoomListView, "톡방 삭제 성공", "톡방삭제",
+													JOptionPane.INFORMATION_MESSAGE);
 					}
-					
-					
-					
+
+					List<List<Map<String, Object>>> tempList = (List) msgrClientView.ois.readObject();
+					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
+
 				}
 					break;
 				case Protocol.BUDDY_ADD: {

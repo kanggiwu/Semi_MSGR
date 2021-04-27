@@ -22,7 +22,6 @@ public class MessengerServerThread extends Thread {
 	String					nickname		= "";
 	MessengerDAO			msgrDAO			= null;
 	MessengerMap			pMap			= null;
-	List<MessengerTalkRoom>	talkRoomList	= null;
 	List<String>			myBuddyList		= null;
 
 	// 깃허브 연습
@@ -42,7 +41,6 @@ public class MessengerServerThread extends Thread {
 
 	public void run() {
 		String msg = "";
-		talkRoomList = new Vector<>();
 		boolean isStop = false;
 
 		try {
@@ -87,9 +85,6 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> allOpenTalkList = msgrDAO.getAllOpenTalkList(pMap.getMap());
 
-					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
-					setTalkRoomList(joinBuddyRoomList); // 방이름, 방번호, 방 종류
-					setTalkRoomList(joinOpenTalkList); // 방이름, 방번호, 방 종류
 
 					// 친구 목록 DB에서 받아오기
 					pMap.getMap().put("mem_id_vc", id);
@@ -273,11 +268,6 @@ public class MessengerServerThread extends Thread {
 						}
 					}
 					
-					// 톡방리스트에 톡방 추가
-					MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
-					msgrTalkRoom.setMsgrTalkRoom(lastTalk_no, room_name, 1);
-					talkRoomList.add(msgrTalkRoom);
-					
 				}
 					break;
 					
@@ -326,7 +316,6 @@ public class MessengerServerThread extends Thread {
 					List<Map<String, Object>> roomList = msgrDAO.getTalkRoomList(pMap.getMap());// id를 파라미터로 넘겨준 뒤 마이바티스를 통해 해당하는 id가 참여한
 																								// 톡방리스트를 받아온다
 					// 받아온 톡방리스트 별로 톡방 객체를 생성한 뒤 톡방List에 넣어준다.
-					setTalkRoomList(roomList);
 
 					response = Integer.toString(Protocol.ROOM_LIST);
 					send(response);// 톡방 리스트 출력 프로토콜 전송
@@ -361,11 +350,6 @@ public class MessengerServerThread extends Thread {
 					msgrServer.textArea_log.append("해당 방에 회원 넣어주기 성공\\n");// 클라이언트에서 받은 메시지 로그창에 출력
 
 					System.out.println("방 입장 DAO 체크" + checkDAO);
-
-					// 스레드 톡방 관리
-					MessengerTalkRoom msgrTalkRoom = new MessengerTalkRoom();
-					msgrTalkRoom.setMsgrTalkRoom(room_no, room_name, 0);
-					talkRoomList.add(msgrTalkRoom);
 
 					response = Protocol.JOIN_OPENROOM
 												+ Protocol.SEPERATOR
@@ -406,7 +390,8 @@ public class MessengerServerThread extends Thread {
 
 					break;
 					//220 # 방번호
-				case Protocol.ROOM_DELETE: {// 톡방 나가기
+					//220 | 참여톡방리스트
+				case Protocol.ROOM_DELETE: {// 톡방 삭제
 					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					
@@ -418,9 +403,21 @@ public class MessengerServerThread extends Thread {
 					int cheakDao = msgrDAO.deleteTalkRoom(pMap.getMap());
 					
 					System.out.println("톡방삭제 테스트"+cheakDao);
-					String response = Protocol.ROOM_DELETE+Protocol.SEPERATOR + room_no;
+					String response = Protocol.ROOM_DELETE+Protocol.SEPERATOR+cheakDao;
+					// 참여한 톡방 리스트 불러오기
+					// 친구 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> joinBuddyRoomList = msgrDAO.getJoinBuddyTalkList(pMap.getMap());
+					// 오픈 톡방 불러오기
+					pMap.getMap().put("mem_id_vc", id);
+					List<Map<String, Object>> joinOpenTalkList = msgrDAO.getJoinOpenTalkList(pMap.getMap());
+					
+					List<List<Map<String, Object>>>	joinRoomList		= new Vector<List<Map<String, Object>>>();
+					joinRoomList.add(joinBuddyRoomList);
+					joinRoomList.add(joinOpenTalkList);
+					
 					send(response);
-
+					send(joinRoomList);
 				}
 					break;
 
@@ -573,19 +570,4 @@ public class MessengerServerThread extends Thread {
 
 	}// end of buddyCasting()
 
-	public void setTalkRoomList(List<Map<String, Object>> roomList) {
-		MessengerTalkRoom msgrTalkRoom = null;
-
-		for (Map<String, Object> map : roomList) {
-			msgrTalkRoom = new MessengerTalkRoom();
-			String	room_name	= (String) map.get("ROOM_NAME_VC");
-			// 해당 부분에서 멈춰버려서 오브젝트를 스트링으로 바꾸고 파스인트를 하니까 됨
-			// int room_no = (int) map.get("ROOM_NO_NU"));
-			int		room_no		= Integer.parseInt(map.get("ROOM_NO_NU").toString());
-			int		is_private	= Integer.parseInt(map.get("IS_PRIVATE_YN").toString());
-
-			msgrTalkRoom.setMsgrTalkRoom(room_no, room_name, is_private);
-			talkRoomList.add(msgrTalkRoom);// 톡방리스트에 만들어준 톡방을 넣어준다.
-		}
-	}
 }

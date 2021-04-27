@@ -73,7 +73,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!-- 톡방 삭제 쿼리문 --><!-- 확인 -->
 	<delete id="deleteTalkRoom" parameterType="java.util.Map">
-		DELETE FROM MSGR_ROOM_IN_LIST  WHERE room_no_nu = #{room_no_nu} and mem_ID_VC = #{mem_id_vc} 
+		{CALL
+			DECLARE
+			BEGIN
+				UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vc};
+				DELETE FROM MSGR_ROOM_IN_LIST WHERE room_no_nu = #{room_no_nu} and mem_id_vc = #{mem_id_vc};
+			END
+		}
 	</delete>
 	
 	<!-- 톡방 참여 쿼리문 --><!-- 확인 -->
