@@ -64,11 +64,12 @@ public class MessengerClientThread extends Thread {
 					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
-					msgrClientView.joinTalkRoomListView.msgrChatView.setVisible(false);
+					if (msgrClientView.joinTalkRoomListView.msgrChatView != null)
+						msgrClientView.joinTalkRoomListView.msgrChatView.setVisible(false);
 					msgrClientView.signInView.setId("");
 					msgrClientView.signInView.setNickname("");
 					msgrClientView.signInView.setVisible(true);
-					
+
 					isStop = true;
 				}
 					break;
@@ -103,30 +104,30 @@ public class MessengerClientThread extends Thread {
 
 				// 201 #
 				case Protocol.ROOM_CREATE_OPENTALK: {
-					List<List<Map<String, Object>>> tempList = (List) msgrClientView.ois.readObject();
-					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
-					msgrClientView.openTalkRoomListView.getRoomList(tempList);
-					
-					
+					List<List<Map<String, Object>>>	joinRoomList	= (List) msgrClientView.ois.readObject();
+					List<Map<String, Object>>		openRoomList	= (List) msgrClientView.ois.readObject();
+					msgrClientView.joinTalkRoomListView.getRoomList(joinRoomList);
+					msgrClientView.openTalkRoomListView.getRoomList(openRoomList);
+
 				}
 					break;
 				case Protocol.ROOM_LIST: {
-					List<Map<String, Object>> tempList = (List<Map<String, Object>>) msgrClientView.ois.readObject();
-//					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
+					List<Map<String, Object>> openRoomList = (List) msgrClientView.ois.readObject();
+					msgrClientView.openTalkRoomListView.getRoomList(openRoomList);
 				}
 					break;
 
 				case Protocol.JOIN_OPENROOM: {
-					int		room_no		= Integer.parseInt(token.nextToken());
-					String	room_name	= token.nextToken();
+					int				room_no		= Integer.parseInt(token.nextToken());
+					String			room_name	= token.nextToken();
 
 					// 참여톡방에 추가해주기
-					Vector<Object> row = new Vector<Object>();
+					Vector<Object>	row			= new Vector<Object>();
 					row.add(0, room_name);
 					row.add(1, room_no);
 					msgrClientView.joinTalkRoomListView.dtm.addRow(row);
-					
-					JOptionPane.showMessageDialog(msgrClientView, room_name+"에 입장하셨습니다.","오픈톡 입장", JOptionPane.INFORMATION_MESSAGE);
+
+					JOptionPane.showMessageDialog(msgrClientView, room_name + "에 입장하셨습니다.", "오픈톡 입장", JOptionPane.INFORMATION_MESSAGE);
 
 				}
 					break;
@@ -189,7 +190,7 @@ public class MessengerClientThread extends Thread {
 						msgrClientView.buddyListView.getBuddyList(buddyList);
 						JOptionPane.showMessageDialog(msgrClientView, "친구가 삭제되었습니다.", "친구 삭제", JOptionPane.INFORMATION_MESSAGE);
 					}
-					
+
 				}
 					break;
 				case Protocol.SENDCHAT: {

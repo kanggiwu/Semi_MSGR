@@ -51,7 +51,7 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 		this.add("Center", scrollPane_list);
 	}
 
-	public void getRoomList(List<Map<String, Object>> buddyList) {
+	public void getRoomList(List<Map<String, Object>> openRoomList) {
 
 		Vector<Object> row = null;
 
@@ -59,7 +59,7 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 			dtm.removeRow(0);
 		}
 
-		for (Map<String, Object> index : buddyList) {
+		for (Map<String, Object> index : openRoomList) {
 			row = new Vector<Object>();
 			row.add(0, index.get("ROOM_NAME_VC"));
 			row.add(1, index.get("ROOM_NO_NU"));
