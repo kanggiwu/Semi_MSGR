@@ -98,17 +98,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="getLastChatNum" parameterType="java.util.Map" resultType="int">
 		SELECT chat_no_nu 
 		FROM(SELECT chat_no_nu FROM msgr_chat WHERE room_no_nu = #{room_no_nu} ORDER BY chat_no_nu DESC)
-		WHERE ROWNUM = 1	 
+		WHERE ROWNUM = 1
 	</select>
 
 	<!-- 톡방 참가한 이후의 대화내용 가져오기 쿼리문 --><!-- 확인 -->
 	<select id="getChatAfterJoin" parameterType="java.util.Map" resultType="java.util.Map">
-		SELECT mem.mem_nick_vc, chat.chat_vc FROM MSGR_MEMBER mem, MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist 
-        WHERE rlist.room_no_nu = chat.room_no_nu
-        AND chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
-        AND rlist.mem_id_vc = #{mem_id_vc}
-        AND chat.room_no_nu = #{room_no_nu}
-        AND mem.mem_id_vc = chat.mem_id_vc
+	SELECT NVL(mem.mem_nick_vc, 'unknown') as mem_nick_vc, chat.chat_vc
+  FROM MSGR_MEMBER mem, MSGR_CHAT chat, MSGR_ROOM_IN_LIST rlist
+ WHERE     rlist.room_no_nu = chat.room_no_nu
+       AND chat.chat_no_nu >= (SELECT join_chat_no_nu
+                                 FROM MSGR_ROOM_IN_LIST
+                                WHERE mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu})
+       AND rlist.mem_id_vc = #{mem_id_vc}
+       AND chat.room_no_nu = #{room_no_nu}
+       AND chat.mem_id_vc = mem.mem_id_vc(+)
 	</select>
 
 	

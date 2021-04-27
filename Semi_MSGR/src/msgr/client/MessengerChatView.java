@@ -43,7 +43,8 @@ public class MessengerChatView extends JDialog implements ActionListener {
 	public MessengerChatView(OpenTalkRoomListView openTalkRoomListView) {
 		this.openTalkRoomListView = openTalkRoomListView;
 		this.room_no = Integer.parseInt(
-									String.valueOf(openTalkRoomListView.dtm.getValueAt(openTalkRoomListView.talkRoomTable.getSelectedRow(), 1)));
+									String.valueOf(openTalkRoomListView.dtm.getValueAt(openTalkRoomListView.talkRoomTable.getSelectedRow(),
+																1)));
 	}
 
 	public void initDisplay() {
@@ -72,13 +73,19 @@ public class MessengerChatView extends JDialog implements ActionListener {
 
 		if (messegeField == obj || button_send == obj) {
 
-			// 400 # 방번호 # nickname # 메시지
+			// 400 # 방번호 # id # nickname # 메시지
 
 			String	room_no	= String.valueOf(joinTalkRoomListView.dtm.getValueAt(joinTalkRoomListView.talkRoomTable.getSelectedRow(), 1));
 
-			String	request	= Protocol.SENDCHAT + Protocol.SEPERATOR + room_no + Protocol.SEPERATOR
+			String	request	= Protocol.SENDCHAT
+										+ Protocol.SEPERATOR
+										+ room_no
+										+ Protocol.SEPERATOR
+										+ joinTalkRoomListView.msgrClientView.getId()
+										+ Protocol.SEPERATOR
 										+ joinTalkRoomListView.msgrClientView.getNickname()
-										+ Protocol.SEPERATOR + messegeField.getText();
+										+ Protocol.SEPERATOR
+										+ messegeField.getText();
 
 			System.out.println(request);
 

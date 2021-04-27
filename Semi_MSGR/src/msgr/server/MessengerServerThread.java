@@ -382,7 +382,6 @@ public class MessengerServerThread extends Thread {
 					// 톡방 참가한 이후의 대화내용 가져오기
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
-
 					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
 
 					response = Protocol.ROOM_IN
@@ -491,9 +490,10 @@ public class MessengerServerThread extends Thread {
 
 				}
 					break;
-				// 400 # 방번호 # nickname # 메시지
+				// 400 # 방번호 # id # nickname # 메시지
 				case Protocol.SENDCHAT: {// 메시지 전송
 					int		room_no		= Integer.parseInt(token.nextToken());
+					String	id			= token.nextToken();
 					String	nickname	= token.nextToken();
 					String	chat		= token.nextToken();
 
@@ -501,7 +501,18 @@ public class MessengerServerThread extends Thread {
 												+ Protocol.SEPERATOR + chat;
 
 					pMap.getMap().put("room_no_nu", room_no);
+					int chat_no = msgrDAO.getLastChatNum(pMap.getMap());
 
+					msgrServer.textArea_log.append(chat_no + "\n");
+
+					pMap.getMap().put("room_no_nu", room_no);
+					pMap.getMap().put("chat_no_nu", ++chat_no);
+					pMap.getMap().put("mem_id_vc", id);
+					pMap.getMap().put("chat_vc", chat);
+					int insertChatResult = msgrDAO.insertChat(pMap.getMap());
+					msgrServer.textArea_log.append("클라이언트에서 전송한 채팅 저장 성공 여부 " + insertChatResult + "\n");
+
+					pMap.getMap().put("room_no_nu", room_no);
 					List<Map<String, Object>> tempList = msgrDAO.getTalkRoomUserList(pMap.getMap());
 
 					// 방에 참여한 사람들에게만 메시지 전송

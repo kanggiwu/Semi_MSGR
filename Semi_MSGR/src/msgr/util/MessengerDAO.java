@@ -1,6 +1,5 @@
 package msgr.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -300,7 +299,15 @@ public class MessengerDAO {
 	public int getLastChatNum(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession	sqlSession	= factory.openSession();
-		int			tempInt		= sqlSession.selectOne("MsgrMapper.getLastChatNum", pMap);
+
+		int			tempInt		= -2;
+
+		try {
+			tempInt = sqlSession.selectOne("MsgrMapper.getLastChatNum", pMap);
+		}
+		catch (Exception e) {
+			tempInt = 0;
+		}
 
 		sqlSession.close();
 
@@ -315,7 +322,7 @@ public class MessengerDAO {
 	 * chat.chat_no_nu >= (SELECT join_chat_no_nu FROM MSGR_ROOM_IN_LIST WHERE
 	 * mem_id_vc = #{mem_id_vc} AND room_no_nu = #{room_no_nu}) AND rlist.mem_id_vc
 	 * = #{mem_id_vc} AND chat.room_no_nu = #{room_no_nu} AND mem.mem_id_vc =
-	 * chat.mem_id_vc
+	 * chat.mem_id_vc(+)
 	 * 
 	 * @param pMap- 사용자가 입력한 아이디, 톡방 번호가 저장된 Map
 	 * @return tempList - 사용자가 입력한 아이디, 톡방 번호를 바탕으로 사용자가 톡방 참가한 이후의 닉네임과 대화 내용을 리스트로
@@ -516,4 +523,19 @@ public class MessengerDAO {
 
 		return tempList;
 	}
+
+//	public static void main(String[] args) {
+//		MessengerDAO	dao	= new MessengerDAO();
+//
+//		MessengerMap	map	= MessengerMap.getInstance();
+//
+//		map.getMap().put("mem_id_vc", "test4");
+//		map.getMap().put("room_no_nu", 7);
+//		System.out.println("sdafasdf");
+//		List<Map<String, Object>> list = dao.getChatAfterJoin(map.getMap());
+//
+//		for (Map<String, Object> map2 : list) {
+//			System.out.println(map2);
+//		}
+//	}
 }
