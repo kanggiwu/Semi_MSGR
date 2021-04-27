@@ -105,6 +105,9 @@ public class MessengerClientThread extends Thread {
 				case Protocol.ROOM_CREATE_OPENTALK: {
 					List<List<Map<String, Object>>> tempList = (List) msgrClientView.ois.readObject();
 					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
+					msgrClientView.openTalkRoomListView.getRoomList(tempList);
+					
+					
 				}
 					break;
 				case Protocol.ROOM_LIST: {
@@ -117,15 +120,13 @@ public class MessengerClientThread extends Thread {
 					int		room_no		= Integer.parseInt(token.nextToken());
 					String	room_name	= token.nextToken();
 
-					// 오픈톡방 채팅방 켜기
-					msgrClientView.joinTalkRoomListView.msgrChatView = new MessengerChatView(msgrClientView.openTalkRoomListView);
-					msgrClientView.joinTalkRoomListView.msgrChatView.setTitle(room_name);
-					msgrClientView.joinTalkRoomListView.msgrChatView.initDisplay();
 					// 참여톡방에 추가해주기
 					Vector<Object> row = new Vector<Object>();
 					row.add(0, room_name);
 					row.add(1, room_no);
 					msgrClientView.joinTalkRoomListView.dtm.addRow(row);
+					
+					JOptionPane.showMessageDialog(msgrClientView, room_name+"에 입장하셨습니다.","오픈톡 입장", JOptionPane.INFORMATION_MESSAGE);
 
 				}
 					break;
