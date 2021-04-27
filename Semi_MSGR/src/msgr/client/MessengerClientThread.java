@@ -221,7 +221,8 @@ public class MessengerClientThread extends Thread {
 				}
 			}
 			catch (IOException ioe) {
-				ioe.printStackTrace();
+				System.out.println("서버 연결 실패");
+				isStop = true;
 			}
 			catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();

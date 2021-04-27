@@ -113,6 +113,7 @@ public class MessengerServerThread extends Thread {
 					// 로그 맨 아래로 스크롤
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					msgrServer.globalList.remove(this);// 접속자 목록에서 삭제
+
 					String response = Protocol.SIGNOUT + Protocol.SEPERATOR + id;
 					System.out.println(id);
 					send(response);

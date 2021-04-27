@@ -67,8 +67,6 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 		}
 		talkRoomTable.getColumnModel().getColumn(1).setMinWidth(0);
 		talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
-
-		System.out.println(dtm.getValueAt(0, 1));
 	}
 
 	public void message_process(String msg, String imgChoice) {

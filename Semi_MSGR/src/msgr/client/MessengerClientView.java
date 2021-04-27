@@ -282,28 +282,31 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		/////////////////////// 톡방 메뉴아이템 끝 ///////////////////////
 		if ("친구삭제".equals(command)) {
 			String buddyId = "";
-			
+
 			if (buddyListView.buddyList.getSelectedValue() != null) {
 				buddyId = String.valueOf(buddyListView.buddyList.getSelectedValue());
 				String request = Protocol.BUDDY_DELETE + Protocol.SEPERATOR + buddyId;
 				send(request);
-			}else {
+			}
+			else {
 				JOptionPane.showMessageDialog(this, "삭제할 친구를 선택해주세요", "친구삭제", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
 		if ("톡방삭제".equals(command)) {
 			System.out.println("톡방삭제 메뉴아이템" + joinTalkRoomListView.talkRoomTable.getSelectedRowCount());
-				if(joinTalkRoomListView.talkRoomTable.getSelectedRowCount()==1) {
-					int row = joinTalkRoomListView.talkRoomTable.getSelectedRow();
-					int room_no = Integer.parseInt(joinTalkRoomListView.dtm.getValueAt(row, 1).toString());
-					String request = Protocol.ROOM_DELETE +  Protocol.SEPERATOR + room_no ;
-					send(request);
-				}else {
-					JOptionPane.showMessageDialog(this, "톡방 하나 선택해주세요", "톡방삭제", JOptionPane.ERROR_MESSAGE);
-					
-				}
-		
+
+			if (joinTalkRoomListView.talkRoomTable.getSelectedRowCount() == 1) {
+				int		row		= joinTalkRoomListView.talkRoomTable.getSelectedRow();
+				int		room_no	= Integer.parseInt(joinTalkRoomListView.dtm.getValueAt(row, 1).toString());
+				String	request	= Protocol.ROOM_DELETE + Protocol.SEPERATOR + room_no;
+				send(request);
+			}
+			else {
+				JOptionPane.showMessageDialog(this, "톡방 하나 선택해주세요", "톡방삭제", JOptionPane.ERROR_MESSAGE);
+
+			}
+
 		}
 	}// end of ActionPerformed()
 
