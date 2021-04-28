@@ -529,19 +529,42 @@ public class MessengerDAO {
 
 		return tempList;
 	}
+	
+	public int getJoinChatNum(Map<String,Object> pMap) {
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession	sqlSession = factory.openSession();
+		int temp = sqlSession.selectOne("MsgrMapper.getJoinChatNum",pMap);
+		sqlSession.close();
+		return temp;
+	}
 
-//	public static void main(String[] args) {
-//		MessengerDAO	dao	= new MessengerDAO();
-//
-//		MessengerMap	map	= MessengerMap.getInstance();
-//
+	public List<Map<String, Object>> getAllChatList(Map<String,Object> pMap){
+		factory = MyBatisCommonFactory.getInstance();
+		SqlSession					sqlSession	= factory.openSession();
+		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getAllChatList", pMap);
+		sqlSession.close();
+
+		return tempList;
+	}
+	
+	public static void main(String[] args) {
+		MessengerDAO	dao	= new MessengerDAO();
+
+		MessengerMap	map	= MessengerMap.getInstance();
+
 //		map.getMap().put("mem_id_vc", "test4");
-//		map.getMap().put("room_no_nu", 7);
+//		map.getMap().put("mem_id_vc", "test3");
+		map.getMap().put("join_chat_no_nu", "1");
+		map.getMap().put("room_no_nu", 1);
+		
+//		int test = dao.getJoinChatNum(map.getMap()); 
+//		System.out.println(test);
+		
 //		System.out.println("sdafasdf");
-//		List<Map<String, Object>> list = dao.getChatAfterJoin(map.getMap());
-//
-//		for (Map<String, Object> map2 : list) {
-//			System.out.println(map2);
-//		}
-//	}
+		List<Map<String, Object>> list = dao.getAllChatList(map.getMap());
+		for (Map<String, Object> map2 : list) {
+			System.out.println(map2);
+		}
+		
+	}
 }

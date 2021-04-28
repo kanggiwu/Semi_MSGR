@@ -372,19 +372,34 @@ public class MessengerServerThread extends Thread {
 				/*	(수신) 212 # 톡방번호 # 톡방 이름
 				 *	(송신) 212 # 톡방번호 # 톡방 이름 | 참가한 후 채팅내용
 				 */
-				case Protocol.ROOM_IN: {// 톡방 입장(이전 대화내용 출력)===========================>완료
+				case Protocol.ROOM_IN: {// 톡방 입장(이전 대화내용 출력)===========================>수정중
 					msgrServer.textArea_log.append(msg + "," + id + "톡방에 입장\n");// 클라이언트에서 받은 메시지 로그창에 출력
 					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response	= null;
 					int		room_no		= Integer.parseInt(token.nextToken());
 					// 톡방이름은 타이틀에 띄워주기 위해 필요
 					String	room_name	= token.nextToken();
-
-					// 톡방 참가한 이후의 대화내용 가져오기
+					
+					// 참여한 톡 번호 가져오기
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
-					List<Map<String, Object>> chatList = msgrDAO.getChatAfterJoin(pMap.getMap());
-
+					
+					int joinChatNum = msgrDAO.getJoinChatNum(pMap.getMap());
+					msgrServer.textArea_log.append("참여한 톡방 채팅번호: "+ joinChatNum);
+					
+					
+					
+					// 참여한 톡 번호 이후로 대화내용 가져오기
+					pMap.getMap().put("room_no_nu", room_no);
+					pMap.getMap().put("join_chat_no_nu", joinChatNum);
+					List<Map<String, Object>> chatList = msgrDAO.getAllChatList(pMap.getMap());
+					
+					for (Map<String, Object> map : chatList) {
+						msgrServer.textArea_log.append("톡내용 불러오기");
+						msgrServer.textArea_log.append("톡내용" + map.get("MEM_NICK_VC")+map.get("CHAT_VC"));
+					}
+					
+					
 					response = Protocol.ROOM_IN
 												+ Protocol.SEPERATOR
 												+ room_no
