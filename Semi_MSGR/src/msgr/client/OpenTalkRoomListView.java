@@ -69,6 +69,27 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 		talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
 	}
 
+	public void getRoomList2(List<List<Map<String, Object>>> openRoomList) {
+
+		Vector<Object> row = null;
+
+		while (dtm.getRowCount() > 0) {
+			dtm.removeRow(0);
+		}
+
+		for (List<Map<String, Object>> index : openRoomList) {
+
+			for (Map<String, Object> innerIndex : index) {
+				row = new Vector<Object>();
+				row.add(0, innerIndex.get("ROOM_NAME_VC"));
+				row.add(1, innerIndex.get("ROOM_NO_NU"));
+				dtm.addRow(row);
+			}
+		}
+		talkRoomTable.getColumnModel().getColumn(1).setMinWidth(0);
+		talkRoomTable.getColumnModel().getColumn(1).setMaxWidth(0);
+	}
+
 	public void message_process(String msg, String imgChoice) {
 
 	}
@@ -84,8 +105,8 @@ public class OpenTalkRoomListView extends JPanel implements MouseListener {
 			System.out.println(room_no);
 			boolean isDuplicate = false;
 
-			
 			for (int i = 0; i < msgrClientView.joinTalkRoomListView.dtm.getRowCount(); i++) {
+
 				if (room_no.equals(msgrClientView.joinTalkRoomListView.dtm.getValueAt(i, 1).toString())) {
 					JOptionPane.showMessageDialog(msgrClientView, "이미 참여한 오픈톡방입니다.", "경고", JOptionPane.ERROR_MESSAGE);
 					isDuplicate = true;

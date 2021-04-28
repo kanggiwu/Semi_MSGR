@@ -112,8 +112,8 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.ROOM_LIST: {
-					List<Map<String, Object>> openRoomList = (List) msgrClientView.ois.readObject();
-					msgrClientView.openTalkRoomListView.getRoomList(openRoomList);
+					List<List<Map<String, Object>>> openRoomList = (List) msgrClientView.ois.readObject();
+					msgrClientView.joinTalkRoomListView.getRoomList(openRoomList);
 				}
 					break;
 

@@ -46,7 +46,7 @@ public class MessengerClientView extends JFrame implements ActionListener {
 	Socket						socket					= null;
 	ObjectOutputStream			oos						= null;
 	ObjectInputStream			ois						= null;
-	private String				ip						= "127.0.0.1";
+	private String				ip						= "121.139.85.156";
 	private int					port					= 21430;
 
 	// 사용자 아이디, 닉네임
