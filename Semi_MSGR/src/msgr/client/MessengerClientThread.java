@@ -61,7 +61,6 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.SIGNOUT: {
-					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					msgrClientView.setVisible(false);
 					msgrClientView.dispose();
 					if (msgrClientView.joinTalkRoomListView.msgrChatView != null)
@@ -74,7 +73,6 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.CHANGE_NICKNAME: {
-					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
 					// 130 # mem_id_vc # nickname
 
 					// 아이디는 바뀌지 않지만 혹시 몰라 바꿔 줌.
@@ -112,8 +110,8 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.ROOM_LIST: {
-					List<List<Map<String, Object>>> openRoomList = (List) msgrClientView.ois.readObject();
-					msgrClientView.joinTalkRoomListView.getRoomList(openRoomList);
+					List<Map<String, Object>> openRoomList = (List) msgrClientView.ois.readObject();
+					msgrClientView.openTalkRoomListView.getRoomList(openRoomList);
 				}
 					break;
 

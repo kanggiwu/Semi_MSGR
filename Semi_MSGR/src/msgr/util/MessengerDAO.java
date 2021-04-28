@@ -141,7 +141,14 @@ public class MessengerDAO {
 	public int getLastRoomNum() {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession	sqlSession	= factory.openSession();
-		int			tempInt		= sqlSession.selectOne("MsgrMapper.getLastRoomNum");
+		int			tempInt		= 0;
+
+		try {
+			tempInt = sqlSession.selectOne("MsgrMapper.getLastRoomNum");
+		}
+		catch (Exception e) {
+			tempInt = 0;
+		}
 
 		sqlSession.close();
 
@@ -207,13 +214,9 @@ public class MessengerDAO {
 	/**
 	 * 톡방 삭제 메서드 /확인
 	 * 
-	 * 		{CALL
-			DECLARE
-			BEGIN
-				UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vc};
-				DELETE FROM MSGR_ROOM_IN_LIST WHERE room_no_nu = #{room_no_nu} and mem_id_vc = #{mem_id_vc};
-			END
-		}
+	 * {CALL DECLARE BEGIN UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc =
+	 * #{mem_id_vc}; DELETE FROM MSGR_ROOM_IN_LIST WHERE room_no_nu = #{room_no_nu}
+	 * and mem_id_vc = #{mem_id_vc}; END }
 	 * 
 	 * @param pMap - 사용자가 입력한 톡방 번호를 저장한 Map
 	 * @return accept - (1) : 톡방 삭제 성공 (-1) : 톡방 삭제 실패
@@ -529,16 +532,16 @@ public class MessengerDAO {
 
 		return tempList;
 	}
-	
-	public int getJoinChatNum(Map<String,Object> pMap) {
+
+	public int getJoinChatNum(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
-		SqlSession	sqlSession = factory.openSession();
-		int temp = sqlSession.selectOne("MsgrMapper.getJoinChatNum",pMap);
+		SqlSession	sqlSession	= factory.openSession();
+		int			temp		= sqlSession.selectOne("MsgrMapper.getJoinChatNum", pMap);
 		sqlSession.close();
 		return temp;
 	}
 
-	public List<Map<String, Object>> getAllChatList(Map<String,Object> pMap){
+	public List<Map<String, Object>> getAllChatList(Map<String, Object> pMap) {
 		factory = MyBatisCommonFactory.getInstance();
 		SqlSession					sqlSession	= factory.openSession();
 		List<Map<String, Object>>	tempList	= sqlSession.selectList("MsgrMapper.getAllChatList", pMap);
@@ -546,7 +549,7 @@ public class MessengerDAO {
 
 		return tempList;
 	}
-	
+
 	public static void main(String[] args) {
 		MessengerDAO	dao	= new MessengerDAO();
 
@@ -556,15 +559,16 @@ public class MessengerDAO {
 //		map.getMap().put("mem_id_vc", "test3");
 		map.getMap().put("join_chat_no_nu", "1");
 		map.getMap().put("room_no_nu", 1);
-		
+
 //		int test = dao.getJoinChatNum(map.getMap()); 
 //		System.out.println(test);
-		
+
 //		System.out.println("sdafasdf");
 		List<Map<String, Object>> list = dao.getAllChatList(map.getMap());
+
 		for (Map<String, Object> map2 : list) {
 			System.out.println(map2);
 		}
-		
+
 	}
 }

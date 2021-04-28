@@ -70,9 +70,6 @@ public class MessengerServerThread extends Thread {
 					id = token.nextToken();
 					nickname = token.nextToken();
 
-					// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.append(msg + "님이 로그인\n");
-
 					// 참여한 톡방 리스트 불러오기
 					// 친구 톡방 불러오기
 					pMap.getMap().put("mem_id_vc", id);
@@ -108,14 +105,9 @@ public class MessengerServerThread extends Thread {
 
 				// 120 # id
 				case Protocol.SIGNOUT: {// 로그아웃============================================================================>완료
-					msgrServer.textArea_log.append(msg + "님이 로그아웃\n");// 클라이언트에서 받은 메시지 로그창에 출력
-
-					// 로그 맨 아래로 스크롤
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					msgrServer.globalList.remove(this);// 접속자 목록에서 삭제
 
 					String response = Protocol.SIGNOUT + Protocol.SEPERATOR + id;
-					System.out.println(id);
 					send(response);
 					isStop = true;
 					// 현재 접속자에 대한 정보를 클라이언트가 알 필요는 없으니까, 메세지를 보낼 필요가 없다.?
@@ -124,8 +116,6 @@ public class MessengerServerThread extends Thread {
 
 				// 130 # id # aftername
 				case Protocol.CHANGE_NICKNAME: {// 닉네임변경=======================================================>완료
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String response = null;
 
 					id = token.nextToken(); // id는 버린다. 로그용
@@ -268,7 +258,6 @@ public class MessengerServerThread extends Thread {
 
 				// 201 # 닉네임(쓰진 않는듯)
 				case Protocol.ROOM_CREATE_OPENTALK: {// 오픈톡 생성
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 
 					int	checkDao	= -3;
 					int	lastTalk_no	= -1;
@@ -278,14 +267,15 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("room_no_nu", ++lastTalk_no);
 					pMap.getMap().put("room_name_vc", room_name);
 					checkDao = msgrDAO.createOpenTalkRoom(pMap.getMap());
-					msgrServer.textArea_log.append("오픈톡방 생성 성공 여부 : " + checkDao + "\n");
+					msgrServer.textArea_log.append("본인의 오픈톡방 생성 성공 여부 : " + checkDao + "\n");
 
 					pMap.getMap().put("mem_id_vc", id);
-					pMap.getMap().put("chat_no_nu", 0);
+					pMap.getMap().put("join_chat_no_nu", 1);
 
 					checkDao = msgrDAO.joinChatMember(pMap.getMap());
-					msgrServer.textArea_log.append("오픈톡방 참여 성공 여부 : " + checkDao + "\n");
+					msgrServer.textArea_log.append("본인의 오픈톡방 참여 성공 여부 : " + checkDao + "\n");
 
+					// 참여한 친구&오픈톡방 목록
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>>		joinBuddyRoomList	= msgrDAO.getJoinBuddyTalkList(pMap.getMap());
 					List<Map<String, Object>>		joinOpenTalkList	= msgrDAO.getJoinOpenTalkList(pMap.getMap());
@@ -293,6 +283,7 @@ public class MessengerServerThread extends Thread {
 					joinRoomList.add(joinBuddyRoomList);
 					joinRoomList.add(joinOpenTalkList);
 
+					// 모든 오픈톡방 목록
 					List<Map<String, Object>>	openTalkList	= msgrDAO.getAllOpenTalkList(pMap.getMap());
 
 					String						response		= Protocol.ROOM_CREATE_OPENTALK + Protocol.SEPERATOR;
@@ -330,8 +321,6 @@ public class MessengerServerThread extends Thread {
 				 * (송신) 211 # 톡방번호 # 톡방이름 
 				 */
 				case Protocol.JOIN_OPENROOM: { // 오픈톡방 참가 ===========================>완료
-					msgrServer.textArea_log.append(msg + " " + id + "님이 오픈톡방 참가\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 					String	response	= null;
 					int		room_no		= Integer.parseInt(token.nextToken());
 					msgrServer.textArea_log.append("방번호" + room_no + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
@@ -341,6 +330,7 @@ public class MessengerServerThread extends Thread {
 					int	checkDAO		= -3;
 
 					// 마지막 방 번호 가져오기
+					pMap.getMap().put("room_no_nu", room_no);
 					last_chatNum = msgrDAO.getLastChatNum(pMap.getMap());
 					msgrServer.textArea_log.append("마지막 대화번호 가져오기 성공\n");// 클라이언트에서 받은 메시지 로그창에 출력
 
@@ -349,7 +339,7 @@ public class MessengerServerThread extends Thread {
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("join_chat_no_nu", ++last_chatNum);
 					checkDAO = msgrDAO.joinChatMember(pMap.getMap());
-					msgrServer.textArea_log.append("해당 방에 회원 넣어주기 성공\\n");// 클라이언트에서 받은 메시지 로그창에 출력
+					msgrServer.textArea_log.append("해당 방에 회원 넣어주기 성공\n");// 클라이언트에서 받은 메시지 로그창에 출력
 
 					System.out.println("방 입장 DAO 체크" + checkDAO);
 
