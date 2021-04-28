@@ -191,13 +191,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<select id="getAllChatList" parameterType = "java.util.Map" resultType = "java.util.Map">
-		SELECT decode(mem.mem_nick_vc,null,'알수없음',mem.mem_nick_vc) mem_nick_vc, chat.chat_vc, chat.room_no_nu
- 		FROM (SELECT mem_id_vc, chat_vc, room_no_nu, CHAT_NO_NU
-          			FROM MSGR_CHAT
-         			WHERE room_no_nu = #{room_no_nu}) chat
-       	left JOIN msgr_member mem
- 		ON chat.mem_id_vc = mem.mem_id_vc
-    		AND CHAT.CHAT_NO_NU >= #{join_chat_no_nu}
+		 SELECT decode(mem.mem_nick_vc,null,'알수없음',mem.mem_nick_vc) as mem_nick_vc, chat.chat_vc, chat.room_no_nu, CHAT.CHAT_NO_NU
+        FROM (SELECT mem_id_vc, chat_vc, room_no_nu, CHAT_NO_NU
+                      FROM MSGR_CHAT
+                     WHERE room_no_nu = #{room_no_nu} ) chat
+        left JOIN msgr_member mem
+        ON chat.mem_id_vc = mem.mem_id_vc
+        WHERE CHAT.CHAT_NO_NU >= (SELECT join_chat_no_nu
+        FROM MSGR_ROOM_IN_LIST
+        where room_no_nu=#{room_no_nu} and mem_id_vc = #{mem_id_vc})
+        order by chat_no_nu
    	</select>
 	
 	
