@@ -83,13 +83,17 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.MEM_DELETE: {
-					JOptionPane.showMessageDialog(msgrClientView, msg + "\n");
-					msgrClientView.setVisible(false);
-					msgrClientView.dispose();
-					msgrClientView.signInView.setId("");
-					msgrClientView.signInView.setNickname("");
-					msgrClientView.signInView.setVisible(true);
-					isStop = true;
+					int result = Integer.parseInt(token.nextToken());
+
+					if (result == -1) {
+						JOptionPane.showMessageDialog(msgrClientView, "탈퇴하였습니다.", "회원탈퇴", JOptionPane.INFORMATION_MESSAGE);
+						msgrClientView.setVisible(false);
+						msgrClientView.dispose();
+						msgrClientView.signInView.setId("");
+						msgrClientView.signInView.setNickname("");
+						msgrClientView.signInView.setVisible(true);
+						isStop = true;
+					}
 				}
 					break;
 
@@ -110,8 +114,8 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.ROOM_LIST: {
-					List<Map<String, Object>> openRoomList = (List) msgrClientView.ois.readObject();
-					msgrClientView.openTalkRoomListView.getRoomList(openRoomList);
+					List<List<Map<String, Object>>> tempList = (List) msgrClientView.ois.readObject();
+					msgrClientView.joinTalkRoomListView.getRoomList(tempList);
 				}
 					break;
 
@@ -180,10 +184,10 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 				case Protocol.BUDDY_DELETE: {
-					int buddy_delete = 0;
-					buddy_delete = Integer.parseInt(token.nextToken());
+					int result = 0;
+					result = Integer.parseInt(token.nextToken());
 
-					if (buddy_delete == -1) {
+					if (result == -1) {
 						List<Map<String, Object>> buddyList = (List) msgrClientView.ois.readObject();
 						msgrClientView.buddyListView.getBuddyList(buddyList);
 						JOptionPane.showMessageDialog(msgrClientView, "친구가 삭제되었습니다.", "친구 삭제", JOptionPane.INFORMATION_MESSAGE);

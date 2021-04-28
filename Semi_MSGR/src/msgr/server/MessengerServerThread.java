@@ -95,9 +95,9 @@ public class MessengerServerThread extends Thread {
 					// 클라이언트 스레드에 메시지 전송
 					response = Protocol.SIGNIN + Protocol.SEPERATOR;
 					send(response);// 로그인 프로토콜 전송
-					send(joinBuddyRoomList);// 톡방 리스트 전송
-					send(joinOpenTalkList);// 친구 리스트 전송
-					send(allOpenTalkList);// 친구 리스트 전송
+					send(joinBuddyRoomList);// 입장 중인 친구톡방
+					send(joinOpenTalkList);// 입장 중인 오픈톡방
+					send(allOpenTalkList);// 모든 오픈톡방
 					send(buddyList);// 친구 리스트 전송
 
 				}
@@ -145,18 +145,16 @@ public class MessengerServerThread extends Thread {
 				/*	(((((수신))))) 140
 				(((((송신))))) 140 # 
 				*/
-				case Protocol.MEM_DELETE: {// 회원탈퇴
-											// =========================================================================>완료
-					msgrServer.textArea_log.append(msg + id + "님이 회원탈퇴\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
+				case Protocol.MEM_DELETE: {// 회원탈퇴=========================================>완료
 
+					int result = 0;
 					// DB에 해당하는 회원 정보 삭제
 					pMap.getMap().put("mem_id_vc", id);
-					msgrDAO.deleteMember(pMap.getMap());
+					result = msgrDAO.deleteMember(pMap.getMap());
 
 					// 회원탈퇴한 회원 정보를 송신
 					// 클라이언트 스레드에서 해당하는 정보를 받으면 창을 끄고 로그인화면을 띄워줌
-					String response = Integer.toString(Protocol.MEM_DELETE);
+					String response = Protocol.MEM_DELETE + Protocol.SEPERATOR + result;
 					send(response);
 
 					/*	회원탈퇴하는 경우, 친구목록에서 사라지고, 대화창에서도 사라진다. 
@@ -429,20 +427,17 @@ public class MessengerServerThread extends Thread {
 
 				// 300 # 친구아이디
 				case Protocol.BUDDY_ADD: {// 친구추가
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
 
 					String	response	= null;
-
 					String	buddyId		= token.nextToken();
 
 					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("buddy_id_vc", buddyId);
 					int result = msgrDAO.makeBuddy(pMap.getMap());
 
-					response = Protocol.BUDDY_ADD
-												+ Protocol.SEPERATOR
-												+ result;
+					response = Protocol.BUDDY_ADD + Protocol.SEPERATOR + result;
+
+					// 300 # 성공여부
 					send(response);
 
 					if (result == -1) {
@@ -450,6 +445,8 @@ public class MessengerServerThread extends Thread {
 						pMap.getMap().put("mem_id_vc", id);
 						List<Map<String, Object>> tempList = msgrDAO.getBuddyList(pMap.getMap());
 						send(tempList);
+
+						buddyCastingTest(tempList, response);
 					}
 
 					// 친구 추가 시 해당하는 친구가 있는지 확인하고 , 있을 경우, 해당 아이디가 있다는 것을 클라이언트 스레드에게 보내준다.
@@ -463,32 +460,25 @@ public class MessengerServerThread extends Thread {
 
 				}
 					break;
-				// 320 # test13 # nick13
+				// 320 # 친구아이디 # 친구닉네임
 				case Protocol.BUDDY_DELETE: {// 친구 삭제
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());// 로그창 맨
-																												// 아래로
 					String	response	= null;
-
 					String	buddyId		= token.nextToken();
 					token.nextToken();
 
+					pMap.getMap().put("mem_id_vc", id);
 					pMap.getMap().put("buddy_id_vc", buddyId);
 					int result = msgrDAO.deleteBuddy(pMap.getMap());
-					System.out.println("친구삭제 쿼리 삭제 " + result);
-					response = Protocol.BUDDY_DELETE
-												+ Protocol.SEPERATOR
-												+ result;
+					msgrServer.textArea_log.append("친구 삭제 결과 : " + result + "\n");
+
+					response = Protocol.BUDDY_DELETE + Protocol.SEPERATOR + result;
 					send(response);
 
 					if (result == -1) {
-
 						pMap.getMap().put("mem_id_vc", id);
 						List<Map<String, Object>> tempList = msgrDAO.getBuddyList(pMap.getMap());
 						send(tempList);
 					}
-					// 스크롤
-
 				}
 					break;
 				// 400 # 방번호 # id # nickname # 메시지
@@ -605,7 +595,24 @@ public class MessengerServerThread extends Thread {
 				}
 			}
 		}
-
 	}// end of buddyCasting()
 
+	private void buddyCastingTest(List<Map<String, Object>> tempList, String response) {// 접속한 친구들한테만 브로드캐스팅
+		// 접속한 사람들 중
+
+		for (MessengerServerThread currentUser : msgrServer.globalList) {
+
+			// 내 친구 리스트에서
+			for (Map<String, Object> buddyMap : tempList) {
+
+				// 현재 접속 중인 유저와 일치하는 아이디가 있으면 send
+				if (buddyMap.get("BUDDY_ID_VC").equals(currentUser.id)) {
+					pMap.getMap().put("mem_id_vc", buddyMap.get("BUDDY_ID_VC"));
+					List<Map<String, Object>> b_buddyList = msgrDAO.getBuddyList(pMap.getMap());
+					currentUser.send(response);
+					currentUser.send(b_buddyList);
+				}
+			}
+		}
+	}// end of buddyCasting()
 }

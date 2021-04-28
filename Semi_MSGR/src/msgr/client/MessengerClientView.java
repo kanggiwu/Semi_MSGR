@@ -208,8 +208,15 @@ public class MessengerClientView extends JFrame implements ActionListener {
 		}
 
 		else if ("회원탈퇴".equals(command)) {
-			String request = Protocol.MEM_DELETE + Protocol.SEPERATOR + id;
-			send(request);
+			String answer = JOptionPane.showInputDialog(this, "정말로 탈퇴하시겠습니까?\n탈퇴하시려면 아이디를 입력해주세요.", "회원탈퇴", JOptionPane.WARNING_MESSAGE);
+
+			if (answer.equals(id)) {
+				String request = Protocol.MEM_DELETE + Protocol.SEPERATOR + id;
+				send(request);
+			}
+			else {
+				JOptionPane.showMessageDialog(this, "아이디가 틀렸습니다.", "회원탈퇴", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 		/////////////////////// 마이페이지 메뉴아이템 끝 ///////////////////////
 
