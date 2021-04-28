@@ -40,7 +40,7 @@ public class MessagerServer extends JFrame implements Runnable {
 		});
 		this.setTitle("Server Log Window");
 		textArea_log.setEditable(false);
-		this.add(textArea_log);
+		this.add("Center", scrollPane);
 		this.setSize(500, 500);
 		this.setVisible(true);
 	}
