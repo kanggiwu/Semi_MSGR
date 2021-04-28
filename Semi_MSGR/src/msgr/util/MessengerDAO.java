@@ -207,7 +207,13 @@ public class MessengerDAO {
 	/**
 	 * 톡방 삭제 메서드 /확인
 	 * 
-	 * DELETE FROM MSGR_ROOM WHERE room_no_nu = #{room_no_nu}
+	 * 		{CALL
+			DECLARE
+			BEGIN
+				UPDATE MSGR_CHAT SET mem_id_vc = null WHERE mem_id_vc = #{mem_id_vc};
+				DELETE FROM MSGR_ROOM_IN_LIST WHERE room_no_nu = #{room_no_nu} and mem_id_vc = #{mem_id_vc};
+			END
+		}
 	 * 
 	 * @param pMap - 사용자가 입력한 톡방 번호를 저장한 Map
 	 * @return accept - (1) : 톡방 삭제 성공 (-1) : 톡방 삭제 실패

@@ -346,7 +346,7 @@ public class MessengerServerThread extends Thread {
 					int	checkDAO		= -3;
 
 					// 마지막 방 번호 가져오기
-					last_chatNum = msgrDAO.getLastRoomNum();
+					last_chatNum = msgrDAO.getLastChatNum(pMap.getMap());
 					msgrServer.textArea_log.append("마지막 대화번호 가져오기 성공\n");// 클라이언트에서 받은 메시지 로그창에 출력
 
 					// 해당 방에 넣어주기
@@ -395,32 +395,35 @@ public class MessengerServerThread extends Thread {
 				}
 
 					break;
-				// 220 # 방번호
-				// 220 | 참여톡방리스트
+				// ois 220 # 방번호
+				// oos 220 & 참여톡방리스트
 				case Protocol.ROOM_DELETE: {// 톡방 삭제
-					msgrServer.textArea_log.append(msg + "\n");// 클라이언트에서 받은 메시지 로그창에 출력
-					msgrServer.textArea_log.setCaretPosition(msgrServer.textArea_log.getDocument().getLength());
-
+					// 방번호
 					int room_no = Integer.parseInt(token.nextToken());
 
+					// 현재 사용자가 들어가있는 방번호의 톡방 삭제
 					pMap.getMap().put("room_no_nu", room_no);
 					pMap.getMap().put("mem_id_vc", id);
-
 					int cheakDao = msgrDAO.deleteTalkRoom(pMap.getMap());
 
-					System.out.println("톡방삭제 테스트" + cheakDao);
-					String response = Protocol.ROOM_DELETE + Protocol.SEPERATOR + cheakDao;
-					// 참여한 톡방 리스트 불러오기
-					// 친구 톡방 불러오기
+					msgrServer.textArea_log.append("톡방삭제 성공 여부 " + cheakDao);
+
+					/* 톡방을 삭제한 이후 리스트를 새로고침할 쿼리. 프로시저로 합쳤어도 좋았을 듯 */
+					// 참여한 친구톡방 리스트 가져오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>> joinBuddyRoomList = msgrDAO.getJoinBuddyTalkList(pMap.getMap());
-					// 오픈 톡방 불러오기
+
+					// 참여한 오픈톡방 리스트 가져오기
 					pMap.getMap().put("mem_id_vc", id);
 					List<Map<String, Object>>		joinOpenTalkList	= msgrDAO.getJoinOpenTalkList(pMap.getMap());
 
+					// 참여한 톡방 리스트에 참여한 친구톡방 & 오픈톡방 리스트 넣어주기
 					List<List<Map<String, Object>>>	joinRoomList		= new Vector<List<Map<String, Object>>>();
 					joinRoomList.add(joinBuddyRoomList);
 					joinRoomList.add(joinOpenTalkList);
+
+					// 220 # 삭제성공여부
+					String response = Protocol.ROOM_DELETE + Protocol.SEPERATOR + cheakDao;
 
 					send(response);
 					send(joinRoomList);
