@@ -8,6 +8,7 @@ public class Protocol {
 	public static final int		MEM_DELETE				= 140;	// 회원탈퇴 (1)(해써)
 	public static final int		ROOM_CREATE_BUDDY		= 200;	// 친구톡 생성
 	public static final int		ROOM_CREATE_OPENTALK	= 201;	// 오픈톡 생성
+	public static final int		OPEN_ROOM_LIST			= 209;	// 톡방 리스트
 	public static final int		ROOM_LIST				= 210;	// 톡방 리스트
 	public static final int		JOIN_OPENROOM			= 211;	// 오픈톡방 참가
 	public static final int		ROOM_IN					= 212;	// 톡방 입장

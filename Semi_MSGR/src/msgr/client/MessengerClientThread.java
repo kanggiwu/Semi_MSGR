@@ -119,6 +119,12 @@ public class MessengerClientThread extends Thread {
 				}
 					break;
 
+				case Protocol.OPEN_ROOM_LIST: {
+					List<Map<String, Object>> tempList = (List) msgrClientView.ois.readObject();
+					msgrClientView.openTalkRoomListView.getRoomList(tempList);
+				}
+					break;
+
 				case Protocol.JOIN_OPENROOM: {
 					int				room_no		= Integer.parseInt(token.nextToken());
 					String			room_name	= token.nextToken();

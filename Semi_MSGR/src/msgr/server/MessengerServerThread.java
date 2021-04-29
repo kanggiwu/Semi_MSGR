@@ -290,7 +290,7 @@ public class MessengerServerThread extends Thread {
 					send(response);
 					send(joinRoomList);
 					send(openTalkList);
-					response = Protocol.ROOM_LIST + Protocol.SEPERATOR;
+					response = Protocol.OPEN_ROOM_LIST + Protocol.SEPERATOR;
 					// 접속한모든 사람들에게 생성된 오픈 톡방을 출력
 					broadCasting(response);
 					broadCasting(openTalkList);
